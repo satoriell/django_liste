@@ -1,7 +1,7 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
 {% comment %}
-    Ortak Detay Sayfası Şablonu (Geliştirilmiş Fotoğraf Alanı)
+    Ortak Detay Sayfası Şablonu (Ratio Sınıfları Olmadan Geliştirilmiş Fotoğraf Alanı)
     Context: item, model_name, item_type, is_favorite
 {% endcomment %}
 
@@ -18,23 +18,21 @@
     </nav>
 
     <div class="card shadow-sm mb-4">
-        {# g-0: sütunlar arası boşluğu kaldırır #}
         <div class="row g-0">
 
-            {# ----- Resim Sütunu (Geliştirildi) ----- #}
-            {# Daha fazla yer kaplaması için col-lg-5 yapıldı, dikeyde ortalamak için align-items-center eklendi #}
-            <div class="col-lg-5 d-flex align-items-center justify-content-center p-3 detail-image-container">
+            {# ----- Resim Sütunu (Ratio Olmadan) ----- #}
+            {# Daha fazla yer kaplaması için col-lg-5, dikey ortalama kaldırıldı, CSS sınıfı eklendi #}
+            <div class="col-lg-5 p-3 detail-image-container-no-ratio">
                  {% if item.cover_image_url %}
-                    {# Bootstrap aspect ratio (3x4) ve object-fit: cover kullanıldı #}
-                    <div class="ratio ratio-3x4 detail-image-wrapper">
-                        <img src="{{ item.cover_image_url }}"
-                             class="rounded shadow-sm detail-image"
-                             alt="{{ item.title }} Kapak">
-                    </div>
+                    {# max-width ve height:auto ile boyutlandırma CSS ile yapılacak #}
+                    <img src="{{ item.cover_image_url }}"
+                         class="rounded shadow-sm detail-image-no-ratio"
+                         alt="{{ item.title }} Kapak">
                 {% else %}
                      {# Placeholder CSS ile stilize edilecek #}
-                    <div class="ratio ratio-3x4 detail-image-placeholder d-flex align-items-center justify-content-center text-muted rounded">
+                    <div class="detail-image-placeholder-no-ratio d-flex align-items-center justify-content-center text-muted rounded">
                         <i class="fas fa-image fa-4x" aria-hidden="true"></i>
+                        <span class="ms-2">Resim Yok</span>
                     </div>
                 {% endif %}
             </div>
