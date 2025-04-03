@@ -12,18 +12,18 @@ Context: item, detail_url_name, edit_url_name, delete_url_name, item_type, favor
         <div class="col-4 col-md-3">
             <a href="{% url 'tracker:'|add:detail_url_name item.pk %}">
                 {# --- Aspect ratio container (3x4) --- #}
-                <div class=" bg-light rounded"> {# Oran 3x4 #}
+                <div class="d-flex align-items-center justify-content-center bg-light rounded"> {# Oran 3x4 #}
                     {% if item.cover_image_url %}
                         <img src="{{ item.cover_image_url }}" alt="{{ item.title }} Kapak"
-                             class="img-thumbnail w-100"
-                             style="object-fit: cover; height: 250px;"> {# contain olarak değiştirildi #}
+                             class="img-thumbnail w-70"
+                             style="object-fit: cover; height: 210px;"> {# contain olarak değiştirildi #}
                     {% else %}
-                        <div class="d-flex align-items-center justify-content-center h-100" style="color:#aaa;">
+                        <div class="d-flex align-items-center justify-content-center h-100"  style="color:#aaa; object-fit: contain;">
                             <i class="fas fa-image fa-3x" aria-hidden="true"></i>
                          </div>
                     {% endif %}
                 </div>
-                 {# --- Aspect ratio container sonu --- #}
+                 {# --- Aspect ratio container sonu --- #}
             </a>
         </div>
 
