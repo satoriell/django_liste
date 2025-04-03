@@ -1,0 +1,97 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% comment %}
+    Ortak Detay Sayfası Şablonu
+    Context: item, model_name, item_type, is_favorite
+{% endcomment %}
+
+{% block title %}{{ item.title }} - {{ model_name }} Detayları{% endblock title %}
+
+{% block content %}
+    {% comment %} Breadcrumb Navigasyonu {% endcomment %}
+    <nav aria-label="breadcrumb" class="mb-4"> {# mb-4 yapıldı #}
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'tracker:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'tracker:'|add:model_name|lower|add:'_list_view' %}">{{ model_name }}ler</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ item.title|truncatechars:50 }}</li>
+      </ol>
+    </nav>
+
+    <div class="card shadow-sm mb-4">
+        <div class="row g-0">
+            {# Resim Sütunu #}
+            <div class="col-lg-4 text-center p-3 bg-light d-flex align-items-center justify-content-center" style="border-right: 1px solid #dee2e6;"> {# col-lg-4 kullanıldı #}
+                 {% if item.cover_image_url %}
+                    <img src="{{ item.cover_image_url }}" class="img-fluid rounded shadow-sm" alt="{{ item.title }} Kapak" style="max-height: 450px; object-fit: contain;"> {# max-height artırıldı #}
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center h-100 text-muted" style="min-height: 300px;"> {# min-height artırıldı #}
+                        <i class="fas fa-image fa-4x" aria-hidden="true"></i>
+                        <span class="ms-2">Resim Yok</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Detaylar Sütunu #}
+            <div class="col-lg-8"> {# col-lg-8 kullanıldı #}
+                <div class="card-body p-4">
+                    {# Başlık ve Eylem Butonları #}
+                    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"> {# flex-wrap ve gap eklendi #}
+                        <h2 class="card-title mb-0 me-3">{{ item.title }}</h2>
+                        <div class="btn-group flex-shrink-0" role="group" aria-label="Eylemler"> {# flex-shrink-0 eklendi #}
+
+                            {# ---- FAVORİ BUTONU GÜNCELLENDİ ---- #}
+                            <a href="{% url 'tracker:toggle_favorite' item_type=item_type item_id=item.pk %}"
+                               class="btn btn-sm {% if is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %} js-toggle-favorite" {# js- class eklendi #}
+                               title="{% if is_favorite %}Favorilerden Çıkar{% else %}Favorilere Ekle{% endif %}"
+                               data-item-id="{{ item.pk }}" {# data attribute'ları eklendi #}
+                               data-item-type="{{ item_type }}">
+                                <i class="fas fa-star" aria-hidden="true"></i>
+                            </a>
+                            {# ---- FAVORİ BUTONU SONU ---- #}
+
+                            {# Diğer Butonlar #}
+                            <a href="{% url 'tracker:'|add:model_name|lower|add:'_edit' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit me-1" aria-hidden="true"></i>Düzenle</a>
+                            <a href="{% url 'tracker:'|add:model_name|lower|add:'_delete' item.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt me-1" aria-hidden="true"></i>Sil</a>
+                        </div>
+                    </div>
+
+                    {# Durum ve Puan #}
+                    <div class="mb-4 pb-1"> {# Alt boşluk artırıldı #}
+                       <span class="badge fs-6 rounded-pill {% if item.status == 'Watching' %} bg-success {% elif item.status == 'Completed' %} bg-primary {% elif item.status == 'Plan to Watch' %} bg-info text-dark {% elif item.status == 'On Hold' %} bg-warning text-dark {% elif item.status == 'Dropped' %} bg-danger {% else %} bg-secondary {% endif %}"><i class="fas fa-check-circle me-1" aria-hidden="true"></i>{{ item.get_status_display }}</span>
+                       {% if item.rating is not None %} <span class="badge fs-6 bg-dark ms-1"><i class="fas fa-star me-1" aria-hidden="true"></i>Puan: {{ item.rating }}/10</span> {% endif %}
+                    </div>
+
+                    {# İlerleme Çubuğu #}
+                    {% with progress=item.get_progress_percent %}
+                        {% if progress is not None %}
+                         {# İlerleme çubuğu ile detaylar arasına çizgi eklendi #}
+                        <div class="mb-3">
+                            <small class="text-muted">İlerleme:</small>
+                            <div class="progress" role="progressbar" aria-label="İlerleme" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="height: 10px;">
+                              <div class="progress-bar {% if progress == 100 %}bg-primary{% else %}bg-success{% endif %}" style="width: {{ progress }}%"></div>
+                            </div>
+                         </div>
+                         <hr class="my-3"> {# Yatay çizgi eklendi #}
+                        {% endif %}
+                    {% endwith %}
+
+                    {# ---- Detay Listesi (Partial Template Kullanılarak) ---- #}
+                    {# _item_details_dl.html dosyasını çağırıyoruz #}
+                    {% include 'tracker/partials/_item_details_dl.html' with item=item %}
+                    {# ---- Detay Listesi Sonu ---- #}
+
+                </div> {# card-body sonu #}
+            </div> {# col-lg-8 sonu #}
+        </div>
+        {# Notlar Alanı #}
+         {% if item.notes %}
+            {# Notlar ve önceki bölüm arasına bir çizgi (hr) eklendi #}
+            <hr class="my-0">
+            <div class="card-footer bg-white p-4"> {# border-top kaldırıldı, padding ayarlandı #}
+                <h5 class="mb-2"><i class="fas fa-comment-alt me-1 text-muted" aria-hidden="true"></i>Notlar:</h5>
+                <p style="white-space: pre-wrap;" class="mb-0">{{ item.notes }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock content %}

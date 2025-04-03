@@ -1,0 +1,39 @@
+{% comment %}
+tracker/templates/tracker/partials/recent_list_card.html
+Son eklenenleri listeleyen kart. Tarih ve puan sırası değiştirildi.
+Context: items, url_name, title
+{% endcomment %}
+
+<div class="card dashboard-card shadow-sm">
+  <div class="card-header">
+    {{ title }}
+  </div>
+  <ul class="list-group list-group-flush">
+    {% if items %}
+        {% for item in items %}
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap"> {# flex-wrap eklendi #}
+                {# Sol Taraf: Başlık Linki #}
+                <a href="{% url 'tracker:'|add:url_name item.pk %}">{{ item.title|truncatechars:40 }}</a> {# Uzun başlıklar için truncatechars eklendi #}
+
+                {# Sağ Taraf: Tarih ve Puan (varsa) - Bitişik göstermek için span içinde gruplandı #}
+                <span class="ms-auto text-nowrap"> {# Sağa yasla ve alt satıra kaymayı engelle #}
+
+                    {# ---- ÖNCE TARİH GÖSTERİMİ ---- #}
+                    <small class="text-muted">{{ item.added_date|date:"d M, H:i" }}</small> {# ms-2 kaldırıldı #}
+
+                    {# ---- SONRA PUAN GÖSTERİMİ (varsa) ---- #}
+                    {% if item.rating is not None %}
+                        <span class="badge bg-dark ms-2"> {# Puanın soluna boşluk eklendi #}
+                            <i class="fas fa-star me-1" aria-hidden="true"></i>{{ item.rating }}/10
+                        </span>
+                    {% endif %}
+                    {# ---- Puan Gösterimi Sonu ---- #}
+
+                </span>
+            </li>
+        {% endfor %}
+    {% else %}
+        <li class="list-group-item text-muted">Henüz kayıt yok.</li>
+    {% endif %}
+  </ul>
+</div>

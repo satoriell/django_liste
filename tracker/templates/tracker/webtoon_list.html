@@ -1,0 +1,75 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/webtoon_list.html {% endcomment %}
+
+{% block title %}Webtoon Listem - Kişisel Liste{% endblock title %}
+
+{% block content %}
+
+    {# Başlık türe göre ayarlandı (text-success) #}
+    <h1 class="mb-4 text-success">Webtoon Listem</h1>
+
+    {% comment %} --- Kontrol Alanı (Partial Template Kullanılarak) --- {% endcomment %}
+    {# İlgili URL adları 'webtoon' için güncellendi #}
+    {% include 'tracker/partials/_list_controls.html' with list_url_name='tracker:webtoon_list_view' export_url_name='tracker:export_webtoon_csv' status_choices=status_choices current_status_filter=current_status_filter search_query=search_query current_sort=current_sort %}
+
+    {% comment %} --- Yeni Webtoon Ekleme Formu (Manuel Render İle) --- {% endcomment %}
+    <div class="form-container shadow-sm mb-5">
+        <h4 class="mb-3">Yeni Webtoon Ekle</h4>
+        {# Action URL'i webtoon listesine yönlendiriyor #}
+        <form method="post" action="{% url 'tracker:webtoon_list_view' %}">
+            {% csrf_token %}
+
+            {# ---- Formu Manuel Render Etme ---- #}
+            {% for field in form %}
+                <div class="mb-3"> {# Her alan için Bootstrap margin bottom #}
+                    {# Etiketi oluşturma #}
+                    <label for="{{ field.id_for_label }}" class="form-label">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                    </label>
+
+                    {# Alanın kendisini render etme (widget'a classlar forms.py'da eklendi) #}
+                    {{ field }}
+
+                    {# Yardım metni varsa göster #}
+                    {% if field.help_text %}
+                        <div id="{{ field.id_for_label }}_help" class="form-text">{{ field.help_text|safe }}</div>
+                    {% endif %}
+
+                    {# Hata mesajları varsa göster #}
+                    {% if field.errors %}
+                        <div class="invalid-feedback d-block"> {# Bootstrap 5'te hataları gösterme #}
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            {# ---- Manuel Render Sonu ---- #}
+
+            <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save me-1" aria-hidden="true"></i>Kaydet</button>
+            {# Admin linki webtoon eklemeye gidiyor #}
+            <a href="{% url 'admin:tracker_webtoon_add' %}" class="btn btn-outline-secondary mt-3 ms-2" target="_blank">Admin Panelinde Ekle</a>
+        </form>
+        {# İPUCU yorumu kaldırıldı çünkü manuel render uygulandı #}
+    </div>
+
+    {% comment %} --- Webtoon Listesi --- {% endcomment %}
+    <h4 class="mb-3">Mevcut Liste {% if current_status_filter or search_query or current_sort != '-added_date' %}(Filtrelenmiş/Sıralanmış Sonuçlar){% endif %}</h4>
+    {% if page_obj %}
+        <ul class="list-group shadow-sm mb-4">
+            {% for webtoon in page_obj %}
+                 {# _list_item partial'ı 'webtoon' için doğru context ile çağrılıyor #}
+                {% include 'tracker/partials/_list_item.html' with item=webtoon detail_url_name='webtoon_detail' edit_url_name='webtoon_edit' delete_url_name='webtoon_delete' item_type='webtoon' favorited_ids=favorited_ids %}
+            {% endfor %}
+        </ul>
+
+        {% comment %} --- Pagination Kontrolleri (Partial Template Kullanılarak) --- {% endcomment %}
+        {% include 'tracker/partials/_pagination.html' with page_obj=page_obj params_encoded=params_encoded %}
+
+    {% else %}
+        {# Uyarı mesajı webtoon için güncellendi #}
+        <div class="alert alert-warning" role="alert"> {% if current_status_filter or search_query or current_sort != '-added_date' %}Seçtiğiniz kriterlere uygun webtoon bulunamadı. <a href="{% url 'tracker:webtoon_list_view' %}" class="alert-link">Filtreyi/Sıralamayı Temizle</a>{% else %}Listenizde henüz hiç webtoon bulunmuyor.{% endif %}</div>
+    {% endif %}
+
+{% endblock content %}

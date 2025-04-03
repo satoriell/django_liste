@@ -1,0 +1,114 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/dashboard.html {% endcomment %}
+
+{% block title %}Dashboard - Kişisel Liste{% endblock title %}
+
+{% block content %}
+    <h1 class="mb-4">Dashboard</h1>
+
+    {% comment %} ----- Toplam Sayılar ----- {% endcomment %}
+    <div class="row mb-4">
+        {# Anime Card #}
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Toplam Anime</h5>
+                    <p class="card-text fs-2 fw-bold my-auto">{{ anime_count }}</p> {# my-auto eklendi #}
+                    <a href="{% url 'tracker:anime_list_view' %}" class="btn btn-primary btn-sm mt-auto">Listeye Git</a>
+                </div>
+            </div>
+        </div>
+        {# Webtoon Card #}
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Toplam Webtoon</h5>
+                    <p class="card-text fs-2 fw-bold my-auto">{{ webtoon_count }}</p>
+                    <a href="{% url 'tracker:webtoon_list_view' %}" class="btn btn-success btn-sm mt-auto">Listeye Git</a>
+                </div>
+            </div>
+        </div>
+        {# Manga Card #}
+        <div class="col-md-3 col-sm-6 mb-3">
+             <div class="card text-center h-100 shadow-sm">
+                 <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Toplam Manga</h5>
+                    <p class="card-text fs-2 fw-bold my-auto">{{ manga_count }}</p>
+                    <a href="{% url 'tracker:manga_list_view' %}" class="btn btn-danger btn-sm mt-auto">Listeye Git</a>
+                </div>
+            </div>
+        </div>
+        {# Novel Card - GÜNCELLENDİ #}
+        <div class="col-md-3 col-sm-6 mb-3">
+            {# Özel border rengi yerine standart card kullanıldı, buton class ile renklendirildi #}
+            <div class="card text-center h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title" style="color: #6f42c1;">Toplam Novel</h5> {# Başlık rengi inline kalabilir veya CSS'e taşınabilir #}
+                    <p class="card-text fs-2 fw-bold my-auto">{{ novel_count }}</p>
+                    {# Inline style yerine özel CSS class'ı kullanıldı #}
+                    <a href="{% url 'tracker:novel_list_view' %}" class="btn btn-novel btn-sm mt-auto">Listeye Git</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% comment %} ----- Grafikler Bölümü ----- {% endcomment %}
+    {# ... (Grafik HTML yapısı aynı kalır) ... #}
+     <div class="row mb-4">
+        <div class="col-md-6 mb-4 mb-md-0">
+             <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-center mb-3">Türlere Göre Dağılım</h5>
+                    <div id="typeDistributionChartContainer" class="flex-grow-1" style="position: relative; min-height: 300px;">
+                         <canvas id="typeDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+             <div class="card shadow-sm h-100">
+                 <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-center mb-3">Durumlara Göre Dağılım</h5>
+                    <div id="statusDistributionChartContainer" class="flex-grow-1" style="position: relative; min-height: 300px;">
+                         <canvas id="statusDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    {% comment %} ----- Son Eklenenler ve En Yüksek Puanlılar ----- {% endcomment %}
+    {# ... (Bu bölüm aynı kalır) ... #}
+    <div class="row">
+         <div class="col-md-6">
+             <h3 class="mb-3">Son Eklenenler</h3>
+             {% with items=recent_anime url_name="anime_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Animeler" %}{% endwith %}
+             {% with items=recent_webtoons url_name="webtoon_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Webtoonlar" %}{% endwith %}
+             {% with items=recent_mangas url_name="manga_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Mangalar" %}{% endwith %}
+             {% with items=recent_novels url_name="novel_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Noveller" %}{% endwith %}
+         </div>
+         <div class="col-md-6">
+             <h3 class="mb-3">En Yüksek Puanlılar</h3>
+             {% with items=top_anime url_name="anime_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Animeler" %}{% endwith %}
+             {% with items=top_webtoons url_name="webtoon_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Webtoonlar" %}{% endwith %}
+             {% with items=top_mangas url_name="manga_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Mangalar" %}{% endwith %}
+             {% with items=top_novels url_name="novel_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Noveller" %}{% endwith %}
+         </div>
+    </div>
+
+    {# Grafik verilerini JSON olarak değişkenden alıp gömüyoruz (Bu kalmalı) #}
+    <script id="chartDataJson" type="application/json">
+        {{ chart_data_json|safe }}
+    </script>
+
+{% endblock content %}
+
+
+{% block extra_scripts %}
+    {# ---- YENİ: Harici Dashboard Chart Scripti ---- #}
+    {# Inline script kaldırıldı, yerine bu dosya çağrılıyor #}
+    <script src="{% static 'tracker/js/dashboard_charts.js' %}"></script>
+{% endblock extra_scripts %}

@@ -1,0 +1,91 @@
+{% comment %}
+tracker/templates/tracker/partials/_item_details_dl.html
+Öğe detaylarını Bootstrap List Group kullanarak gösterir. Görünüm iyileştirildi.
+Gerekli Context: item
+{% endcomment %}
+
+{# Kenarlıksız ve dış boşluksuz liste grubu #}
+<ul class="list-group list-group-flush">
+
+    {% comment %} Stüdyo (varsa) {% endcomment %}
+    {% if item.studio %}
+        {# Her öğeye dikey padding (py-2) eklendi #}
+        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+            {# Etiket kısmı: İkon + Normal font ağırlığında etiket #}
+            <span><i class="fas fa-fw fa-film me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">Stüdyo:</span></span>
+            {# Değer kısmı: Sağa yaslı #}
+            <span class="text-end">{{ item.studio }}</span>
+        </li>
+    {% endif %}
+
+    {% comment %} Yazar (varsa) {% endcomment %}
+    {% if item.author %}
+        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+            <span><i class="fas fa-fw fa-user-edit me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">Yazar:</span></span>
+            <span class="text-end">{{ item.author }}</span>
+        </li>
+    {% endif %}
+
+    {% comment %} Çizer (varsa) {% endcomment %}
+    {% if item.artist %}
+         <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+            <span><i class="fas fa-fw fa-palette me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">Çizer:</span></span>
+            <span class="text-end">{{ item.artist }}</span>
+        </li>
+    {% endif %}
+
+    {% comment %} Platform (varsa) {% endcomment %}
+    {% if item.platform %}
+         <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+            <span><i class="fas fa-fw fa-globe me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">Platform:</span></span>
+            <span class="text-end">{{ item.platform }}</span>
+        </li>
+    {% endif %}
+
+    {% comment %} İzlenen Bölüm (varsa) {% endcomment %}
+    {% if item.episodes_watched is not None %}
+        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+            <span><i class="fas fa-fw fa-play me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">İzlenen Bölüm:</span></span>
+            <span class="text-end">{{ item.episodes_watched }}{% if item.total_episodes is not None %} / {{ item.total_episodes }}{% else %} / ?{% endif %}</span>
+        </li>
+    {% endif %}
+
+    {% comment %} Okunan Bölüm (varsa) {% endcomment %}
+    {% if item.chapters_read is not None %}
+         <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+            <span><i class="fas fa-fw fa-book-reader me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">Okunan Bölüm:</span></span>
+            <span class="text-end">{{ item.chapters_read }}{% if item.total_chapters is not None %} / {{ item.total_chapters }}{% else %} / ?{% endif %}</span>
+        </li>
+    {% endif %}
+
+    {% comment %} Okunan Cilt (varsa) {% endcomment %}
+    {% if item.volumes_read is not None %}
+        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+            <span><i class="fas fa-fw fa-layer-group me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">Okunan Cilt:</span></span>
+            <span class="text-end">{{ item.volumes_read }}{% if item.total_volumes is not None %} / {{ item.total_volumes }}{% else %} / ?{% endif %}</span>
+        </li>
+    {% endif %}
+
+    {% comment %} Başlama Tarihi (varsa) {% endcomment %}
+    {% if item.start_date %}
+        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+            <span><i class="fas fa-fw fa-calendar-alt me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">Başlama Tarihi:</span></span>
+            <span class="text-end">{{ item.start_date|date:"d F Y" }}</span>
+        </li>
+    {% endif %}
+
+    {% comment %} Bitirme Tarihi (varsa) {% endcomment %}
+    {% if item.end_date %}
+        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+            <span><i class="fas fa-fw fa-calendar-check me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">Bitirme Tarihi:</span></span>
+            <span class="text-end">{{ item.end_date|date:"d F Y" }}</span>
+        </li>
+    {% endif %}
+
+    {% comment %} Eklenme Tarihi (her zaman var) {% endcomment %}
+    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap py-2">
+        <span><i class="fas fa-fw fa-calendar-plus me-2 text-muted" aria-hidden="true"></i><span class="fw-normal me-2">Eklenme Tarihi:</span></span>
+        <span class="text-end">{{ item.added_date|date:"d F Y, H:i" }}</span>
+    </li>
+
+</ul>

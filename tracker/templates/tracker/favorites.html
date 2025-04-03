@@ -1,0 +1,49 @@
+{% extends 'tracker/base.html' %}
+{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/favorites.html {% endcomment %}
+{% load static %}
+
+{% block title %}Favorilerim - Kişisel Liste{% endblock title %}
+
+{% block content %}
+    {# ---- YENİ: Ana container'a ID eklendi ---- #}
+    <div id="favorites-page-container">
+
+        <h1 class="mb-4"><i class="fas fa-heart text-danger me-2" aria-hidden="true"></i>Favorilerim</h1>
+
+        {% if total_favorites > 0 %}
+            <p class="lead mb-4">Toplam {{ total_favorites }} favori öğeniz bulunmaktadır.</p> {# Bu sayıyı dinamik güncellemek daha karmaşık, şimdilik statik kalabilir #}
+
+            {# Türlere göre gruplanmış listeler #}
+            {% for type, items, urls in favorited_items_list %}
+                 <div class="mb-5">
+                    {# Tür başlığı #}
+                    <h3 class="mb-3 border-bottom pb-2">
+                        {% if type == 'anime' %} <i class="fas fa-tv me-2 text-primary" aria-hidden="true"></i> Animeler
+                        {% elif type == 'webtoon' %} <i class="fas fa-scroll me-2 text-success" aria-hidden="true"></i> Webtoonlar
+                        {% elif type == 'manga' %} <i class="fas fa-book-open me-2 text-danger" aria-hidden="true"></i> Mangalar
+                        {% elif type == 'novel' %} <i class="fas fa-book me-2" style="color: #6f42c1;" aria-hidden="true"></i> Noveller
+                        {% else %} {{ type|capfirst }} {% endif %}
+                        <span class="badge bg-secondary ms-2">{{ items|length }}</span> {# Bu sayıyı da dinamik güncellemek daha karmaşık #}
+                    </h3>
+                    <ul class="list-group shadow-sm">
+                        {% for item in items %}
+                             {# Base URL isimleri (namespace'siz) gönderiliyor, _list_item içinde namespace ekleniyor #}
+                             {% with detail_base_name=urls.detail|slice:"8:" edit_base_name=urls.edit|slice:"8:" delete_base_name=urls.delete|slice:"8:" %}
+                                 {% include 'tracker/partials/_list_item.html' with item=item detail_url_name=detail_base_name edit_url_name=edit_base_name delete_url_name=delete_base_name item_type=type is_on_favorites_page=True %}
+                             {% endwith %}
+                         {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+
+        {% else %}
+             <div class="alert alert-info mt-4" role="alert">
+               <h4 class="alert-heading"><i class="fas fa-info-circle me-2" aria-hidden="true"></i>Henüz Favori Yok</h4>
+               <p>Listelerdeki veya detay sayfalarındaki <i class="fas fa-star text-warning" aria-hidden="true"></i> ikonuna tıklayarak öğeleri favorilerinize ekleyebilirsiniz.</p>
+               <hr>
+               <p class="mb-0">Favorileriniz geçicidir ve tarayıcı oturumunuzla birlikte saklanır.</p>
+             </div>
+        {% endif %}
+
+    </div> {# ---- favorites-page-container sonu ---- #}
+{% endblock content %}

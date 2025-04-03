@@ -1,0 +1,74 @@
+{% comment %}
+Bu şablon, farklı medya türleri için tek bir liste öğesini render eder.
+Fotoğraf görünümü Bootstrap aspect ratio (3x4) ve object-fit:contain ile güncellendi.
+Context: item, detail_url_name, edit_url_name, delete_url_name, item_type, favorited_ids?, is_on_favorites_page?
+{% endcomment %}
+{% load static %}
+
+<li class="list-group-item p-3 border rounded shadow-sm mb-2 d-flex">
+    <div class="row g-3 w-100 align-items-center">
+
+        {# Resim Alanı - Bootstrap aspect ratio (3x4) ve object-fit: contain #}
+        <div class="col-4 col-md-3">
+            <a href="{% url 'tracker:'|add:detail_url_name item.pk %}">
+                {# --- Aspect ratio container (3x4) --- #}
+                <div class="ratio ratio-3x4 bg-light rounded"> {# Oran 3x4 #}
+                    {% if item.cover_image_url %}
+                        <img src="{{ item.cover_image_url }}" alt="{{ item.title }} Kapak"
+                             class="img-fluid"
+                             style="object-fit: contain;"> {# contain olarak değiştirildi #}
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100" style="color:#aaa;">
+                            <i class="fas fa-image fa-3x" aria-hidden="true"></i>
+                         </div>
+                    {% endif %}
+                </div>
+                 {# --- Aspect ratio container sonu --- #}
+            </a>
+        </div>
+
+        {# İçerik Alanı #}
+        <div class="col-8 col-md-6">
+             {# Başlık #}
+            <h5 class="mb-1"><a href="{% url 'tracker:'|add:detail_url_name item.pk %}" class="text-decoration-none">{{ item.title }}</a></h5>
+            {# Durum ve Puan #}
+             <div class="mb-1">
+                <span class="badge rounded-pill {% if item.status == 'Watching' %} bg-success {% elif item.status == 'Completed' %} bg-primary {% elif item.status == 'Plan to Watch' %} bg-info text-dark {% elif item.status == 'On Hold' %} bg-warning text-dark {% elif item.status == 'Dropped' %} bg-danger {% else %} bg-secondary {% endif %}">{{ item.get_status_display }}</span>
+                {% if item.rating is not None %}
+                    <span class="badge bg-dark ms-1"><i class="fas fa-star me-1" aria-hidden="true"></i>{{ item.rating }}/10</span>
+                {% endif %}
+            </div>
+            {# Türe Özel Detaylar #}
+             <small class="text-muted d-block mb-1">
+                {% if item.studio %} <i class="fas fa-film me-1" aria-hidden="true"></i> Stüdyo: {{ item.studio }} <br> {% endif %}
+                 {% if item.author %} <i class="fas fa-user-edit me-1" aria-hidden="true"></i>
+                    {% if item.artist and item.artist != item.author %} Yazar: {{ item.author }} | Çizer: {{ item.artist }}
+                    {% else %} Yazar: {{ item.author }} {% endif %} <br>
+                 {% elif item.artist %} <i class="fas fa-palette me-1" aria-hidden="true"></i> Çizer: {{ item.artist }} <br> {% endif %}
+                 {% if item.platform %} <i class="fas fa-globe me-1" aria-hidden="true"></i> Platform: {{ item.platform }} <br> {% endif %}
+                {% if item.episodes_watched is not None %} <i class="fas fa-play me-1" aria-hidden="true"></i> Bölüm: {{ item.episodes_watched }}{% if item.total_episodes is not None %} / {{ item.total_episodes }}{% else %} / ?{% endif %} <br> {% endif %}
+                {% if item.chapters_read is not None %} <i class="fas fa-book-reader me-1" aria-hidden="true"></i> Bölüm: {{ item.chapters_read }}{% if item.total_chapters is not None %} / {{ item.total_chapters }}{% else %} / ?{% endif %} <br> {% endif %}
+                 {% if item.volumes_read is not None %} <i class="fas fa-layer-group me-1" aria-hidden="true"></i> Cilt: {{ item.volumes_read }}{% if item.total_volumes is not None %} / {{ item.total_volumes }}{% else %} / ?{% endif %} <br> {% endif %}
+            </small>
+            {# Notlar #}
+            {% if item.notes %}<p class="mb-1 fst-italic text-muted"><small><i class="fas fa-comment-alt me-1" aria-hidden="true"></i>{{ item.notes|truncatewords_html:15 }}</small></p>{% endif %}
+            {# Eklenme Tarihi #}
+            <small class="text-muted"><i class="fas fa-calendar-plus me-1" aria-hidden="true"></i>Eklendi: {{ item.added_date|date:"d M Y, H:i" }}</small>
+        </div>
+
+        {# Eylem Düğmeleri Alanı #}
+        <div class="col-12 col-md-3 action-buttons">
+            {# Favori Butonu #}
+             <a href="{% url 'tracker:toggle_favorite' item_type=item_type item_id=item.pk %}"
+               class="btn btn-sm {% if is_on_favorites_page or item.pk in favorited_ids %}btn-warning{% else %}btn-outline-warning{% endif %} w-100 w-md-auto js-toggle-favorite"
+               title="{% if is_on_favorites_page or item.pk in favorited_ids %}Favorilerden Çıkar{% else %}Favorilere Ekle{% endif %}"
+               data-item-id="{{ item.pk }}"
+               data-item-type="{{ item_type }}">
+                <i class="fas fa-star" aria-hidden="true"></i>
+            </a>
+            {# Diğer Butonlar #}
+            <a href="{% url 'tracker:'|add:edit_url_name item.pk %}" class="btn btn-sm btn-outline-primary w-100 w-md-auto"><i class="fas fa-edit me-1" aria-hidden="true"></i>Düzenle</a>
+            <a href="{% url 'tracker:'|add:delete_url_name item.pk %}" class="btn btn-sm btn-outline-danger w-100 w-md-auto"><i class="fas fa-trash-alt me-1" aria-hidden="true"></i>Sil</a>
+        </div>
+    </div>
+</li>

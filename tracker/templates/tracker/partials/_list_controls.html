@@ -1,0 +1,57 @@
+{% comment %}
+tracker/templates/tracker/partials/_list_controls.html
+
+Liste sayfalarındaki filtreleme, arama, sıralama ve export kontrollerini içerir.
+
+Gerekli Context Değişkenleri:
+- list_url_name: Listenin ana URL adı (örn. 'tracker:anime_list_view')
+- export_url_name: CSV export URL adı (örn. 'tracker:export_anime_csv')
+- status_choices: Modelin STATUS_CHOICES listesi
+- current_status_filter: Mevcut durum filtresi değeri
+- search_query: Mevcut arama sorgusu
+- current_sort: Mevcut sıralama parametresi
+{% endcomment %}
+
+<div class="controls-container bg-light p-3 mb-4 border rounded shadow-sm">
+    {% comment %} Filtreleme ve Arama Formu {% endcomment %}
+    <form method="get" action="{% url list_url_name %}" class="row g-3 align-items-center mb-3 border-bottom pb-3">
+        <div class="col-md-4">
+            <label for="statusFilter" class="form-label visually-hidden">Durum</label>
+            <select class="form-select form-select-sm" id="statusFilter" name="status">
+                <option value="" {% if not current_status_filter %}selected{% endif %}>-- Tüm Durumlar --</option>
+                {% for value, display_text in status_choices %}
+                    <option value="{{ value }}" {% if current_status_filter == value %}selected{% endif %}>{{ display_text }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-5">
+            <label for="searchInput" class="form-label visually-hidden">Ara</label>
+            <input type="text" class="form-control form-control-sm" id="searchInput" name="q" placeholder="Başlık içinde ara..." value="{{ search_query|default:'' }}">
+        </div>
+        <div class="col-md-3 text-end">
+            <button type="submit" class="btn btn-secondary btn-sm w-100">Filtrele / Ara</button>
+        </div>
+    </form>
+
+    {% comment %} Sıralama Linkleri {% endcomment %}
+    <div class="sorting-links">
+        <small class="me-2">Sırala:</small>
+        {# URL'leri dinamik olarak oluşturmak için list_url_name kullanılıyor #}
+        {% url list_url_name as list_url %}
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=title_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_asc' %}active{% endif %}">Başlık (A-Z)</a>
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=title_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_desc' %}active{% endif %}">Başlık (Z-A)</a>
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=rating_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_desc' %}active{% endif %}">Puan (Yüksek)</a>
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=rating_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_asc' %}active{% endif %}">Puan (Düşük)</a>
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=date_desc" class="btn btn-outline-dark btn-sm {% if current_sort == '-added_date' or current_sort == 'date_desc' %}active{% endif %}">Tarih (Yeni)</a>
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=date_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'date_asc' %}active{% endif %}">Tarih (Eski)</a>
+    </div>
+     {% comment %} --- Sıralama Linkleri Sonu --- {% endcomment %}
+
+     {% comment %} Export Düğmesi {% endcomment %}
+     <div class="mt-2 text-end">
+         {# Export URL'i dinamik olarak oluşturuluyor #}
+         <a href="{% url export_url_name %}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}" class="btn btn-outline-success btn-sm"><i class="fas fa-file-csv me-1" aria-hidden="true"></i>CSV Olarak Dışa Aktar</a>
+    </div>
+
+</div>
+ {% comment %} --- Kontrol Alanı Sonu --- {% endcomment %}

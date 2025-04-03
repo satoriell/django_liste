@@ -1,0 +1,134 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/novel_form.html {% endcomment %}
+
+{% block title %}Novel Düzenle: {{ item.title }} - Kişisel Liste{% endblock title %} {# 'item' kullanıldı #}
+
+{% block content %}
+    <div class="row justify-content-center mt-4 mb-5"> {# Üst ve alt boşluk #}
+        <div class="col-md-10 col-lg-8">
+            <div class="form-container shadow-sm"> {# Stil base.html'den geliyor #}
+                <h2 class="mb-3" style="color: #6f42c1;">Novel Düzenle</h2> {# Renk türe göre #}
+                <h4 class="mb-4 text-secondary">{{ item.title }}</h4> {# 'item' kullanıldı #}
+
+                <form method="post" action=""> {# Action boş bırakıldı, doğru #}
+                    {% csrf_token %}
+
+                    {# ----- Formu Alan Alan Manuel Render Etme (Grid ile) ----- #}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {# Title - Tam Satır #}
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}{% if form.title.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors|striptags }}</div>{% endif %}
+                        {% if form.title.help_text %}<div class="form-text">{{ form.title.help_text|safe }}</div>{% endif %}
+                    </div>
+
+                    {# Status ve Rating Yan Yana #}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}{% if form.status.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors|striptags }}</div>{% endif %}
+                            {% if form.status.help_text %}<div class="form-text">{{ form.status.help_text|safe }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.rating.id_for_label }}" class="form-label">{{ form.rating.label }}{% if form.rating.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                            {{ form.rating }}
+                            {% if form.rating.errors %}<div class="invalid-feedback d-block">{{ form.rating.errors|striptags }}</div>{% endif %}
+                            {% if form.rating.help_text %}<div class="form-text">{{ form.rating.help_text|safe }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                     {# Başlama ve Bitiş Tarihi Yan Yana #}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                             <label for="{{ form.start_date.id_for_label }}" class="form-label">{{ form.start_date.label }}{% if form.start_date.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                             {{ form.start_date }}
+                             {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors|striptags }}</div>{% endif %}
+                             {% if form.start_date.help_text %}<div class="form-text">{{ form.start_date.help_text|safe }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                             <label for="{{ form.end_date.id_for_label }}" class="form-label">{{ form.end_date.label }}{% if form.end_date.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                             {{ form.end_date }}
+                             {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors|striptags }}</div>{% endif %}
+                             {% if form.end_date.help_text %}<div class="form-text">{{ form.end_date.help_text|safe }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    {# Kapak Resmi URL - Tam Satır #}
+                    <div class="mb-3">
+                        <label for="{{ form.cover_image_url.id_for_label }}" class="form-label">{{ form.cover_image_url.label }}{% if form.cover_image_url.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                        {{ form.cover_image_url }}
+                        {% if form.cover_image_url.errors %}<div class="invalid-feedback d-block">{{ form.cover_image_url.errors|striptags }}</div>{% endif %}
+                        {% if form.cover_image_url.help_text %}<div class="form-text">{{ form.cover_image_url.help_text|safe }}</div>{% endif %}
+                    </div>
+
+                    {# Yazar - Tam Satır (Novel'da sadece Yazar var) #}
+                    <div class="mb-3">
+                        <label for="{{ form.author.id_for_label }}" class="form-label">{{ form.author.label }}{% if form.author.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                        {{ form.author }}
+                        {% if form.author.errors %}<div class="invalid-feedback d-block">{{ form.author.errors|striptags }}</div>{% endif %}
+                        {% if form.author.help_text %}<div class="form-text">{{ form.author.help_text|safe }}</div>{% endif %}
+                    </div>
+
+                    {# Okunan ve Toplam Bölüm Yan Yana #}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.chapters_read.id_for_label }}" class="form-label">{{ form.chapters_read.label }}{% if form.chapters_read.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                            {{ form.chapters_read }}
+                            {% if form.chapters_read.errors %}<div class="invalid-feedback d-block">{{ form.chapters_read.errors|striptags }}</div>{% endif %}
+                            {% if form.chapters_read.help_text %}<div class="form-text">{{ form.chapters_read.help_text|safe }}</div>{% endif %}
+                        </div>
+                         <div class="col-md-6 mb-3">
+                            <label for="{{ form.total_chapters.id_for_label }}" class="form-label">{{ form.total_chapters.label }}{% if form.total_chapters.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                            {{ form.total_chapters }}
+                            {% if form.total_chapters.errors %}<div class="invalid-feedback d-block">{{ form.total_chapters.errors|striptags }}</div>{% endif %}
+                            {% if form.total_chapters.help_text %}<div class="form-text">{{ form.total_chapters.help_text|safe }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    {# Okunan ve Toplam Cilt Yan Yana #}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.volumes_read.id_for_label }}" class="form-label">{{ form.volumes_read.label }}{% if form.volumes_read.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                            {{ form.volumes_read }}
+                            {% if form.volumes_read.errors %}<div class="invalid-feedback d-block">{{ form.volumes_read.errors|striptags }}</div>{% endif %}
+                            {% if form.volumes_read.help_text %}<div class="form-text">{{ form.volumes_read.help_text|safe }}</div>{% endif %}
+                        </div>
+                         <div class="col-md-6 mb-3">
+                            <label for="{{ form.total_volumes.id_for_label }}" class="form-label">{{ form.total_volumes.label }}{% if form.total_volumes.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                            {{ form.total_volumes }}
+                            {% if form.total_volumes.errors %}<div class="invalid-feedback d-block">{{ form.total_volumes.errors|striptags }}</div>{% endif %}
+                            {% if form.total_volumes.help_text %}<div class="form-text">{{ form.total_volumes.help_text|safe }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    {# Notlar - Tam Satır #}
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}{% if form.notes.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors|striptags }}</div>{% endif %}
+                        {% if form.notes.help_text %}<div class="form-text">{{ form.notes.help_text|safe }}</div>{% endif %}
+                    </div>
+
+                    {# ----- Manuel Render Sonu ----- #}
+
+                    <hr class="mt-4 mb-3"> {# Ayırıcı çizgi #}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end"> {# Butonları sağa yasla #}
+                        {# İptal linki novel listesine gider #}
+                        <a href="{% url 'tracker:novel_list_view' %}" class="btn btn-secondary">İptal</a>
+                        {# Buton ikonu zaten aria-hidden içeriyor #}
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save me-1" aria-hidden="true"></i>Değişiklikleri Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,112 @@
+/* tracker/static/tracker/css/custom.css */
+
+/* --- Genel Sayfa Düzeni --- */
+body {
+    padding-top: 70px; /* Navbar yüksekliğine göre ayarla */
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-container {
+    flex: 1; /* Footer'ı aşağı itmek için */
+}
+
+footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    border-top: 1px solid #dee2e6;
+    background-color: #e9ecef;
+    flex-shrink: 0;
+}
+
+/* --- Dashboard --- */
+.dashboard-card {
+    margin-bottom: 20px;
+}
+
+.dashboard-card .list-group-item {
+    font-size: 0.9em;
+    padding: 0.5rem 0.75rem;
+}
+
+.dashboard-card .list-group-item .badge {
+    margin-left: auto;
+}
+
+.dashboard-card .list-group-item a {
+    text-decoration: none; /* Buton içindeki linkin altını çizme */
+}
+
+.dashboard-card .list-group-item small.text-muted {
+    font-size: 0.8em;
+}
+
+#typeDistributionChartContainer,
+#statusDistributionChartContainer {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+/* Dashboard Kartları için Özel Buton Stilleri */
+/* btn-novel stilini güncelleyerek Bootstrap'in ezmesini engellemeye çalışalım */
+.btn-novel {
+    background-color: #6f42c1 !important; /* Rengi zorla uygula */
+    color: white !important; /* Rengi zorla uygula */
+    border-color: #6f42c1;
+    text-decoration: none; /* Link alt çizgisini kaldır */
+}
+
+.btn-novel:hover, .btn-novel:focus {
+    background-color: #5a37a0 !important; /* Rengi zorla uygula */
+    color: white !important; /* Rengi zorla uygula */
+    border-color: #5a37a0;
+    text-decoration: none; /* Link alt çizgisini kaldır */
+}
+
+/* --- Formlar --- */
+.form-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+/* Not: !important kullanımı genellikle kaçınılması gereken bir durumdur,
+   ancak Bootstrap gibi framework stillerini ezmek için bazen gerekebilir. */
+.form-container h4, .form-container h2 {
+     margin-bottom: 1.5rem !important;
+}
+
+/* --- Listeler --- */
+.list-group-item .action-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Liste öğesi aksiyon butonlarının küçük ekranlardaki düzeni */
+@media (max-width: 767.98px) {
+    .list-group-item .action-buttons {
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+     }
+}
+
+/* --- Yardımcı Programlar / Bileşenler --- */
+.pagination {
+    flex-wrap: wrap; /* Sayfalamanın küçük ekranlarda taşmasını engelle */
+}
+
+.bootstrap-messages .alert {
+    margin-bottom: 1rem; /* Django mesajları arası boşluk */
+}
+
+/* İleride buraya başka özel stiller ekleyebilirsin */
