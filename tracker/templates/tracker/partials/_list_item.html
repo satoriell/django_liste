@@ -12,7 +12,7 @@ Context: item, detail_url_name, edit_url_name, delete_url_name, item_type, favor
         <div class="col-4 col-md-3">
             <a href="{% url 'tracker:'|add:detail_url_name item.pk %}">
                 {# --- Aspect ratio container (3x4) --- #}
-                <div class="ratio ratio-3x4 bg-light rounded"> {# Oran 3x4 #}
+                <div class=" bg-light rounded"> {# Oran 3x4 #}
                     {% if item.cover_image_url %}
                         <img src="{{ item.cover_image_url }}" alt="{{ item.title }} Kapak"
                              class="img-thumbnail w-100"
