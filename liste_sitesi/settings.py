@@ -28,10 +28,8 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() == "true"
 # Projeye hangi host isimlerinden veya IP adreslerinden erişilebileceği.
 # DEBUG = False olduğunda bu listeyi doldurmak zorunludur.
 # Örnek: ALLOWED_HOSTS = ['www.example.com', '192.168.1.100']
+DEBUG = True
 ALLOWED_HOSTS = []
-# DEBUG=True ise veya test çalıştırılıyorsa localhost'a izin ver
-if DEBUG or os.environ.get('DJANGO_TESTING') == 'True':
-    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
 
 # Application definition
