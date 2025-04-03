@@ -26,14 +26,14 @@
             <div class="col-lg-5 d-flex align-items-center justify-content-center p-3 detail-image-container">
                  {% if item.cover_image_url %}
                     {# Bootstrap aspect ratio (3x4) ve object-fit: cover kullanıldı #}
-                    <div class="ratio ratio-3x4 detail-image-wrapper">
+                    <div class="w-100 detail-image-wrapper">
                         <img src="{{ item.cover_image_url }}"
-                             class="rounded shadow-sm detail-image"
-                             alt="{{ item.title }} Kapak">
+                             class=" w-100  rounded shadow-sm detail-image"
+                             alt="{{ item.title }} Kapak" style="object-fit: cover;">
                     </div>
                 {% else %}
                      {# Placeholder CSS ile stilize edilecek #}
-                    <div class="ratio ratio-3x4 detail-image-placeholder d-flex align-items-center justify-content-center text-muted rounded">
+                    <div class=" w-100 detail-image-placeholder d-flex align-items-center justify-content-center text-muted rounded" style="object-fit: cover;">
                         <i class="fas fa-image fa-4x" aria-hidden="true"></i>
                     </div>
                 {% endif %}
