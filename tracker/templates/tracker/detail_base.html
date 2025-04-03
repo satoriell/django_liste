@@ -29,11 +29,11 @@
                     <div class="w-70 detail-image-wrapper">
                         <img src="{{ item.cover_image_url }}"
                              class=" w-100  rounded shadow-sm detail-image"
-                             alt="{{ item.title }} Kapak" style="object-fit: cover;">
+                             alt="{{ item.title }} Kapak" style="object-fit: cover; height: 395px;">
                     </div>
                 {% else %}
                      {# Placeholder CSS ile stilize edilecek #}
-                    <div class=" w-100 detail-image-placeholder d-flex align-items-center justify-content-center text-muted rounded" style="object-fit: cover;">
+                    <div class=" w-100 detail-image-placeholder d-flex align-items-center justify-content-center text-muted rounded" style="object-fit: cover; height: 300px;">
                         <i class="fas fa-image fa-4x" aria-hidden="true"></i>
                     </div>
                 {% endif %}
