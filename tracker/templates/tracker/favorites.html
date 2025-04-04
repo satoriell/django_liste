@@ -1,52 +1,92 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
-{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/favorites.html {% endcomment %}
+{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/favorites.html (Inline Stiller Kaldırıldı) {% endcomment %}
 
 {% block title %}Favorilerim - Kişisel Liste{% endblock title %}
 
 {% block content %}
 
-    <h1 class="mb-4"><i class="fas fa-heart text-danger me-2"></i>Favorilerim ({{ total_favorites }})</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0"><i class="fas fa-heart text-danger me-2"></i>Favorilerim</h1>
+        <span class="badge bg-secondary rounded-pill fs-6" id="favorites-page-total-count">{{ total_favorites }}</span> Öğe
+    </div>
 
     {% if grouped_favorites_list %}
-        {# Favori öğeleri türe göre gruplandırarak göster #}
         {% for item_type_key, items_list in grouped_favorites_list %}
-            {# Her tür için bir başlık (Türkçeleştirilmiş) #}
-            {# DÜZELTME: Gereksiz 'replace' filtreleri kaldırıldı #}
             {% with item_type_name=item_type_key|capfirst %}
-                <h3 class="mb-3 mt-4">
-                    {# Türe göre ikon ve renk #}
+                <h3 class="mb-3 mt-4 border-bottom pb-2">
+                    {% comment %} Türe göre ikonlar {% endcomment %}
                     {% if item_type_key == 'anime' %}<i class="fas fa-tv text-primary me-2"></i>Anime
                     {% elif item_type_key == 'webtoon' %}<i class="fas fa-scroll text-success me-2"></i>Webtoon
                     {% elif item_type_key == 'manga' %}<i class="fas fa-book-open text-danger me-2"></i>Manga
-                    {% elif item_type_key == 'novel' %}<i class="fas fa-book me-2" style="color: #6f42c1;"></i>Novel
+                    {% elif item_type_key == 'novel' %}<i class="fas fa-book me-2" style="color: var(--primary-color);"></i>Novel
                     {% else %}{{ item_type_name }}
                     {% endif %}
-                    <span class="badge bg-secondary ms-2">{{ items_list|length }}</span>
+                    {# Koyu/Açık tema uyumlu öğe sayısı rozeti (CSS ile yönetiliyor) #}
+                    <span class="badge bg-light text-dark ms-2">{{ items_list|length }}</span>
                 </h3>
             {% endwith %}
 
-            {# O türe ait favori öğeler listesi #}
-            <ul class="list-group shadow-sm mb-4">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mb-4">
                 {% for item in items_list %}
-                    {# _list_item partial'ını çağırırken doğru context'i sağla #}
-                    {% with detail_url_name=item_type_key|add:'_detail' edit_url_name=item_type_key|add:'_edit' delete_url_name=item_type_key|add:'_delete' %}
-                    {# favorited_pks set'ini oluştur (bu sayfada hepsi favori olduğu için hepsini içerir) #}
-                    {# DİKKAT: favorited_pks'in bir set veya liste olması beklenir, string değil. View'dan doğru geldiğini varsayıyoruz. #}
-                    {% include 'tracker/partials/_list_item.html' with item=item detail_url_name=detail_url_name edit_url_name=edit_url_name delete_url_name=delete_url_name item_type=item_type_key favorited_pks=favorited_pks %}
-                    {% endwith %}
-                {% empty %}
-                    {# Bu aslında olmamalı çünkü grouped_favorites_list boşsa buraya gelinmez, ama güvenlik için #}
-                    <li class="list-group-item text-muted">Bu türde favori öğe bulunamadı.</li>
+                    <div class="col d-flex align-items-stretch">
+                        {# Kart (h-100 ile yüksekliği eşitle) #}
+                        <div class="card h-100 shadow-sm favorite-card" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 50 %}">
+
+                            {# Kart Resmi (Sabit Yükseklikli Konteyner - CSS ile yönetiliyor) #}
+                            <a href="{% url 'tracker:'|add:item_type_key|add:'_detail' item.pk %}" class="text-decoration-none">
+                                <div class="bg-light card-img-top-container fixed-height-image-container"> {# Sınıf eklendi #}
+                                    {% if item.cover_image_url %}
+                                        <img src="{{ item.cover_image_url }}" class="card-img-top favorite-card-img" alt="{{ item.title }} Kapak">
+                                    {% else %}
+                                        <div class="d-flex align-items-center justify-content-center h-100">
+                                            <i class="fas fa-image fa-3x text-secondary"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {# Kart İçeriği (d-flex flex-column ile içeriği dikeyde yönet) #}
+                            <div class="card-body d-flex flex-column p-3">
+                                {# Başlık Alanı (flex-grow-1 ile esner, CSS ile satır sınırlı) #}
+                                <div class="favorite-card-title-container mb-2 flex-grow-1"> {# Sınıf eklendi #}
+                                    <h6 class="card-title favorite-card-title"> {# Sınıf eklendi #}
+                                        <a href="{% url 'tracker:'|add:item_type_key|add:'_detail' item.pk %}" class="text-decoration-none">{{ item.title }}</a>
+                                    </h6>
+                                </div>
+                                {# Rozetler ve Buton Alanı (mt-auto ile en alta itilir) #}
+                                <div class="mt-auto d-flex justify-content-between align-items-center">
+                                    {# Rozetler Grubu #}
+                                    <div class="me-2">
+                                        <span class="badge rounded-pill badge-status {% if item.status == 'Watching' %}badge-status-watching{% elif item.status == 'Completed' %}badge-status-completed{% elif item.status == 'On Hold' %}badge-status-onhold{% elif item.status == 'Dropped' %}badge-status-dropped{% elif item.status == 'Plan to Watch' %}badge-status-plantowatch{% else %}badge-status-default{% endif %}">{{ item.get_status_display }}</span>
+                                        {% if item.rating is not None %}
+                                            <span class="badge bg-dark ms-1"><i class="fas fa-star me-1"></i>{{ item.rating }}/10</span>
+                                        {% endif %}
+                                    </div>
+                                    {# Favori Butonu (CSS ile yönetiliyor) #}
+                                    <button type="button"
+                                        class="btn btn-sm btn-warning js-toggle-favorite favorite-toggle-button-card flex-shrink-0"
+                                        title="Favorilerden Çıkar"
+                                        data-item-id="{{ item.pk }}"
+                                        data-item-type="{{ item_type_key }}">
+                                         <i class="fas fa-star"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
         {% endfor %}
 
     {% else %}
-        {# Hiç favori yoksa mesaj göster #}
-        <div class="alert alert-info mt-4" role="alert">
-            <i class="fas fa-info-circle me-2"></i> Henüz favorilerinize eklediğiniz bir öğe bulunmuyor. Listelerdeki <i class="fas fa-star"></i> ikonuna tıklayarak favorilerinize ekleyebilirsiniz.
+        <div class="text-center py-5 my-5" data-aos="fade-in">
+            <i class="fas fa-heart-broken fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Favori Listeniz Henüz Boş</h4>
+            <p class="text-muted">Listelerdeki <i class="fas fa-star text-warning"></i> ikonuna tıklayarak öğeleri favorilerinize ekleyebilirsiniz.</p>
+            <a href="{% url 'tracker:dashboard' %}" class="btn btn-outline-primary mt-3">Listelere Göz At</a>
         </div>
     {% endif %}
+
+    {# --- INLINE STYLE BLOĞU KALDIRILDI --- #}
 
 {% endblock content %}

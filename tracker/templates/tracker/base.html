@@ -44,8 +44,9 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto align-items-center">
             {% if user.is_authenticated %}
+                {# Listeler Dropdown'ı - Aktiflik kontrolü güncellendi #}
                 <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'tracker' and request.resolver_match.url_name != 'dashboard' %}active{% endif %}" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-layer-group me-1"></i> Listeler</a>
+                  <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'tracker' and request.resolver_match.url_name != 'dashboard' and request.resolver_match.url_name != 'favorites_view' %}active{% endif %}" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-layer-group me-1"></i> Listeler</a>
                   <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
                     <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:anime_list_view' %}active{% endif %}" href="{% url 'tracker:anime_list_view' %}"><i class="fas fa-fw fa-tv me-2"></i>Animeler</a></li>
                     <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:webtoon_list_view' %}active{% endif %}" href="{% url 'tracker:webtoon_list_view' %}"><i class="fas fa-fw fa-scroll me-2"></i>Webtoonlar</a></li>
@@ -53,6 +54,24 @@
                     <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:novel_list_view' %}active{% endif %}" href="{% url 'tracker:novel_list_view' %}"><i class="fas fa-fw fa-book me-2"></i>Noveller</a></li>
                   </ul>
                 </li>
+
+                {# --- GÜNCELLENDİ: Favoriler Linki (Sayı Rozeti ID'si ile) --- #}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.view_name == 'tracker:favorites_view' %}active{% endif %}"
+                       href="{% url 'tracker:favorites_view' %}">
+                        <i class="fas fa-heart me-1 text-danger"></i>Favorilerim
+                        {# Context processor'dan gelen sayıyı gösteren rozet (ID eklendi) #}
+                        {% if favorite_count > 0 %}
+                            <span class="badge rounded-pill bg-danger ms-1" id="navbar-favorite-count">{{ favorite_count }}</span>
+                        {% else %}
+                            {# Sayı 0 ise gizli span (JS'in bulabilmesi için ID'li) #}
+                            <span class="badge rounded-pill bg-danger ms-1" id="navbar-favorite-count" style="display: none;">0</span>
+                        {% endif %}
+                    </a>
+                </li>
+                {# --- GÜNCELLEME SONU --- #}
+
+                {# Kullanıcı Dropdown'ı #}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user me-1"></i> {{ user.username }}</a>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarUserDropdown">
@@ -65,6 +84,7 @@
                     </ul>
                 </li>
             {% else %}
+                {# Kayıt Ol ve Giriş Yap Linkleri #}
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.view_name == 'tracker:signup' %}active{% endif %}" href="{% url 'tracker:signup' %}"><i class="fas fa-user-plus me-1"></i> Kayıt Ol</a>
                 </li>
@@ -73,8 +93,10 @@
                 </li>
             {% endif %}
             {% if user.is_authenticated and user.is_staff %}
+             {# Admin Linki #}
              <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}" target="_blank"><i class="fas fa-user-shield me-1"></i>Admin</a></li>
             {% endif %}
+            {# Tema Değiştirme Butonu #}
             <li class="nav-item ms-2">
                 <button id="theme-toggle-button" class="btn btn-outline-secondary btn-sm" title="Temayı Değiştir">
                     <i class="fas fa-sun theme-icon light-icon"></i>
@@ -112,7 +134,8 @@
                  <br>
                  Django <i class="fas fa-heart text-danger mx-1"></i> ile geliştirildi.
                  <br>
-                 {{ time_now }} - {{ current_location }}
+                 {# Bu değişkenlerin context'te tanımlı olması gerekir #}
+                 {% if time_now %} {{ time_now }} {% endif %} {% if current_location %} - {{ current_location }} {% endif %}
              </small>
         </div>
     </footer>

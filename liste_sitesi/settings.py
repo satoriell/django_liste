@@ -62,6 +62,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth", # user değişkenini şablonlara ekler
                 "django.contrib.messages.context_processors.messages", # messages değişkenini şablonlara ekler
+                # --- GÜNCELLENDİ ---
+                "tracker.context_processors.favorites_processor", # Favori sayısını global olarak ekler
+                # --- GÜNCELLEME SONU ---
             ],
         },
     },
