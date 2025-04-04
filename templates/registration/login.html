@@ -1,0 +1,54 @@
+{# templates/registration/login.html #}
+{% extends 'tracker/base.html' %}
+
+{% block title %}Giriş Yap - Kişisel Liste{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            {# GÜNCELLENDİ: text-center eklendi ve h2 içine ikon eklendi #}
+            <div class="card-header text-center">
+                <h2 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Giriş Yap</h2>
+            </div>
+            <div class="card-body p-4">
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        Kullanıcı adı veya şifre hatalı. Lütfen tekrar deneyin.
+                    </div>
+                {% endif %}
+
+                {% if next %}
+                    {% if user.is_authenticated %}
+                    <p class="text-warning">Hesabınızın bu sayfaya erişim izni yok. Devam etmek için lütfen yetkili bir hesapla giriş yapın.</p>
+                    {% else %}
+                    <p class="text-info">Lütfen bu sayfayı görmek için giriş yapın.</p>
+                    {% endif %}
+                {% endif %}
+
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Kullanıcı Adı</label>
+                        <input type="text" name="username" id="id_username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Şifre</label>
+                        <input type="password" name="password" id="id_password" class="form-control" required>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Giriş Yap</button>
+                    </div>
+                    <input type="hidden" name="next" value="{{ next | default:'/' }}"> {# next yoksa anasayfaya git #}
+                </form>
+                <hr>
+                <div class="text-center small">
+                    <a href="{% url 'password_reset' %}">Şifreni mi unuttun?</a>
+                    <br>
+                    <span class="text-muted">Hesabın yok mu? <a href="{% url 'tracker:signup' %}">Kayıt Ol</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

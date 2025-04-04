@@ -5,48 +5,46 @@
 {% block title %}Dashboard - Kişisel Liste{% endblock title %}
 
 {% block content %}
-    <h1 class="mb-4">Dashboard</h1>
+    <h1 class="mb-4" data-aos="fade-down"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
 
     {% comment %} ----- Toplam Sayılar ----- {% endcomment %}
     <div class="row mb-4">
-        {# Anime Card #}
-        <div class="col-md-3 col-sm-6 mb-3">
+        {# GÜNCELLENDİ: data-aos="zoom-in-up" kullanıldı #}
+        <div class="col-md-3 col-sm-6 mb-3" data-aos="zoom-in-up">
             <div class="card text-center h-100 shadow-sm">
                 <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Toplam Anime</h5>
-                    <p class="card-text fs-2 fw-bold my-auto">{{ anime_count }}</p> {# my-auto eklendi #}
+                    <h5 class="card-title"><i class="fas fa-tv me-1 text-primary"></i>Toplam Anime</h5>
+                    <p class="card-text fs-2 fw-bold my-auto">{{ anime_count }}</p>
                     <a href="{% url 'tracker:anime_list_view' %}" class="btn btn-primary btn-sm mt-auto">Listeye Git</a>
                 </div>
             </div>
         </div>
-        {# Webtoon Card #}
-        <div class="col-md-3 col-sm-6 mb-3">
+        {# GÜNCELLENDİ: data-aos="zoom-in-up" kullanıldı #}
+        <div class="col-md-3 col-sm-6 mb-3" data-aos="zoom-in-up" data-aos-delay="100">
             <div class="card text-center h-100 shadow-sm">
                 <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Toplam Webtoon</h5>
+                    <h5 class="card-title"><i class="fas fa-scroll me-1 text-success"></i>Toplam Webtoon</h5>
                     <p class="card-text fs-2 fw-bold my-auto">{{ webtoon_count }}</p>
                     <a href="{% url 'tracker:webtoon_list_view' %}" class="btn btn-success btn-sm mt-auto">Listeye Git</a>
                 </div>
             </div>
         </div>
-        {# Manga Card #}
-        <div class="col-md-3 col-sm-6 mb-3">
+        {# GÜNCELLENDİ: data-aos="zoom-in-up" kullanıldı #}
+        <div class="col-md-3 col-sm-6 mb-3" data-aos="zoom-in-up" data-aos-delay="200">
              <div class="card text-center h-100 shadow-sm">
                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Toplam Manga</h5>
+                    <h5 class="card-title"><i class="fas fa-book-open me-1 text-danger"></i>Toplam Manga</h5>
                     <p class="card-text fs-2 fw-bold my-auto">{{ manga_count }}</p>
                     <a href="{% url 'tracker:manga_list_view' %}" class="btn btn-danger btn-sm mt-auto">Listeye Git</a>
                 </div>
             </div>
         </div>
-        {# Novel Card - GÜNCELLENDİ #}
-        <div class="col-md-3 col-sm-6 mb-3">
-            {# Özel border rengi yerine standart card kullanıldı, buton class ile renklendirildi #}
+        {# GÜNCELLENDİ: data-aos="zoom-in-up" kullanıldı #}
+        <div class="col-md-3 col-sm-6 mb-3" data-aos="zoom-in-up" data-aos-delay="300">
             <div class="card text-center h-100 shadow-sm">
                 <div class="card-body d-flex flex-column">
-                    <h5 class="card-title" style="color: #6f42c1;">Toplam Novel</h5> {# Başlık rengi inline kalabilir veya CSS'e taşınabilir #}
+                    <h5 class="card-title" style="color: #6f42c1;"><i class="fas fa-book me-1"></i>Toplam Novel</h5>
                     <p class="card-text fs-2 fw-bold my-auto">{{ novel_count }}</p>
-                    {# Inline style yerine özel CSS class'ı kullanıldı #}
                     <a href="{% url 'tracker:novel_list_view' %}" class="btn btn-novel btn-sm mt-auto">Listeye Git</a>
                 </div>
             </div>
@@ -54,22 +52,23 @@
     </div>
 
     {% comment %} ----- Grafikler Bölümü ----- {% endcomment %}
-    {# ... (Grafik HTML yapısı aynı kalır) ... #}
      <div class="row mb-4">
-        <div class="col-md-6 mb-4 mb-md-0">
+         {# GÜNCELLENDİ: data-aos="zoom-in-up" kullanıldı #}
+        <div class="col-md-6 mb-4 mb-md-0" data-aos="zoom-in-up">
              <div class="card shadow-sm h-100">
                 <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-center mb-3">Türlere Göre Dağılım</h5>
+                    <h5 class="card-title text-center mb-3"><i class="fas fa-chart-pie me-1"></i>Türlere Göre Dağılım</h5>
                     <div id="typeDistributionChartContainer" class="flex-grow-1" style="position: relative; min-height: 300px;">
                          <canvas id="typeDistributionChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+         {# GÜNCELLENDİ: data-aos="zoom-in-up" kullanıldı #}
+        <div class="col-md-6" data-aos="zoom-in-up" data-aos-delay="150">
              <div class="card shadow-sm h-100">
                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-center mb-3">Durumlara Göre Dağılım</h5>
+                    <h5 class="card-title text-center mb-3"><i class="fas fa-chart-bar me-1"></i>Durumlara Göre Dağılım</h5>
                     <div id="statusDistributionChartContainer" class="flex-grow-1" style="position: relative; min-height: 300px;">
                          <canvas id="statusDistributionChart"></canvas>
                     </div>
@@ -78,20 +77,23 @@
         </div>
     </div>
 
-    <hr class="my-4">
+    <hr class="my-4" data-aos="fade">
 
     {% comment %} ----- Son Eklenenler ve En Yüksek Puanlılar ----- {% endcomment %}
-    {# ... (Bu bölüm aynı kalır) ... #}
     <div class="row">
-         <div class="col-md-6">
-             <h3 class="mb-3">Son Eklenenler</h3>
+         {# GÜNCELLENDİ: Sol Sütun - data-aos="fade-right" kullanıldı #}
+         <div class="col-md-6" data-aos="fade-right">
+             <h3 class="mb-3"><i class="fas fa-clock text-info me-2"></i>Son Eklenenler</h3>
+             {# Include edilen kartlardan AOS kaldırıldı, sütun animasyonu yeterli #}
              {% with items=recent_anime url_name="anime_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Animeler" %}{% endwith %}
              {% with items=recent_webtoons url_name="webtoon_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Webtoonlar" %}{% endwith %}
              {% with items=recent_mangas url_name="manga_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Mangalar" %}{% endwith %}
              {% with items=recent_novels url_name="novel_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Noveller" %}{% endwith %}
          </div>
-         <div class="col-md-6">
-             <h3 class="mb-3">En Yüksek Puanlılar</h3>
+          {# GÜNCELLENDİ: Sağ Sütun - data-aos="fade-left" kullanıldı #}
+         <div class="col-md-6" data-aos="fade-left" data-aos-delay="150">
+             <h3 class="mb-3"><i class="fas fa-trophy text-warning me-2"></i>En Yüksek Puanlılar</h3>
+              {# Include edilen kartlardan AOS kaldırıldı, sütun animasyonu yeterli #}
              {% with items=top_anime url_name="anime_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Animeler" %}{% endwith %}
              {% with items=top_webtoons url_name="webtoon_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Webtoonlar" %}{% endwith %}
              {% with items=top_mangas url_name="manga_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Mangalar" %}{% endwith %}
@@ -99,7 +101,6 @@
          </div>
     </div>
 
-    {# Grafik verilerini JSON olarak değişkenden alıp gömüyoruz (Bu kalmalı) #}
     <script id="chartDataJson" type="application/json">
         {{ chart_data_json|safe }}
     </script>
@@ -108,7 +109,5 @@
 
 
 {% block extra_scripts %}
-    {# ---- YENİ: Harici Dashboard Chart Scripti ---- #}
-    {# Inline script kaldırıldı, yerine bu dosya çağrılıyor #}
     <script src="{% static 'tracker/js/dashboard_charts.js' %}"></script>
 {% endblock extra_scripts %}

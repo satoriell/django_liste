@@ -2,6 +2,7 @@
 tracker/templates/tracker/partials/_list_controls.html
 
 Liste sayfalarındaki filtreleme, arama, sıralama ve export kontrollerini içerir.
+Sıralama linklerine ikonlar eklendi.
 
 Gerekli Context Değişkenleri:
 - list_url_name: Listenin ana URL adı (örn. 'tracker:anime_list_view')
@@ -33,22 +34,22 @@ Gerekli Context Değişkenleri:
         </div>
     </form>
 
-    {% comment %} Sıralama Linkleri {% endcomment %}
-    <div class="sorting-links">
-        <small class="me-2">Sırala:</small>
+    {% comment %} Sıralama Linkleri - GÜNCELLENDİ (İkonlar Eklendi) {% endcomment %}
+    <div class="sorting-links d-flex flex-wrap gap-2"> {# Flexbox ve gap eklendi #}
+        <small class="me-2 align-self-center">Sırala:</small> {# Dikeyde ortalamak için #}
         {# URL'leri dinamik olarak oluşturmak için list_url_name kullanılıyor #}
         {% url list_url_name as list_url %}
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=title_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_asc' %}active{% endif %}">Başlık (A-Z)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=title_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_desc' %}active{% endif %}">Başlık (Z-A)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=rating_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_desc' %}active{% endif %}">Puan (Yüksek)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=rating_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_asc' %}active{% endif %}">Puan (Düşük)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=date_desc" class="btn btn-outline-dark btn-sm {% if current_sort == '-added_date' or current_sort == 'date_desc' %}active{% endif %}">Tarih (Yeni)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=date_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'date_asc' %}active{% endif %}">Tarih (Eski)</a>
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=title_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_asc' %}active{% endif %}"><i class="fas fa-sort-alpha-down me-1"></i>Başlık (A-Z)</a>
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=title_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_desc' %}active{% endif %}"><i class="fas fa-sort-alpha-up me-1"></i>Başlık (Z-A)</a>
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=rating_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_desc' %}active{% endif %}"><i class="fas fa-arrow-down-9-1 me-1"></i>Puan (Yüksek)</a> {# İkon değişti #}
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=rating_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_asc' %}active{% endif %}"><i class="fas fa-arrow-up-1-9 me-1"></i>Puan (Düşük)</a> {# İkon değişti #}
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=date_desc" class="btn btn-outline-dark btn-sm {% if current_sort == '-added_date' or current_sort == 'date_desc' %}active{% endif %}"><i class="fas fa-calendar-day me-1"></i>Tarih (Yeni)</a>
+        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}&sort=date_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'date_asc' %}active{% endif %}"><i class="fas fa-calendar-alt me-1"></i>Tarih (Eski)</a> {# İkon değişti #}
     </div>
      {% comment %} --- Sıralama Linkleri Sonu --- {% endcomment %}
 
      {% comment %} Export Düğmesi {% endcomment %}
-     <div class="mt-2 text-end">
+     <div class="mt-3 text-end"> {# Üst boşluk artırıldı #}
          {# Export URL'i dinamik olarak oluşturuluyor #}
          <a href="{% url export_url_name %}?status={{ current_status_filter|urlencode }}&q={{ search_query|urlencode }}" class="btn btn-outline-success btn-sm"><i class="fas fa-file-csv me-1" aria-hidden="true"></i>CSV Olarak Dışa Aktar</a>
     </div>
