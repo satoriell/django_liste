@@ -1,25 +1,38 @@
 {% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/base.html {% endcomment %}
 {% load static %}
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Kişisel Listem{% endblock title %}</title>
-    {# Bootstrap CSS #}
+    {# CSS Linkleri ... #}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    {# FontAwesome (İkonlar için) #}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    {# AOS (Animate On Scroll) Kütüphanesi CSS #}
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    {# Özel CSS dosyamızı bağlıyoruz #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'tracker/css/custom.css' %}">
     {% block extra_head %}{% endblock extra_head %}
+    <style>
+        .theme-icon { display: none; }
+        html[data-theme="light"] .light-icon { display: inline-block; }
+        html[data-theme="dark"] .dark-icon { display: inline-block; }
+    </style>
 </head>
 <body>
 
-    {% comment %} ----- Navbar ----- {% endcomment %}
-    {# GÜNCELLENDİ: Navbar'a ID eklendi #}
+    {# GÜNCELLENDİ: Preloader HTML yapısı değişti #}
+    <div id="preloader">
+        <div class="bounce-spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+    </div>
+
+    {# Navbar ... #}
     <nav id="mainNavbar" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
       <div class="container">
         <a class="navbar-brand" href="{% if user.is_authenticated %}{% url 'tracker:dashboard' %}{% else %}{% url 'login' %}{% endif %}">
@@ -32,78 +45,66 @@
           <ul class="navbar-nav ms-auto align-items-center">
             {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'tracker' and request.resolver_match.url_name != 'dashboard' %}active{% endif %}"
-                     href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-layer-group me-1" aria-hidden="true"></i> Listeler
-                  </a>
+                  <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'tracker' and request.resolver_match.url_name != 'dashboard' %}active{% endif %}" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-layer-group me-1"></i> Listeler</a>
                   <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:anime_list_view' %}active{% endif %}" href="{% url 'tracker:anime_list_view' %}"><i class="fas fa-fw fa-tv me-2" aria-hidden="true"></i>Animeler</a></li>
-                    <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:webtoon_list_view' %}active{% endif %}" href="{% url 'tracker:webtoon_list_view' %}"><i class="fas fa-fw fa-scroll me-2" aria-hidden="true"></i>Webtoonlar</a></li>
-                    <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:manga_list_view' %}active{% endif %}" href="{% url 'tracker:manga_list_view' %}"><i class="fas fa-fw fa-book-open me-2" aria-hidden="true"></i>Mangalar</a></li>
-                    <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:novel_list_view' %}active{% endif %}" href="{% url 'tracker:novel_list_view' %}"><i class="fas fa-fw fa-book me-2" aria-hidden="true"></i>Noveller</a></li>
+                    <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:anime_list_view' %}active{% endif %}" href="{% url 'tracker:anime_list_view' %}"><i class="fas fa-fw fa-tv me-2"></i>Animeler</a></li>
+                    <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:webtoon_list_view' %}active{% endif %}" href="{% url 'tracker:webtoon_list_view' %}"><i class="fas fa-fw fa-scroll me-2"></i>Webtoonlar</a></li>
+                    <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:manga_list_view' %}active{% endif %}" href="{% url 'tracker:manga_list_view' %}"><i class="fas fa-fw fa-book-open me-2"></i>Mangalar</a></li>
+                    <li><a class="dropdown-item {% if request.resolver_match.view_name == 'tracker:novel_list_view' %}active{% endif %}" href="{% url 'tracker:novel_list_view' %}"><i class="fas fa-fw fa-book me-2"></i>Noveller</a></li>
                   </ul>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user me-1"></i> {{ user.username }}
-                    </a>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user me-1"></i> {{ user.username }}</a>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarUserDropdown">
                         <li><a class="dropdown-item" href="{% url 'password_change' %}"><i class="fas fa-key fa-fw me-2"></i>Şifre Değiştir</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
-                                {% csrf_token %}
-                            </form>
-                            <a class="dropdown-item" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
-                               <i class="fas fa-sign-out-alt fa-fw me-2"></i>Çıkış Yap
-                            </a>
+                            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">{% csrf_token %}</form>
+                            <a class="dropdown-item" href="#" onclick="document.getElementById('logout-form').submit(); return false;"><i class="fas fa-sign-out-alt fa-fw me-2"></i>Çıkış Yap</a>
                         </li>
                     </ul>
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.view_name == 'tracker:signup' %}active{% endif %}" href="{% url 'tracker:signup' %}">
-                        <i class="fas fa-user-plus me-1"></i> Kayıt Ol
-                    </a>
+                    <a class="nav-link {% if request.resolver_match.view_name == 'tracker:signup' %}active{% endif %}" href="{% url 'tracker:signup' %}"><i class="fas fa-user-plus me-1"></i> Kayıt Ol</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}?next={{ request.path }}">
-                       <i class="fas fa-sign-in-alt me-1"></i> Giriş Yap
-                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}?next={{ request.path }}"><i class="fas fa-sign-in-alt me-1"></i> Giriş Yap</a>
                 </li>
             {% endif %}
             {% if user.is_authenticated and user.is_staff %}
-             <li class="nav-item">
-                <a class="nav-link" href="{% url 'admin:index' %}" target="_blank"><i class="fas fa-user-shield me-1" aria-hidden="true"></i>Admin</a>
-             </li>
+             <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}" target="_blank"><i class="fas fa-user-shield me-1"></i>Admin</a></li>
             {% endif %}
+            <li class="nav-item ms-2">
+                <button id="theme-toggle-button" class="btn btn-outline-secondary btn-sm" title="Temayı Değiştir">
+                    <i class="fas fa-sun theme-icon light-icon"></i>
+                    <i class="fas fa-moon theme-icon dark-icon"></i>
+                </button>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
-    {% comment %} ----- NAVBAR SONU ----- {% endcomment %}
+    {# Navbar Sonu #}
 
+    {# Ana İçerik Alanı ... #}
     <div class="container mt-4 main-container">
-        {% comment %} Django Mesajlarını Gösterme Alanı {% endcomment %}
          {% if messages %}
-            <div class="bootstrap-messages pt-3">
+            <div class="bootstrap-messages">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" data-aos="fade-left" data-aos-delay="200">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
             </div>
         {% endif %}
-        {% comment %} Mesaj Alanı Sonu {% endcomment %}
-
         <div class="pt-3">
-            {% block content %}
-            {% endblock content %}
+            {% block content %}{% endblock content %}
         </div>
     </div>
 
-    {# Footer #}
+    {# Footer ... #}
     <footer class="text-center py-4 text-muted">
         <div class="container">
              <small>
@@ -115,49 +116,59 @@
              </small>
         </div>
     </footer>
-    {# Footer Sonu #}
 
-    {# Bootstrap JS #}
+    {# JS Kütüphaneleri ... #}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    {# Chart.js Kütüphanesi #}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    {# AOS (Animate On Scroll) Kütüphanesi JS #}
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    {# AOS Başlatma Scripti #}
-    <script>
-      AOS.init({
-          duration: 600, // Animasyon süresi (ms)
-          once: true // Animasyonlar sadece bir kere tetiklensin
-      });
-    </script>
-
-    {# ---- YENİ: Navbar Scroll Efekti Scripti ---- #}
-    <script>
+    <script> AOS.init({ duration: 600, once: true }); </script>
+    <script> /* Navbar Scroll Scripti ... */
         const mainNavbar = document.getElementById('mainNavbar');
-        if (mainNavbar) {
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 50) { // 50 piksel aşağı kaydırılınca
-                    mainNavbar.classList.add('navbar-scrolled');
-                } else {
-                    mainNavbar.classList.remove('navbar-scrolled');
-                }
-            });
-        }
+        if (mainNavbar) { window.addEventListener('scroll', function() { if (window.scrollY > 50) { mainNavbar.classList.add('navbar-scrolled'); } else { mainNavbar.classList.remove('navbar-scrolled'); } }); }
     </script>
-    {# ---- Navbar Scroll Efekti Scripti Sonu ---- #}
 
-
-    {# ---- Sayfaya Özel Scriptler Bloğu ---- #}
+    {# ---- Sayfaya Özel Scriptler Bloğu ... ---- #}
     {% block extra_scripts %}
         {% if request.resolver_match.view_name == 'tracker:dashboard' %}
             <script id="chartDataJson" type="application/json">{{ chart_data_json|safe }}</script>
             <script src="{% static 'tracker/js/dashboard_charts.js' %}"></script>
         {% endif %}
     {% endblock extra_scripts %}
-    {# ---- Sayfaya Özel Scriptler Bloğu Sonu ---- #}
 
-    {# ---- Harici AJAX Favori Scripti ---- #}
+    {# ---- Harici AJAX Favori Scripti ... ---- #}
     <script src="{% static 'tracker/js/favorites_ajax.js' %}"></script>
+
+    {# Tema Değiştirme Scripti ... #}
+    <script>
+        const themeToggleButton = document.getElementById('theme-toggle-button');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        htmlElement.setAttribute('data-theme', savedTheme);
+        function toggleTheme() {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        if (themeToggleButton) { themeToggleButton.addEventListener('click', toggleTheme); }
+    </script>
+
+    {# Preloader Gizleme Scripti ... #}
+    <script>
+        window.addEventListener('load', function() {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(function() {
+                     preloader.classList.add('loaded');
+                }, 200); // Gecikme biraz artırılabilir: 300
+                // İsteğe bağlı: Tamamen kaybolduktan sonra DOM'dan kaldır
+                 preloader.addEventListener('transitionend', function() {
+                     if (!preloader.classList.contains('loaded')) return; // Hala görünürse dokunma
+                     // preloader.remove(); // Kaldırmak sorunlara yol açabilir, gizli kalsın
+                 });
+            }
+        });
+    </script>
 
 </body>
 </html>

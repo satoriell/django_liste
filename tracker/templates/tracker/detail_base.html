@@ -2,111 +2,107 @@
 {% load static %}
 {% comment %}
     Ortak Detay Sayfası Şablonu
-    Favori butonu ve AJAX için hazır.
-    Düzenle/Sil butonları sadece sahibine gösteriliyor.
-    Context: item, model_name, item_type, is_favorite, is_owner
+    AOS animasyonları çeşitlendirildi.
 {% endcomment %}
 
 {% block title %}{{ item.title }} - {{ model_name }} Detayları{% endblock title %}
 
 {% block content %}
-    {% comment %} Breadcrumb Navigasyonu (Aynı kalır) {% endcomment %}
-    <nav aria-label="breadcrumb" class="mb-4">
+    {# Breadcrumb Navigasyonu #}
+    <nav aria-label="breadcrumb" class="mb-4" data-aos="fade-down">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'tracker:dashboard' %}">Dashboard</a></li>
-        {# model_name küçük harfe çevrilip _list_view ekleniyor #}
         <li class="breadcrumb-item"><a href="{% url 'tracker:'|add:item_type|add:'_list_view' %}">{{ model_name }}ler</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{ item.title|truncatechars:50 }}</li>
       </ol>
     </nav>
 
-    <div class="card shadow-sm mb-4">
-        <div class="row g-0">
+    {# --- Ana İçerik Alanı --- #}
+    <div class="detail-content-wrapper">
 
-            {# ----- Resim Sütunu (Aynı kalır) ----- #}
-            <div class="col-lg-5 d-flex align-items-center justify-content-center p-3 detail-image-container">
-                 {% if item.cover_image_url %}
-                    <div class="w-70 detail-image-wrapper">
-                        <img src="{{ item.cover_image_url }}"
-                             class=" w-100 rounded shadow-sm detail-image"
-                             alt="{{ item.title }} Kapak" style="object-fit: cover; height: 395px;">
-                    </div>
-                {% else %}
-                    <div class=" w-100 detail-image-placeholder d-flex align-items-center justify-content-center text-muted rounded" style="min-height: 300px;">
-                        <i class="fas fa-image fa-4x" aria-hidden="true"></i>
-                    </div>
+        {# Başlık ve Eylem Butonları #}
+        <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2" data-aos="fade-down">
+            <h1 class="mb-0 me-3">{{ item.title }}</h1>
+            <div class="btn-group flex-shrink-0" role="group" aria-label="Eylemler">
+                {% if user.is_authenticated %}
+                <button type="button"
+                   class="btn btn-sm {% if is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %} js-toggle-favorite"
+                   title="Favoriye Ekle/Çıkar"
+                   data-item-id="{{ item.pk }}"
+                   data-item-type="{{ item_type }}">
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                </button>
+                {% endif %}
+                {% if is_owner %}
+                    <a href="{% url 'tracker:'|add:item_type|add:'_edit' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit me-1"></i>Düzenle</a>
+                    <a href="{% url 'tracker:'|add:item_type|add:'_delete' item.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt me-1"></i>Sil</a>
                 {% endif %}
             </div>
-            {# ----- Resim Sütunu Sonu ----- #}
-
-
-            {# ----- Detaylar Sütunu ----- #}
-            <div class="col-lg-7">
-                <div class="card-body p-4">
-                    {# Başlık ve Eylem Butonları #}
-                    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
-                        <h2 class="card-title mb-0 me-3">{{ item.title }}</h2>
-                        {# Eylem Butonları Grubu #}
-                        <div class="btn-group flex-shrink-0" role="group" aria-label="Eylemler">
-                            {# Favori Butonu - Sadece giriş yapmış kullanıcılar görür #}
-                            {% if user.is_authenticated %}
-                            <button type="button"
-                               class="btn btn-sm {% if is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %} js-toggle-favorite"
-                               title="Favoriye Ekle/Çıkar"
-                               data-item-id="{{ item.pk }}"
-                               data-item-type="{{ item_type }}">
-                                <i class="fas fa-star" aria-hidden="true"></i>
-                            </button>
-                            {% endif %}
-
-                            {# DÜZELTME: Düzenle ve Sil butonlarını sadece öğenin sahibi görür #}
-                            {% if is_owner %}
-                                <a href="{% url 'tracker:'|add:item_type|add:'_edit' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit me-1" aria-hidden="true"></i>Düzenle</a>
-                                <a href="{% url 'tracker:'|add:item_type|add:'_delete' item.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt me-1" aria-hidden="true"></i>Sil</a>
-                            {% endif %}
-                            {# DÜZELTME SONU #}
-                        </div>
-                    </div>
-
-                    {# Ekleyen Kullanıcı Bilgisi (Opsiyonel) #}
-                    <p class="text-muted mb-2"><small>Ekleyen: {{ item.user.username }}</small></p>
-
-                    {# Durum ve Puan (Aynı kalır) #}
-                    <div class="mb-4 pb-1">
-                       <span class="badge fs-6 rounded-pill {% if item.status == 'Watching' %} bg-success {% elif item.status == 'Completed' %} bg-primary {% elif item.status == 'Plan to Watch' %} bg-info text-dark {% elif item.status == 'On Hold' %} bg-warning text-dark {% elif item.status == 'Dropped' %} bg-danger {% else %} bg-secondary {% endif %}"><i class="fas fa-check-circle me-1" aria-hidden="true"></i>{{ item.get_status_display }}</span>
-                       {% if item.rating is not None %} <span class="badge fs-6 bg-dark ms-1"><i class="fas fa-star me-1" aria-hidden="true"></i>Puan: {{ item.rating }}/10</span> {% endif %}
-                    </div>
-
-                    {# İlerleme Çubuğu (Aynı kalır) #}
-                    {% with progress=item.get_progress_percent %}
-                        {% if progress is not None %}
-                        <div class="mb-3">
-                            <small class="text-muted">İlerleme:</small>
-                            <div class="progress" role="progressbar" aria-label="İlerleme" aria-valuenow="{{ progress|floatformat:0 }}" aria-valuemin="0" aria-valuemax="100" style="height: 10px;"> {# floatformat:0 eklendi #}
-                              <div class="progress-bar {% if progress == 100 %}bg-primary{% else %}bg-success{% endif %}" style="width: {{ progress }}%"></div>
-                            </div>
-                         </div>
-                         <hr class="my-3">
-                        {% endif %}
-                    {% endwith %}
-
-                    {# Detay Listesi (Partial template çağrısı aynı kalır) #}
-                    {% include 'tracker/partials/_item_details_dl.html' with item=item %}
-
-                </div> {# card-body sonu #}
-            </div> {# col-lg-7 sonu #}
-            {# ----- Detaylar Sütunu Sonu ----- #}
-
         </div>
 
-        {# Notlar Alanı (Aynı kalır) #}
+        {# Ekleyen Kullanıcı Bilgisi #}
+        <p class="text-muted mb-4" data-aos="fade-right" data-aos-delay="100"><small>Ekleyen: {{ item.user.username }}</small></p>
+
+        {# Resim Alanı - Ortalanmış #}
+        {# GÜNCELLENDİ: data-aos="flip-left" kullanıldı #}
+        <div class="text-center mb-4" data-aos="flip-left" data-aos-delay="150">
+             {% if item.cover_image_url %}
+                <a href="{{ item.cover_image_url }}" target="_blank" class="d-inline-block">
+                    <img src="{{ item.cover_image_url }}"
+                         class="img-fluid rounded shadow-sm detail-image"
+                         alt="{{ item.title }} Kapak"
+                         style="max-width: 350px; max-height: 500px; object-fit: contain;">
+                 </a>
+            {% else %}
+                <div class="d-inline-block detail-image-placeholder d-flex align-items-center justify-content-center text-secondary rounded bg-light"
+                     style="width: 300px; height: 400px;">
+                    <i class="fas fa-image fa-5x" aria-hidden="true"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        {# Durum ve Puan - Ortalanmış #}
+        {# GÜNCELLENDİ: data-aos="zoom-in-up" kullanıldı #}
+        <div class="text-center mb-4" data-aos="zoom-in-up" data-aos-delay="200">
+           <span class="badge fs-6 rounded-pill badge-status {% if item.status == 'Watching' %}badge-status-watching{% elif item.status == 'Completed' %}badge-status-completed{% elif item.status == 'On Hold' %}badge-status-onhold{% elif item.status == 'Dropped' %}badge-status-dropped{% elif item.status == 'Plan to Watch' %}badge-status-plantowatch{% else %}badge-status-default{% endif %}"><i class="fas fa-check-circle me-1"></i>{{ item.get_status_display }}</span>
+           {% if item.rating is not None %} <span class="badge fs-6 bg-dark ms-1"><i class="fas fa-star me-1"></i>Puan: {{ item.rating }}/10</span> {% endif %}
+        </div>
+
+        {# İlerleme Çubuğu (varsa) #}
+        {% with progress=item.get_progress_percent %}
+            {% if progress is not None %}
+            {# GÜNCELLENDİ: data-aos="zoom-in" kullanıldı #}
+            <div class="mb-4 mx-auto" style="max-width: 500px;" data-aos="zoom-in" data-aos-delay="250">
+                <small class="text-muted d-block text-center mb-1">İlerleme:</small>
+                <div class="progress" role="progressbar" aria-label="İlerleme" aria-valuenow="{{ progress|floatformat:0 }}" aria-valuemin="0" aria-valuemax="100" style="height: 10px;">
+                  <div class="progress-bar {% if progress == 100 %}bg-primary{% else %}bg-success{% endif %}" style="width: {{ progress }}%"></div>
+                </div>
+             </div>
+            {% endif %}
+        {% endwith %}
+
+        <hr class="my-4" data-aos="fade" data-aos-delay="300">
+
+        {# Detay Listesi #}
+        {# GÜNCELLENDİ: data-aos="fade-up" kullanıldı #}
+        <div class="item-details-list mx-auto" style="max-width: 600px;" data-aos="fade-up" data-aos-delay="350">
+             <h4 class="text-center mb-3">Detaylar</h4>
+             {% include 'tracker/partials/_item_details_dl.html' with item=item %}
+        </div>
+
+        {# Notlar Alanı (varsa) #}
          {% if item.notes %}
-            <hr class="my-0">
-            <div class="card-footer bg-white p-4">
-                <h5 class="mb-2"><i class="fas fa-comment-alt me-1 text-muted" aria-hidden="true"></i>Notlar:</h5>
-                <p class="item-notes mb-0" style="white-space: pre-wrap;">{{ item.notes }}</p>
+            <hr class="my-4" data-aos="fade" data-aos-delay="400">
+            {# GÜNCELLENDİ: data-aos="fade-up" kullanıldı #}
+            <div class="item-notes-section mx-auto" style="max-width: 700px;" data-aos="fade-up" data-aos-delay="450">
+                <h4 class="mb-3 text-center"><i class="fas fa-comment-alt me-1 text-muted"></i>Notlar</h4>
+                <div class="bg-light p-3 rounded" style="white-space: pre-wrap;">{{ item.notes }}</div>
+                 {# Koyu tema için not arkaplanı #}
+                 <style> html[data-theme="dark"] .item-notes-section .bg-light { background-color: var(--gray-300) !important; } </style>
             </div>
         {% endif %}
+
     </div>
+    {# --- Ana İçerik Alanı Sonu --- #}
 
 {% endblock content %}

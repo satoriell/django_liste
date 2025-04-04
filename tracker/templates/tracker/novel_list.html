@@ -6,63 +6,51 @@
 
 {% block content %}
 
-    <h1 class="mb-4" style="color: #6f42c1;">Novel Listem</h1> {# Başlık rengi güncellendi #}
+    {# Başlığa animasyon #}
+    <h1 class="mb-4" style="color: var(--primary-color);" data-aos="fade-down">Novel Listem</h1> {# Novel rengi primary'ye eşitlendi #}
 
-     {% comment %} --- Kontrol Alanı (Partial Template Kullanılarak) --- {% endcomment %}
-     {# GÜNCELLENDİ: Kontrol alanına animasyon #}
-    <div data-aos="fade-up">
+     {% comment %} --- Kontrol Alanı --- {% endcomment %}
+     {# Kontrol alanına animasyon #}
+    <div data-aos="slide-down" data-aos-duration="500">
         {% include 'tracker/partials/_list_controls.html' with list_url_name='tracker:novel_list_view' export_url_name='tracker:export_novel_csv' status_choices=status_choices current_status_filter=current_status_filter search_query=search_query current_sort=current_sort %}
     </div>
 
-    {% comment %} --- Yeni Novel Ekleme Formu (Manuel Render İle) --- {% endcomment %}
-    {# GÜNCELLENDİ: Form konteynerine animasyon #}
-    <div class="form-container shadow-sm mb-5" data-aos="zoom-in-up" data-aos-delay="100">
+    {% comment %} --- Yeni Novel Ekleme Formu --- {% endcomment %}
+    {# Form konteynerine animasyon ve margin ayarı #}
+    <div class="form-container shadow-sm mb-4" data-aos="slide-up" data-aos-delay="100" data-aos-duration="500">
         <h4 class="mb-3">Yeni Novel Ekle</h4>
         <form method="post" action="{% url 'tracker:novel_list_view' %}">
             {% csrf_token %}
-
-            {# ---- Formu Manuel Render Etme ---- #}
             {% for field in form %}
                 <div class="mb-3">
-                    <label for="{{ field.id_for_label }}" class="form-label">
-                        {{ field.label }}
-                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
-                    </label>
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.field.required %}<span class="text-danger">*</span>{% endif %}</label>
                     {{ field }}
-                    {% if field.help_text %}
-                        <div id="{{ field.id_for_label }}_help" class="form-text">{{ field.help_text|safe }}</div>
-                    {% endif %}
-                    {% if field.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ field.errors|striptags }}
-                        </div>
-                    {% endif %}
+                    {% if field.help_text %}<div id="{{ field.id_for_label }}_help" class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+                    {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>{% endif %}
                 </div>
             {% endfor %}
-            {# ---- Manuel Render Sonu ---- #}
-
-            <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save me-1" aria-hidden="true"></i>Kaydet</button>
+            <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save me-1"></i>Kaydet</button>
              <a href="{% url 'admin:tracker_novel_add' %}" class="btn btn-outline-secondary mt-3 ms-2" target="_blank">Admin Panelinde Ekle</a>
         </form>
     </div>
 
     {% comment %} --- Novel Listesi --- {% endcomment %}
-    <h4 class="mb-3">Mevcut Liste {% if current_status_filter or search_query or current_sort != '-added_date' %}(Filtrelenmiş/Sıralanmış Sonuçlar){% endif %}</h4>
+     {# Liste başlığına animasyon #}
+    <h4 class="mb-3" data-aos="fade-up" data-aos-delay="150">Mevcut Liste {% if current_status_filter or search_query or current_sort != '-added_date' %}(Filtrelenmiş/Sıralanmış Sonuçlar){% endif %}</h4>
     {% if page_obj %}
-        <ul class="list-group shadow-sm mb-4">
+        <ul class="list-group mb-4">
             {% for novel in page_obj %}
-                {# GÜNCELLENDİ: Gecikme için cycle etiketi kullanılıyor #}
-                {% cycle '0' '100' '200' '300' '400' as current_delay silent %}
+                {# Sıralı gecikme için cycle etiketi #}
+                {% cycle '0' '50' '100' '150' '200' as current_delay silent %}
+                {# Liste öğesi partial'ı (içinde fade-left/right animasyonu var) #}
                 {% include 'tracker/partials/_list_item.html' with item=novel detail_url_name='novel_detail' edit_url_name='novel_edit' delete_url_name='novel_delete' item_type='novel' favorited_pks=favorited_pks aos_delay=current_delay %}
             {% endfor %}
         </ul>
-
-        {% comment %} --- Pagination Kontrolleri (Partial Template Kullanılarak) --- {% endcomment %}
+        {# Sayfalama partial'ı #}
         {% include 'tracker/partials/_pagination.html' with page_obj=page_obj params_encoded=params_encoded %}
-
     {% else %}
-         {# GÜNCELLENDİ: Uyarı mesajına animasyon #}
-         <div class="alert alert-warning" role="alert" data-aos="fade-in"> {% if current_status_filter or search_query or current_sort != '-added_date' %}Seçtiğiniz kriterlere uygun novel bulunamadı. <a href="{% url 'tracker:novel_list_view' %}" class="alert-link">Filtreyi/Sıralamayı Temizle</a>{% else %}Listenizde henüz hiç novel bulunmuyor.{% endif %}</div>
+         {# Uyarı mesajına animasyon #}
+         <div class="alert alert-warning" role="alert" data-aos="fade-in" data-aos-delay="200"> {% if current_status_filter or search_query or current_sort != '-added_date' %}Seçtiğiniz kriterlere uygun novel bulunamadı. <a href="{% url 'tracker:novel_list_view' %}" class="alert-link">Filtreyi/Sıralamayı Temizle</a>{% else %}Listenizde henüz hiç novel bulunmuyor.{% endif %}</div>
     {% endif %}
 
 {% endblock content %}
