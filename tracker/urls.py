@@ -1,14 +1,11 @@
 # tracker/urls.py
 # Konum: /home/admin/App/django_liste/tracker/urls.py
-# --- DEĞİŞİKLİK GEREKMEZ ---
+# YENİ: Jikan API (Novel) için URL'ler eklendi.
 
 from django.urls import path
-# UUID tipini import et
-import uuid
-# View fonksiyonlarını import et
+import uuid # MangaDex ID için
 from . import views
 
-# Uygulama ad alanı (namespace)
 app_name = "tracker"
 
 urlpatterns = [
@@ -16,15 +13,13 @@ urlpatterns = [
     path("", views.dashboard_view, name="dashboard"),
 
     # --- Kayıt (Signup) ---
-    # Ana projenin urls.py dosyasında 'accounts/' handle edilmeli (genellikle django.contrib.auth.urls ile)
-    # Eğer burada tanımlamak istersen: path("signup/", views.signup_view, name="signup"),
-    # Ama genellikle projenin ana urls.py'sinde olur.
+    # Ana projenin urls.py'sinde 'accounts/' altında handle ediliyor.
 
     # --- Favori URL'leri ---
     path("favorite/toggle/", views.toggle_favorite, name="toggle_favorite"),
     path("favorites/", views.favorites_view, name="favorites_view"),
 
-    # --- MangaDex API Arama ve Ekleme URL'leri ---
+    # --- MangaDex API (Manga/Webtoon) ---
     path("manga/search-api/", views.manga_api_search_view, name="manga_api_search"),
     path("webtoon/search-api/", views.manga_api_search_view, name="webtoon_api_search"),
     path("add-from-mangadex/<uuid:mangadex_id>/", views.md_add_item_view, name="md_add_item"),
@@ -35,6 +30,9 @@ urlpatterns = [
     path("anime/<int:pk>/edit/", views.anime_edit, name="anime_edit"),
     path("anime/<int:pk>/delete/", views.anime_delete, name="anime_delete"),
     path("anime/export/csv/", views.export_anime_csv, name="export_anime_csv"),
+    # --- Jikan API (Anime) URL'leri ---
+    path("anime/search-api/", views.anime_api_search_view, name="anime_api_search"),
+    path("add-from-jikan/<int:mal_id>/", views.jikan_add_anime_view, name="jikan_add_anime"),
 
     # --- Webtoon URL'leri ---
     path("webtoon/", views.webtoon_list_and_create, name="webtoon_list_view"),
@@ -56,8 +54,11 @@ urlpatterns = [
     path("novel/<int:pk>/edit/", views.novel_edit, name="novel_edit"),
     path("novel/<int:pk>/delete/", views.novel_delete, name="novel_delete"),
     path("novel/export/csv/", views.export_novel_csv, name="export_novel_csv"),
+    # --- YENİ: Jikan API (Novel) URL'leri ---
+    path("novel/search-api/", views.novel_api_search_view, name="novel_api_search"),
+    path("add-novel-from-jikan/<int:mal_id>/", views.jikan_add_novel_view, name="jikan_add_novel"),
+    # ---------------------------------------
 
-    # Opsiyonel: İleride tüm tipleri tek bir etikete göre listeleyen bir sayfa istersen
-    # buraya yeni bir path ekleyebilirsin, örneğin:
+    # Opsiyonel: Etikete göre listeleme (varsa)
     # path("tags/<slug:tag_slug>/", views.items_by_tag_view, name="items_by_tag"),
 ]

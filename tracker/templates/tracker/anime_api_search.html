@@ -1,0 +1,81 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% comment %}
+    Konum: tracker/templates/tracker/anime_api_search.html
+    Jikan API kullanarak anime arama sonuçlarını gösterir.
+    Context: search_results, query, add_item_url_name, search_title, item_type_name
+{% endcomment %}
+
+{% block title %}{{ search_title|default:"API ile Anime Ara" }} - Kişisel Liste{% endblock title %}
+
+{% block content %}
+    <h1 class="mb-4 text-primary" data-aos="fade-down"><i class="fas fa-search me-2"></i>{{ search_title|default:"Jikan API ile Anime Ara" }}</h1>
+
+    {# --- Arama Formu --- #}
+    <div class="controls-container p-3 mb-4 border rounded shadow-sm" data-aos="fade-up">
+        {# Action URL doğru view'a gitmeli #}
+        <form method="post" action="{% url 'tracker:anime_api_search' %}">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="text" class="form-control" name="query" placeholder="{{ item_type_name|default:'Anime' }} başlığı girin..." value="{{ query|default:'' }}" aria-label="{{ item_type_name|default:'Anime' }} başlığı" required>
+                <button class="btn btn-primary" type="submit">Ara</button>
+            </div>
+        </form>
+    </div>
+
+    {# --- Arama Sonuçları --- #}
+    {% if search_results is not None %}
+        <hr data-aos="fade">
+        <h4 class="mb-3" data-aos="fade-up">Arama Sonuçları {% if query %}({{ query }}){% endif %}</h4>
+
+        {% if search_results %}
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for result in search_results %}
+                    <div class="col d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 50 %}">
+                        <div class="card h-100 shadow-sm">
+                            {# Resim (Jikan'dan gelen image_url kullanılır) #}
+                            {% if result.image_url %}
+                                <img src="{{ result.image_url }}" class="card-img-top" alt="{{ result.title }} Kapak" style="height: 250px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light text-secondary" style="height: 250px;">
+                                    <i class="fas fa-image fa-3x"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title flex-grow-1">
+                                    {{ result.title }}
+                                    {% if result.type %}<small class="text-muted"> ({{ result.type }})</small>{% endif %}
+                                </h6>
+                                <small class="text-muted mb-2 d-block">
+                                    {% if result.episodes %}Bölüm: {{ result.episodes }} | {% endif %}
+                                    {% if result.score %}Puan: {{ result.score }}/10 | {% endif %}
+                                    {% if result.status %}Durum: {{ result.status }}{% endif %}
+                                </small>
+                                {% if result.synopsis_snippet %}
+                                    <p class="card-text small text-muted mb-2"><i>{{ result.synopsis_snippet }}</i></p>
+                                {% endif %}
+
+                                {# Ekleme butonu (jikan_add_anime URL'ine mal_id ile gider) #}
+                                <a href="{% url add_item_url_name result.mal_id %}" class="btn btn-sm btn-success mt-auto w-100">
+                                    <i class="fas fa-plus me-1"></i> Listeme Ekle
+                                </a>
+                            </div>
+                            <div class="card-footer text-muted small">
+                                MAL ID: {{ result.mal_id }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {# Arama yapıldı ama sonuç yoksa #}
+            {% if query %}
+            <div class="alert alert-warning" role="alert" data-aos="fade-in">
+                "{{ query }}" için sonuç bulunamadı.
+            </div>
+            {% endif %}
+        {% endif %}
+
+    {% endif %} {# search_results is not None kontrolü sonu #}
+
+{% endblock content %}

@@ -1,5 +1,6 @@
 # tracker/models.py
 # Konum: /home/admin/App/django_liste/tracker/models.py
+# YENİ: Novel modeline mal_id eklendi.
 
 import uuid
 from django.db import models
@@ -8,19 +9,16 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from taggit.managers import TaggableManager # <- YENİ: django-taggit import edildi
+from taggit.managers import TaggableManager
 
 # Ortak alanları burada tanımlayıp diğer modellerde tekrar yazmaktan kurtulabiliriz.
 class MediaItem(models.Model):
-    # Kullanıcı ile ilişki (ForeignKey)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='%(class)s_items',
         verbose_name="Kullanıcı"
     )
-
-    # Durum seçenekleri
     STATUS_CHOICES = [
         ("Watching", "İzliyorum/Okuyorum"),
         ("Completed", "Tamamladım"),
@@ -28,8 +26,6 @@ class MediaItem(models.Model):
         ("Dropped", "Bıraktım"),
         ("Plan to Watch", "İzleyeceğim/Okuyacağım"),
     ]
-
-    # Alanlar
     title = models.CharField(max_length=255, verbose_name="Başlık")
     status = models.CharField(
         max_length=20,
@@ -59,8 +55,6 @@ class MediaItem(models.Model):
     added_date = models.DateTimeField(
         default=timezone.now, verbose_name="Eklenme Tarihi"
     )
-
-    # --- API ID Alanları ---
     mangadex_id = models.UUIDField(
         null=True,
         blank=True,
@@ -68,65 +62,49 @@ class MediaItem(models.Model):
         db_index=True,
         verbose_name="MangaDex ID"
     )
-    # --------------------------
-
-    # --- YENİ: Etiket Alanı (django-taggit) ---
     tags = TaggableManager(
-        blank=True, # Etiket eklemek zorunlu değil
+        blank=True,
         verbose_name="Etiketler",
-        help_text="Etiketleri virgülle ayırarak giriniz." # Admin panelinde yardımcı metin
+        help_text="Etiketleri virgülle ayırarak giriniz."
     )
-    # ---------------------------------------
 
-    # Meta
     class Meta:
         abstract = True
         ordering = ['user', "-added_date", "title"]
 
-    # Metodlar
     def __str__(self):
         return self.title
 
     def get_progress_percent(self):
-        """Öğenin ilerleme yüzdesini hesaplar (ondalıklı).
-           Bölüm/Chapter bilgisi varsa onu, yoksa Cilt/Volume bilgisini kullanır."""
         total = None
         current = None
-
-        # Öncelik: Bölüm/Episode/Chapter sayıları
         if hasattr(self, "total_episodes") and self.total_episodes is not None and self.total_episodes > 0:
             total = self.total_episodes
-            current = getattr(self, "episodes_watched", 0) # Varsayılan 0
+            current = getattr(self, "episodes_watched", 0)
         elif hasattr(self, "total_chapters") and self.total_chapters is not None and self.total_chapters > 0:
             total = self.total_chapters
-            current = getattr(self, "chapters_read", 0) # Varsayılan 0
-
-        # Eğer bölüm bilgisi yoksa veya toplam 0 ise, Cilt/Volume bilgilerini kontrol et (Manga/Novel için)
+            current = getattr(self, "chapters_read", 0)
         if total is None:
              if hasattr(self, "total_volumes") and self.total_volumes is not None and self.total_volumes > 0:
                  total = self.total_volumes
-                 current = getattr(self, "volumes_read", 0) # Varsayılan 0
-
-        # Hesaplama
-        if (
-            total is not None and total > 0 and
-            current is not None and isinstance(current, (int, float)) and isinstance(total, (int, float)) # int/float olabilir
-           ):
+                 current = getattr(self, "volumes_read", 0)
+        if (total is not None and total > 0 and current is not None and isinstance(current, (int, float)) and isinstance(total, (int, float))):
             try:
-                current = max(0, current) # Negatif değer olmasın
+                current = max(0, current)
                 percentage = (current / total) * 100
-                return min(percentage, 100) # %100'ü geçmesin
-            except ZeroDivisionError:
-                return None
-            except (TypeError, ValueError):
-                return None
+                return min(percentage, 100)
+            except ZeroDivisionError: return None
+            except (TypeError, ValueError): return None
         return None
 
-# --- Medya Modelleri (Değişiklik yok, 'tags' alanı MediaItem'dan miras alınacak) ---
+# --- Medya Modelleri ---
 class Anime(MediaItem):
     studio = models.CharField(max_length=100, blank=True, verbose_name="Stüdyo")
     episodes_watched = models.PositiveIntegerField(default=0, verbose_name="İzlenen Bölüm")
     total_episodes = models.PositiveIntegerField(null=True, blank=True, verbose_name="Toplam Bölüm")
+    mal_id = models.PositiveIntegerField(
+        null=True, blank=True, unique=True, db_index=True, verbose_name="MyAnimeList ID"
+    )
 
 class Webtoon(MediaItem):
     author = models.CharField(max_length=100, blank=True, verbose_name="Yazar")
@@ -150,10 +128,18 @@ class Novel(MediaItem):
     total_chapters = models.PositiveIntegerField(null=True, blank=True, verbose_name="Toplam Bölüm")
     total_volumes = models.PositiveIntegerField(null=True, blank=True, verbose_name="Toplam Cilt")
 
+    # YENİ: Jikan API (MyAnimeList) ID alanı (Novel için de)
+    # Jikan novelleri de manga endpoint'i altında listeler ve MAL ID'leri vardır.
+    mal_id = models.PositiveIntegerField(
+        null=True,       # API'dan eklenmeyenler için boş olabilir
+        blank=True,      # Formlarda boş bırakılabilir
+        unique=True,     # Her MAL ID'si benzersiz olmalı (ama null olabilir)
+        db_index=True,   # Bu alana göre arama yapılacağı için index iyi olur
+        verbose_name="MyAnimeList ID"
+    )
 
-# --- Favori Modeli (Değişiklik yok) ---
+# --- Favori Modeli ---
 class Favorite(models.Model):
-    """Kullanıcının favoriye eklediği öğeleri tutar."""
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -169,20 +155,15 @@ class Favorite(models.Model):
         verbose_name="Obje ID"
     )
     content_object = GenericForeignKey('content_type', 'object_id')
-
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Eklenme Zamanı"
     )
-
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'content_type', 'object_id'], name='unique_user_content_favorite')
-        ]
+        constraints = [ models.UniqueConstraint(fields=['user', 'content_type', 'object_id'], name='unique_user_content_favorite') ]
         ordering = ['-created_at']
         verbose_name = "Favori"
         verbose_name_plural = "Favoriler"
-
     def __str__(self):
         item_title = str(self.content_object) if self.content_object else f"{self.content_type.model}-{self.object_id}"
         return f"{self.user.username} - {item_title}"
