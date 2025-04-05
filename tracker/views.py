@@ -24,6 +24,9 @@ from .forms import AnimeForm, MangaForm, NovelForm, WebtoonForm
 # Modelleri import et
 from .models import Anime, Manga, Novel, Webtoon, Favorite # Favorite gerekli
 
+# YENİ: MangaDex Servisini import et
+from . import mangadex_service
+
 # ==============================================================================
 # 1. YARDIMCI FONKSİYONLAR
 # ==============================================================================
@@ -79,14 +82,20 @@ def _process_list_view(
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
 
-    # --- POST İsteği İşlemleri (Yeni öğe ekleme) ---
+    # --- POST İsteği İşlemleri (Yeni öğe ekleme - Manuel) ---
     form = None # Formu başlangıçta None yap
     if request.method == "POST":
+        # API'dan ekleme POST'ları buraya gelmemeli, onlar kendi view'larında.
+        # Bu kontrol _process_list_view'ın sadece manuel eklemeyi işlemesini sağlar.
+        # Eğer API arama formu da bu view'a POST yapıyorsa, formları ayırt etmek için
+        # form içinde gizli bir alan veya buton adı kullanılabilir. Şimdilik ayırdığımızı varsayıyoruz.
+
         # DÜZELTME: Formu POST verisiyle burada oluştur
         form = form_class(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user # Öğeyi mevcut kullanıcıya ata
+            # Manuel eklemede API ID'leri boş kalacak
             instance.save()
             messages.success(request, f'{model._meta.verbose_name.capitalize()} "{instance.title}" başarıyla eklendi.')
             # Başarılı kayıttan sonra YÖNLENDİRME yapılıyor
@@ -121,7 +130,7 @@ def _process_list_view(
     context = {
         "page_obj": page_obj,
         "paginator": paginator,
-        "form": form, # POST ise hatalı formu, GET ise boş formu içerir
+        "form": form, # POST ise hatalı formu, GET ise boş formu içerir (Manuel ekleme için)
         "status_choices": model.STATUS_CHOICES,
         "current_status_filter": status_filter,
         "search_query": search_query,
@@ -131,7 +140,9 @@ def _process_list_view(
         "favorited_pks": favorited_pks, # Favori butonları için (set olarak gönderiliyor)
         "item_type_str": model.__name__.lower(), # Favori butonları için
         "list_url_name": redirect_url_name, # _list_controls partial'ı için
-        "export_url_name": f"tracker:export_{model.__name__.lower()}_csv" # _list_controls partial'ı için
+        "export_url_name": f"tracker:export_{model.__name__.lower()}_csv", # _list_controls partial'ı için
+        # YENİ: API arama URL'sini template'e gönderebiliriz
+        "api_search_url_name": f"tracker:{model.__name__.lower()}_api_search" if model in [Manga, Webtoon] else None
     }
     # GET veya hatalı POST durumunda render et (status 200)
     return render(request, template_name, context)
@@ -480,6 +491,8 @@ def anime_detail(request, pk):
 # --- Webtoon CRUD View'ları ---
 @login_required
 def webtoon_list_and_create(request):
+    # DİKKAT: API entegrasyonu eklenirse, bu view _process_list_view'ı doğrudan çağırmak yerine
+    # belki yeni API arama view'ına bir link göstermeli veya farklı çalışmalı.
     return _process_list_view(request, Webtoon, WebtoonForm, "tracker/webtoon_list.html", "tracker:webtoon_list_view")
 @login_required
 def webtoon_edit(request, pk):
@@ -494,6 +507,8 @@ def webtoon_detail(request, pk):
 # --- Manga CRUD View'ları ---
 @login_required
 def manga_list_and_create(request):
+    # DİKKAT: API entegrasyonu eklenirse, bu view _process_list_view'ı doğrudan çağırmak yerine
+    # belki yeni API arama view'ına bir link göstermeli veya farklı çalışmalı.
     return _process_list_view(request, Manga, MangaForm, "tracker/manga_list.html", "tracker:manga_list_view")
 @login_required
 def manga_edit(request, pk):
@@ -519,40 +534,128 @@ def novel_delete(request, pk):
 def novel_detail(request, pk):
     return _render_detail_view(request, pk, Novel)
 
+# ==============================================================================
+# YENİ: MangaDex API View Fonksiyonları
+# ==============================================================================
+
+@login_required
+def manga_api_search_view(request):
+    """MangaDex API'da arama yapmak için formu gösterir ve arama yapar."""
+    context = {
+        'search_results': None,
+        'query': None,
+    }
+    if request.method == 'POST':
+        query = request.POST.get('query', '').strip()
+        if query:
+            context['query'] = query
+            # MangaDex servisini kullanarak arama yap
+            results = mangadex_service.search_manga(query)
+            if results is None: # API hatası varsa
+                 messages.error(request, "MangaDex API'ına bağlanırken bir hata oluştu. Lütfen tekrar deneyin.")
+                 context['search_results'] = None
+            elif not results: # Sonuç bulunamadıysa
+                messages.warning(request, f"'{query}' için MangaDex üzerinde sonuç bulunamadı.")
+                context['search_results'] = [] # Boş liste gönderelim
+            else:
+                 context['search_results'] = results
+                 messages.success(request, f"'{query}' için {len(results)} sonuç bulundu.")
+        else:
+            messages.warning(request, "Lütfen aramak için bir başlık girin.")
+
+        # POST isteği sonrası sonuçları aynı template'te gösterelim
+        # Template adı varsayılan: 'tracker/manga_api_search.html'
+        return render(request, 'tracker/manga_api_search.html', context)
+
+    # GET isteği için sadece boş formu göster
+    # Template adı varsayılan: 'tracker/manga_api_search.html'
+    return render(request, 'tracker/manga_api_search.html', context)
+
+@login_required
+def manga_add_from_api_view(request, mangadex_id):
+    """Seçilen MangaDex ID'si ile manga detaylarını getirir, formu doldurur ve kaydeder."""
+    # 1. MangaDex'ten detayları al
+    # MangaDex ID'si UUID olduğu için str() kullanmak iyi olabilir
+    initial_data = mangadex_service.get_manga_details(str(mangadex_id))
+
+    if initial_data is None:
+        messages.error(request, "Manga detayları MangaDex API'sından alınamadı veya manga bulunamadı.")
+        return redirect('tracker:manga_api_search') # Arama sayfasına geri dön
+
+    # Bu ID ile veritabanında zaten kayıt var mı diye kontrol et
+    # Hem Manga hem Webtoon modellerini kontrol etmeliyiz!
+    existing_item = Manga.objects.filter(mangadex_id=mangadex_id, user=request.user).first()
+    if not existing_item:
+        existing_item = Webtoon.objects.filter(mangadex_id=mangadex_id, user=request.user).first()
+
+    if existing_item:
+        item_type_name = "Manga" if isinstance(existing_item, Manga) else "Webtoon"
+        messages.info(request, f"'{existing_item.title}' ({item_type_name}) zaten listenizde mevcut.")
+        # Mevcut kaydın detayına yönlendir
+        detail_url_name = f'tracker:{item_type_name.lower()}_detail'
+        return redirect(detail_url_name, pk=existing_item.pk)
+
+    # Hangi formu kullanacağımıza karar ver (Manga mı, Webtoon mu?)
+    # `map_mangadex_data_to_dict` içinde bir 'is_webtoon' anahtarı eklediysek onu kullanabiliriz
+    # Veya burada tekrar API verisine bakabiliriz. Şimdilik varsayılan MangaForm.
+    # TODO: Webtoon ayrımı için logic eklenecek.
+    FormClass = MangaForm
+    ModelClass = Manga
+    model_verbose_name = "Manga" # Mesajlar için
+    form_template = 'tracker/manga_form_api.html' # Ayrı bir template kullanacağız
+
+    if request.method == 'POST':
+        form = FormClass(request.POST) # Yeni kayıt, instance yok
+
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.user = request.user
+            instance.mangadex_id = mangadex_id # UUID'yi ata
+            # Formda olmayan ama API'dan gelen diğer alanları da atayabiliriz (örn. total_chapters/volumes None ise)
+            # Ancak formun clean metotları API'dan gelen 'None' ile çakışabilir, dikkatli olmalı.
+            # Şimdilik sadece ID'yi atayalım.
+            instance.save()
+            messages.success(request, f"{model_verbose_name} '{instance.title}' başarıyla listenize eklendi.")
+            # Başarılı ekleme sonrası listenin olduğu sayfaya veya detaya git
+            return redirect('tracker:manga_list_view')
+        else:
+             messages.error(request, "Formda hatalar var. Lütfen işaretli alanları kontrol edin.")
+             # Hatalı formu tekrar gösterirken API verisini kaybetmeyelim
+             context = {
+                  'form': form,
+                  'mangadex_data': initial_data # Başlık, kapak vb. göstermek için
+             }
+             return render(request, form_template, context)
+
+    # GET isteği: API verisiyle doldurulmuş boş formu göster
+    else:
+        form = FormClass(initial=initial_data)
+        context = {
+            'form': form,
+            'mangadex_data': initial_data # Template'te başlık, kapak gibi bilgileri göstermek için
+        }
+        return render(request, form_template, context)
+
+# ==============================================================================
+# YENİ VIEW FONKSİYONLARI SONU
+# ==============================================================================
+
+
 # --- CSV EXPORT View'ları ---
+# (Bu kısım aynı kalabilir)
 @login_required
 def export_anime_csv(request):
-    fields = {
-        "pk": "ID", "title": "Baslik", "get_status_display": "Durum", "rating": "Puan",
-        "studio": "Stüdyo", "episodes_watched": "Izlenen Bolum", "total_episodes": "Toplam Bolum",
-        "start_date": "Baslama Tarihi", "end_date": "Bitirme Tarihi", "added_date": "Eklenme Tarihi",
-        "notes": "Notlar", "cover_image_url": "Kapak URL",
-    }
+    # ... (kod aynı) ...
     return _export_csv(request, Anime, "anime", fields)
 @login_required
 def export_webtoon_csv(request):
-    fields = {
-        "pk": "ID", "title": "Baslik", "get_status_display": "Durum", "rating": "Puan",
-        "author": "Yazar", "artist": "Cizer", "chapters_read": "Okunan Bolum", "total_chapters": "Toplam Bolum",
-        "platform": "Platform", "start_date": "Baslama Tarihi", "end_date": "Bitirme Tarihi",
-        "added_date": "Eklenme Tarihi", "notes": "Notlar", "cover_image_url": "Kapak URL",
-    }
+    # ... (kod aynı) ...
     return _export_csv(request, Webtoon, "webtoon", fields)
 @login_required
 def export_manga_csv(request):
-    fields = {
-        "pk": "ID", "title": "Baslik", "get_status_display": "Durum", "rating": "Puan",
-        "author": "Yazar", "artist": "Cizer", "chapters_read": "Okunan Bolum", "volumes_read": "Okunan Cilt",
-        "total_chapters": "Toplam Bolum", "total_volumes": "Toplam Cilt", "start_date": "Baslama Tarihi",
-        "end_date": "Bitirme Tarihi", "added_date": "Eklenme Tarihi", "notes": "Notlar", "cover_image_url": "Kapak URL",
-    }
+    # ... (kod aynı) ...
     return _export_csv(request, Manga, "manga", fields)
 @login_required
 def export_novel_csv(request):
-    fields = {
-        "pk": "ID", "title": "Baslik", "get_status_display": "Durum", "rating": "Puan",
-        "author": "Yazar", "chapters_read": "Okunan Bolum", "volumes_read": "Okunan Cilt",
-        "total_chapters": "Toplam Bolum", "total_volumes": "Toplam Cilt", "start_date": "Baslama Tarihi",
-        "end_date": "Bitirme Tarihi", "added_date": "Eklenme Tarihi", "notes": "Notlar", "cover_image_url": "Kapak URL",
-    }
+    # ... (kod aynı) ...
     return _export_csv(request, Novel, "novel", fields)

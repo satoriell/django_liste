@@ -1,0 +1,71 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% comment %} Konum: tracker/templates/tracker/manga_api_search.html {% endcomment %}
+
+{% block title %}MangaDex API ile Manga Ara - Kişisel Liste{% endblock title %}
+
+{% block content %}
+    <h1 class="mb-4 text-danger" data-aos="fade-down"><i class="fas fa-search me-2"></i>MangaDex API ile Manga Ara</h1>
+
+    {# --- Arama Formu --- #}
+    <div class="controls-container p-3 mb-4 border rounded shadow-sm" data-aos="fade-up">
+        <form method="post" action="{% url 'tracker:manga_api_search' %}">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="text" class="form-control" name="query" placeholder="Manga başlığı girin..." value="{{ query|default:'' }}" aria-label="Manga başlığı" required>
+                <button class="btn btn-danger" type="submit">Ara</button> {# Buton rengi Manga temasına uygun #}
+            </div>
+        </form>
+    </div>
+
+    {# --- Arama Sonuçları --- #}
+    {% if search_results is not None %} {# Arama yapıldıysa (API hatası olsa bile None olmaz, boş liste olur) #}
+        <hr data-aos="fade">
+        <h4 class="mb-3" data-aos="fade-up">Arama Sonuçları {% if query %}({{ query }}){% endif %}</h4>
+
+        {% if search_results %}
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for result in search_results %}
+                    <div class="col d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 50 %}">
+                        <div class="card h-100 shadow-sm">
+                            {% if result.cover_url %}
+                                <img src="{{ result.cover_url }}" class="card-img-top" alt="{{ result.title }} Kapak" style="height: 250px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light text-secondary" style="height: 250px;">
+                                    <i class="fas fa-image fa-3x"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title flex-grow-1">
+                                    {{ result.title }}
+                                    {% if result.year %}<small class="text-muted"> ({{ result.year }})</small>{% endif %}
+                                </h6>
+                                <small class="text-muted mb-2 d-block">
+                                    {% if result.authors %}Yazar: {{ result.authors }}{% endif %}
+                                    {% if result.artists and result.artists != result.authors %}<br>Çizer: {{ result.artists }}{% endif %}
+                                </small>
+                                {% if result.description_snippet %}
+                                    <p class="card-text small text-muted mb-2"><i>{{ result.description_snippet }}</i></p>
+                                {% endif %}
+                                {# API'dan gelen UUID ile add_from_api URL'ine link ver #}
+                                <a href="{% url 'tracker:manga_add_from_api' result.id %}" class="btn btn-sm btn-success mt-auto w-100">
+                                    <i class="fas fa-plus me-1"></i> Listeme Ekle
+                                </a>
+                            </div>
+                            <div class="card-footer text-muted small">
+                                ID: {{ result.id|truncatechars:15 }}... | Durum: {{ result.status|capfirst|default:'Bilinmiyor' }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+             {# Arama yapıldı ama sonuç bulunamadıysa (views.py'de mesaj veriliyor ama burada da belirtebiliriz) #}
+            <div class="alert alert-warning" role="alert" data-aos="fade-in">
+                Arama kriterlerinize uygun sonuç bulunamadı.
+            </div>
+        {% endif %}
+
+    {% endif %} {# search_results is not None kontrolü sonu #}
+
+{% endblock content %}

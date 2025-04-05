@@ -116,3 +116,7 @@ LOGOUT_REDIRECT_URL = 'login' # Başarılı çıkış sonrası gidilecek URL ad�
 # Session Ayarları (Artık favoriler için kullanılmıyor ama mesajlar vb. için kalabilir)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # SESSION_COOKIE_AGE = 1209600 # 2 hafta
+
+# --- YENİ: MangaDex API Ayarı ---
+MANGADEX_API_URL = "https://api.mangadex.org"
+# ---------------------------------

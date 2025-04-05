@@ -1,6 +1,7 @@
 # tracker/models.py
 # Konum: /home/admin/App/django_liste/tracker/models.py
 
+import uuid # <- YENİ: UUIDField için eklendi
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
@@ -57,6 +58,17 @@ class MediaItem(models.Model):
     added_date = models.DateTimeField(
         default=timezone.now, verbose_name="Eklenme Tarihi"
     )
+
+    # --- YENİ: API ID Alanları ---
+    # anilist_id = models.PositiveIntegerField(...) # Önceki adımdan (varsa)
+    mangadex_id = models.UUIDField(
+        null=True,
+        blank=True,
+        unique=True, # Bir mangadex_id sadece bir öğeye ait olmalı
+        db_index=True, # Aramayı hızlandırmak için index ekleyelim
+        verbose_name="MangaDex ID"
+    )
+    # --------------------------
 
     # Meta
     class Meta:

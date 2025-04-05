@@ -2,7 +2,9 @@
 # Konum: /home/admin/App/django_liste/tracker/urls.py
 
 from django.urls import path
-from . import views # signup_view ve yeni favori view'ları import edilmiş olmalı
+# YENİ: UUID tipini import et
+import uuid
+from . import views # signup_view ve yeni view'ları import edilmiş olmalı
 
 # Uygulama ad alanı (namespace) - URL'leri tersine çevirirken kullanılır
 app_name = "tracker"
@@ -14,10 +16,20 @@ urlpatterns = [
     # --- Kayıt (Signup) ---
     path("accounts/signup/", views.signup_view, name="signup"),
 
-    # --- YENİ: Favori URL'leri (Veritabanı Tabanlı) ---
-    # toggle_favorite artık URL'den parametre almıyor, veriyi POST body'sinden alacak
+    # --- Favori URL'leri (Veritabanı Tabanlı) ---
     path("favorite/toggle/", views.toggle_favorite, name="toggle_favorite"),
     path("favorites/", views.favorites_view, name="favorites_view"),
+
+    # --- YENİ: MangaDex API Arama ve Ekleme URL'leri ---
+    path("manga/search-api/", views.manga_api_search_view, name="manga_api_search"),
+    # Arama sonuçları GET ile aynı view'da gösterilebilir veya ayrı bir URL olabilir.
+    # Şimdilik aynı view'da (manga_api_search_view) hem GET (form) hem POST (arama) yapısını kuralım.
+    path("manga/add-from-api/<uuid:mangadex_id>/", views.manga_add_from_api_view, name="manga_add_from_api"),
+    # ----------------------------------------------------
+    # --- YENİ: Webtoon için de benzerleri eklenebilir ---
+    # path("webtoon/search-api/", views.webtoon_api_search_view, name="webtoon_api_search"),
+    # path("webtoon/add-from-api/<uuid:mangadex_id>/", views.webtoon_add_from_api_view, name="webtoon_add_from_api"),
+    # ----------------------------------------------------
 
     # --- Anime URL'leri ---
     path("anime/", views.anime_list_and_create, name="anime_list_view"),
