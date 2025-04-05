@@ -1,0 +1,255 @@
+/* tracker/static/tracker/css/cards.css */
+/* Kart bileşenleri için stiller */
+
+/* ==========================================================================
+   5.2 Kartlar
+   ========================================================================== */
+
+/* Genel Kart Stilleri */
+.card {
+    transition: var(--long-transition-duration) var(--base-transition-timing);
+    transition-property: transform, box-shadow, background-color, border-color;
+    border: none; /* Bootstrap'in varsayılan kenarlığını kaldır */
+    border-radius: var(--border-radius-lg); /* Daha geniş köşe yuvarlaklığı */
+    box-shadow: var(--box-shadow-sm);
+    background-color: var(--card-bg); /* Temaya göre değişen arkaplan */
+    margin-bottom: var(--spacer-4); /* Kartlar arası alt boşluk */
+    overflow: hidden; /* Yuvarlak köşelerden taşmayı engelle */
+  }
+  
+  .card:hover {
+    transform: translateY(-5px) scale(1.01); /* Hover efekti */
+    box-shadow: var(--box-shadow);
+    z-index: 10; /* Hover sırasında diğer öğelerin üzerine çıksın */
+  }
+  
+  .card-header {
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing),
+                border-color var(--theme-transition-duration) var(--base-transition-timing),
+                color var(--theme-transition-duration) var(--base-transition-timing);
+    padding: var(--spacer-3) var(--spacer-4);
+    margin-bottom: 0;
+    background-color: var(--header-bg); /* Temaya göre değişen arkaplan */
+    border-bottom: var(--border-width) solid var(--border-color);
+    font-weight: var(--font-weight-bold); /* Başlıklar kalın */
+    color: var(--heading-color); /* Başlık rengi */
+  }
+  
+  .card-body {
+    padding: var(--spacer-4);
+  }
+  
+  .card-footer {
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing),
+                border-color var(--theme-transition-duration) var(--base-transition-timing),
+                color var(--theme-transition-duration) var(--base-transition-timing);
+    padding: var(--spacer-3) var(--spacer-4);
+    background-color: transparent; /* Genellikle arkaplansız */
+    border-top: var(--border-width) solid var(--border-color);
+  }
+  
+  .card-title {
+    margin-bottom: var(--spacer-3);
+    font-weight: var(--font-weight-bold);
+    color: var(--heading-color); /* Başlık rengini de tema değişkeninden al */
+  }
+  
+  /* Dashboard Özet Kartları */
+  .summary-card .card {
+    border-top-width: var(--border-width-lg); /* Üst kenarlık kalınlığı */
+    border-top-style: solid;
+    box-shadow: var(--box-shadow);
+    background-color: var(--card-bg);
+    transition: transform var(--long-transition-duration) var(--base-transition-timing),
+                box-shadow var(--long-transition-duration) var(--base-transition-timing);
+  }
+  .summary-card .card:hover {
+    transform: translateY(-8px) scale(1.02); /* Daha belirgin hover efekti */
+    box-shadow: var(--box-shadow-lg);
+  }
+  
+  /* Renkli Üst Kenarlıklar */
+  .summary-card-anime .card { border-top-color: var(--primary-color); }
+  .summary-card-webtoon .card { border-top-color: var(--success-color); }
+  .summary-card-manga .card { border-top-color: var(--danger-color); }
+  .summary-card-novel .card { border-top-color: var(--primary-color); } /* Novel için de primary kullandık */
+  
+  .summary-card .card-title i {
+    margin-right: var(--spacer-2); /* İkon ve başlık arası boşluk */
+  }
+  .summary-card .card-body p.fs-2 { /* Toplam sayı */
+      color: var(--heading-color) !important;
+      transition: color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  .summary-card .btn-primary,
+  .summary-card .btn-success,
+  .summary-card .btn-danger {
+      color: var(--white-color) !important; /* Buton metin renkleri */
+  }
+  
+  
+  /* Dashboard Liste Kartları (Son Eklenenler/En Yüksek Puanlılar) */
+  .dashboard-card {
+    margin-bottom: var(--spacer-4);
+    border: none; /* Kenarlık yok */
+  }
+  .dashboard-card .card-header {
+    background-color: var(--header-bg);
+    padding: 0.75rem var(--spacer-4);
+    border-bottom-color: var(--border-color);
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing),
+                border-color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  .dashboard-card .list-group-item {
+    font-size: var(--small-font-size);
+    padding: var(--spacer-2) var(--spacer-3);
+    background-color: transparent; /* Kartın arkaplanını alır */
+    border: none;
+    border-bottom: var(--border-width) solid var(--border-color);
+    transition: background-color var(--base-transition-duration) var(--base-transition-timing),
+                border-color var(--theme-transition-duration) var(--base-transition-timing),
+                color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  .dashboard-card .list-group-flush .list-group-item:last-child {
+    border-bottom-width: 0; /* Son elemanın alt çizgisini kaldır */
+  }
+  .dashboard-card .list-group-item a { /* Liste içindeki linkler */
+      color: var(--link-color) !important;
+      transition: color var(--base-transition-duration) var(--base-transition-timing);
+  }
+  .dashboard-card .list-group-item a:hover {
+      color: var(--link-hover-color) !important;
+  }
+  .dashboard-card .list-group-item .badge {
+    margin-left: auto; /* Rozetleri sağa yasla */
+  }
+  .dashboard-card .list-group-item small.text-muted {
+    font-size: 0.8em;
+    color: var(--muted-text-color) !important;
+    transition: color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  
+  /* Favoriler Sayfası ve API Sonuç Kartları Özel Stilleri */
+  .favorite-card { /* Genel favori/API kartı için */
+      display: flex; /* Örnek bir stil */
+      flex-direction: column;
+  }
+  
+  /* Sabit yükseklikli resim konteyneri */
+  .fixed-height-image-container {
+    height: 200px; /* Resim alanı yüksekliği */
+    overflow: hidden;
+    position: relative;
+    background-color: var(--gray-200); /* Resim yoksa gösterilecek arkaplan */
+    border-top-left-radius: var(--border-radius-lg); /* Kartın köşeleriyle uyumlu */
+    border-top-right-radius: var(--border-radius-lg);
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  
+  .fixed-height-image-container .favorite-card-img { /* Kart içindeki resim */
+    object-fit: cover; /* Resmi konteynere sığdır, kırp */
+    width: 100%;
+    height: 100%;
+    transition: transform var(--long-transition-duration) ease;
+  }
+  .favorite-card:hover .favorite-card-img { /* Hover'da resmi büyüt */
+    transform: scale(1.08);
+  }
+  
+  .favorite-card .card-body {
+    min-height: 130px; /* Kart içeriğinin minimum yüksekliği */
+  }
+  
+  /* Kart başlığının taşmasını engellemek ve çok satırlı yapmak için */
+  .favorite-card-title-container {
+    overflow: hidden;
+    min-height: 44px; /* Yaklaşık 2 satır başlık için */
+  }
+  .favorite-card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Gösterilecek satır sayısı */
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4; /* Satır yüksekliği */
+    margin-bottom: 0; /* Alt boşluğu kaldır */
+  }
+  .favorite-card-title a {
+    color: var(--heading-color);
+    text-decoration: none;
+    transition: color var(--base-transition-duration) var(--base-transition-timing);
+  }
+  .favorite-card-title a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+  }
+  
+  /* Kart içindeki favori butonu (küçük, yuvarlak) */
+  .favorite-toggle-button-card {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .3rem .6rem;
+    font-size: var(--small-font-size);
+    opacity: 1;
+    visibility: visible;
+    line-height: 1;
+    width: 32px; /* Sabit genişlik */
+    height: 32px; /* Sabit yükseklik */
+    border-radius: 50%; /* Tam yuvarlak */
+  }
+  
+  /* Teyit Kartı (API Ekleme Sayfaları) */
+  .confirmation-card .card-body { /* Örneğin md_form_api.html'deki kart */
+      padding: var(--spacer-4); /* Varsayılan bir iç boşluk ekleyin */
+      background-color: var(--card-bg); /* Kart arkaplanını temaya uygun yapın */
+  }
+  .confirmation-card img { /* API'dan gelen resim */
+      max-height: 250px;
+      object-fit: cover;
+      width: 100%;
+  }
+  
+  /* Kartlar İçin Karanlık Mod Override'ları (dark_mode.css'e de eklenecek) */
+  html[data-theme="dark"] .card {
+      background-color: var(--card-bg) !important;
+  }
+  html[data-theme="dark"] .card-header {
+      background-color: var(--header-bg) !important;
+      border-bottom-color: var(--border-color) !important;
+      color: var(--heading-color) !important;
+  }
+  html[data-theme="dark"] .card-footer {
+      background-color: transparent !important;
+      border-top-color: var(--border-color) !important;
+  }
+  html[data-theme="dark"] .card-title,
+  html[data-theme="dark"] .summary-card .card-body p.fs-2 {
+      color: var(--heading-color) !important;
+  }
+  html[data-theme="dark"] .dashboard-card .card-header {
+      background-color: var(--header-bg) !important;
+      border-bottom-color: var(--border-color) !important;
+  }
+  html[data-theme="dark"] .dashboard-card .list-group-item {
+      border-bottom-color: var(--border-color) !important;
+  }
+  html[data-theme="dark"] .dashboard-card .list-group-item a {
+      color: var(--link-color) !important;
+  }
+  html[data-theme="dark"] .dashboard-card .list-group-item a:hover {
+      color: var(--link-hover-color) !important;
+  }
+  html[data-theme="dark"] .dashboard-card .list-group-item small.text-muted {
+     color: var(--muted-text-color) !important;
+  }
+  html[data-theme="dark"] .fixed-height-image-container {
+    background-color: var(--gray-300);
+  }
+  html[data-theme="dark"] .favorite-card-title a {
+    color: var(--heading-color);
+  }
+  html[data-theme="dark"] .favorite-card-title a:hover {
+    color: var(--link-hover-color);
+  }

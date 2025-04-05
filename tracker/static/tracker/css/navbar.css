@@ -1,0 +1,136 @@
+/* tracker/static/tracker/css/navbar.css */
+/* Navbar bileşeni stilleri */
+
+/* ==========================================================================
+   5.1 Navbar
+   ========================================================================== */
+
+   .navbar {
+    transition: background-color var(--long-transition-duration) var(--base-transition-timing),
+                box-shadow var(--long-transition-duration) var(--base-transition-timing);
+    padding-top: var(--spacer-2);
+    padding-bottom: var(--spacer-2);
+  }
+  
+  /* Navbar Arkaplanı (Açık Tema - base.html'deki bg-dark kaldırılmalı veya bu override etmeli) */
+  .navbar-dark.bg-dark {
+    /* Bootstrap'in varsayılanını kullanabiliriz veya özelleştirebiliriz */
+     background-color: var(--dark-color) !important; /* Açık tema için koyu */
+  }
+  
+  /* Navbar Markası (Logo/Site Adı) */
+  .navbar-brand {
+    font-weight: var(--font-weight-bold);
+    font-size: 1.25rem;
+    transition: transform var(--base-transition-duration) ease,
+                color var(--base-transition-duration) ease;
+  }
+  .navbar-brand:hover {
+    transform: scale(1.03);
+    color: var(--primary-color) !important; /* Hover rengi primary */
+  }
+  /* Açık tema metin rengi */
+  .navbar-dark .navbar-brand {
+    color: var(--light-color);
+  }
+  
+  /* Navbar Linkleri */
+  .navbar-dark .navbar-nav .nav-link {
+    transition: var(--base-transition);
+    border-radius: var(--border-radius-sm);
+    margin: 0 var(--spacer-1);
+    padding: var(--spacer-2) var(--spacer-3);
+    color: rgba(var(--white-color-rgb), 0.8); /* Hafif transparan beyaz */
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .navbar-dark .navbar-nav .nav-link.active {
+    color: var(--white-color);
+    font-weight: var(--font-weight-bold);
+  }
+  
+  .navbar-dark .navbar-nav .nav-link:hover,
+  .navbar-dark .navbar-nav .nav-link:focus {
+    background-color: rgba(var(--white-color-rgb), 0.1); /* Hafif hover arkaplanı */
+    color: var(--white-color);
+    outline: none;
+    transform: translateY(-1px); /* Hafif yukarı kayma efekti */
+  }
+  
+  /* Navbar Toggler (Mobil Menü Butonu) */
+  .navbar-dark .navbar-toggler {
+    border-color: rgba(var(--white-color-rgb), 0.1);
+  }
+  .navbar-dark .navbar-toggler-icon {
+     /* Bootstrap'in varsayılan ikonu */
+     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  }
+  
+  /* Navbar Dropdown Menüsü */
+  .navbar-dark .navbar-nav .dropdown-menu {
+    background-color: var(--dark-color);
+    border-color: rgba(var(--white-color-rgb), 0.15);
+    border-radius: var(--border-radius);
+    margin-top: var(--spacer-1);
+    box-shadow: var(--box-shadow);
+    padding: var(--spacer-2) 0;
+  }
+  .navbar-dark .navbar-nav .dropdown-item {
+    color: rgba(var(--white-color-rgb), 0.8);
+    padding: var(--spacer-2) var(--spacer-4);
+    transition: var(--base-transition);
+    font-weight: var(--font-weight-semibold);
+  }
+  .navbar-dark .navbar-nav .dropdown-item i.fa-fw {
+    opacity: 0.8;
+    transition: opacity var(--base-transition);
+    margin-right: var(--spacer-2) !important;
+  }
+  .navbar-dark .navbar-nav .dropdown-item:hover,
+  .navbar-dark .navbar-nav .dropdown-item:focus {
+    color: var(--white-color);
+    background-color: rgba(var(--white-color-rgb), 0.1);
+  }
+  .navbar-dark .navbar-nav .dropdown-item:hover i.fa-fw,
+  .navbar-dark .navbar-nav .dropdown-item:focus i.fa-fw {
+    opacity: 1;
+  }
+  .navbar-dark .navbar-nav .dropdown-menu .dropdown-item.active,
+  .navbar-dark .navbar-nav .dropdown-menu .dropdown-item:active {
+    background-color: rgba(var(--primary-color-rgb), 0.2) !important;
+    color: var(--white-color) !important;
+  }
+  
+  /* Navbar Scroll Efekti */
+  .navbar.navbar-scrolled {
+    box-shadow: var(--box-shadow) !important;
+    background-color: rgba(var(--dark-color-rgb), 0.9) !important; /* Hafif transparan */
+    backdrop-filter: blur(5px);
+    transition: background-color var(--long-transition-duration) var(--base-transition-timing),
+                box-shadow var(--long-transition-duration) var(--base-transition-timing);
+  }
+  
+  /* Navbar Tema Değiştirme Butonu (Özel Stiller - buttons.css'e de bakılabilir) */
+  #theme-toggle-button {
+      /* Buton boyutunu ve ikonları hizalamak için */
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+  }
+  .theme-icon { display: none; } /* JS ile yönetilecek */
+  html[data-theme="light"] .light-icon { display: inline-block; }
+  html[data-theme="dark"] .dark-icon { display: inline-block; }
+  
+  /* Responsive Ayarlamalar (Navbar için özel) */
+  @media (max-width: 767.98px) {
+    .navbar {
+      padding-top: var(--spacer-1);
+      padding-bottom: var(--spacer-1);
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+    }
+  }

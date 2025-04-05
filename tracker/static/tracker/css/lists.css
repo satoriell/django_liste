@@ -1,0 +1,167 @@
+/* tracker/static/tracker/css/lists.css */
+/* Liste grupları ve liste öğeleri için stiller */
+
+/* ==========================================================================
+   5.4 Listeler
+   ========================================================================== */
+
+/* Genel Liste Grubu Stilleri (Bootstrap List Group temel alınarak) */
+.list-group {
+    border-radius: var(--border-radius-lg); /* Kartlarla uyumlu köşe yuvarlaklığı */
+    box-shadow: var(--box-shadow-sm); /* Hafif gölge */
+    border: none; /* Bootstrap kenarlığını kaldır */
+    overflow: hidden; /* Köşelerden taşmayı engelle */
+  }
+  
+  /* Liste Öğesi Stilleri */
+  .list-group-item {
+    border: none; /* Bootstrap kenarlığını kaldır */
+    border-bottom: var(--border-width) solid var(--border-color); /* Sadece alt kenarlık */
+    margin-bottom: 0; /* Bootstrap'in alt boşluğunu kaldır */
+    background-color: var(--card-bg); /* Kartlarla aynı arkaplan */
+    padding: var(--spacer-3) var(--spacer-4); /* İç boşluk */
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing),
+                transform var(--long-transition-duration) var(--base-transition-timing),
+                border-color var(--theme-transition-duration) var(--base-transition-timing),
+                box-shadow var(--long-transition-duration) var(--base-transition-timing);
+    position: relative; /* Hover efekti için */
+  }
+  
+  .list-group-item:last-child {
+    border-bottom: none; /* Son elemanın alt kenarlığını kaldır */
+  }
+  
+  .list-group-item:hover {
+    background-color: var(--hover-bg); /* Hover arkaplanı */
+    z-index: 1; /* Diğer öğelerin üzerine çıksın */
+    transform: scale(1.005); /* Hafif büyüme efekti */
+    box-shadow: var(--box-shadow); /* Belirginleşen gölge */
+  }
+  
+  /* Liste Öğesi İçindeki Aksiyon Butonları Alanı (_list_item.html) */
+  .list-group-item .action-buttons {
+    display: flex;
+    flex-direction: column; /* Mobilde dikey */
+    justify-content: center;
+    align-items: stretch; /* Butonlar tam genişliğe yayılsın (mobilde) */
+    gap: var(--spacer-2); /* Butonlar arası boşluk */
+    width: 100%; /* Mobilde tam genişlik */
+  }
+  /* Orta ve büyük ekranlarda yatay düzen */
+  @media (min-width: 768px) {
+    .list-group-item .action-buttons {
+      flex-direction: row; /* Yatay */
+      justify-content: flex-end; /* Sağa yasla */
+      align-items: center; /* Dikeyde ortala */
+      gap: var(--spacer-2);
+      width: auto; /* Otomatik genişlik */
+    }
+    .list-group-item .action-buttons .btn { /* Butonların genişlemesini engelle */
+        flex-grow: 0 !important;
+    }
+  }
+  
+  /* Liste Öğesi Resmi (_list_item.html) */
+  .list-item-image-link {
+    display: block; /* Linkin tamamını kaplaması için */
+    overflow: hidden; /* Resmin taşmasını engelle */
+    border-radius: var(--border-radius); /* Hafif yuvarlak köşeler */
+  }
+  
+  .list-item-image {
+    transition: transform var(--long-transition-duration) cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                filter var(--long-transition-duration) var(--base-transition-timing),
+                box-shadow var(--long-transition-duration) var(--base-transition-timing);
+    display: block;
+    /* object-fit: cover; şablonda ratio ile yönetiliyor */
+  }
+  .list-item-image-link:hover .list-item-image {
+    transform: scale(1.08); /* Hover'da resmi büyüt */
+    filter: brightness(1.05) saturate(1.1) contrast(1.02); /* Hafif efekt */
+    box-shadow: var(--box-shadow);
+  }
+  /* Resim yoksa placeholder (_list_item.html) */
+  .list-item-image-link .bg-light { /* Placeholder arkaplanı */
+      transition: background-color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  .list-item-image-link .bg-light i { /* Placeholder ikonu */
+      transition: color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  
+  
+  /* Liste Öğesi Başlığı (_list_item.html) */
+  .list-item-title a {
+    color: var(--heading-color); /* Tema başlık rengi */
+    transition: color var(--base-transition-duration) var(--base-transition-timing);
+  }
+  .list-item-title a:hover {
+    color: var(--link-hover-color);
+  }
+  
+  /* Detay Sayfasındaki Özellik Listesi (_item_details_dl.html) */
+  .item-details-list .list-group-item {
+    background-color: transparent; /* Arkaplansız */
+    padding-left: 0;
+    padding-right: 0;
+    border: none;
+    border-bottom: var(--border-width) solid var(--border-color);
+    box-shadow: none; /* Gölge yok */
+    transition: border-color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  .item-details-list .list-group-item:last-child {
+    border-bottom: none;
+  }
+  .item-details-list span:first-child { /* Özellik adı */
+    color: var(--muted-text-color);
+    transition: color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  .item-details-list span:first-child .fw-normal { /* Etiket */
+    color: var(--text-color);
+  }
+  .item-details-list span:last-child { /* Özellik değeri */
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-color);
+    transition: color var(--theme-transition-duration) var(--base-transition-timing);
+    text-align: right; /* Değeri sağa yasla */
+  }
+  /* İkonlar için */
+  .item-details-list .list-group-item i.fa-fw {
+      transition: color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  
+  
+  /* Listeler İçin Karanlık Mod Override'ları (dark_mode.css'e de eklenecek) */
+  html[data-theme="dark"] .list-group {
+      border-color: var(--border-color) !important; /* Ana konteyner kenarlığı */
+  }
+  html[data-theme="dark"] .list-group-item {
+      background-color: var(--card-bg) !important; /* Liste öğesi arkaplanı */
+      border-bottom-color: var(--border-color) !important; /* Ayırıcı çizgi */
+  }
+  html[data-theme="dark"] .list-item-title a {
+      color: var(--heading-color) !important;
+  }
+  html[data-theme="dark"] .list-item-title a:hover {
+      color: var(--link-hover-color) !important;
+  }
+  html[data-theme="dark"] .item-details-list span:first-child {
+      color: var(--muted-text-color);
+  }
+  html[data-theme="dark"] .item-details-list span:first-child .fw-normal {
+      color: var(--text-color);
+  }
+  html[data-theme="dark"] .item-details-list span:last-child {
+      color: var(--text-color);
+  }
+  html[data-theme="dark"] .item-details-list .list-group-item {
+      border-bottom-color: var(--border-color);
+  }
+  html[data-theme="dark"] .item-details-list .list-group-item i.fa-fw {
+      color: var(--muted-text-color);
+  }
+  html[data-theme="dark"] .list-item-image-link .bg-light {
+      background-color: var(--gray-300) !important; /* Placeholder arkaplanı */
+  }
+  html[data-theme="dark"] .list-item-image-link .bg-light i {
+      color: var(--gray-600) !important; /* Placeholder ikon rengi */
+  }

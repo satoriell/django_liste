@@ -1,0 +1,58 @@
+/* tracker/static/tracker/css/scrollbar.css */
+/* WebKit tarayıcılar için özel kaydırma çubuğu stilleri */
+
+/* ==========================================================================
+   8. Özel Scrollbar Stilleri (WebKit)
+   ========================================================================== */
+
+/* Kaydırma çubuğunun genel genişliği/yüksekliği */
+::-webkit-scrollbar {
+    width: 8px; /* Dikey kaydırma çubuğu genişliği */
+    height: 8px; /* Yatay kaydırma çubuğu yüksekliği */
+  }
+  
+  /* Kaydırma çubuğunun arka planı (track) */
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-bg); /* Tema değişkeni */
+    border-radius: 10px; /* Kenarları yuvarlat */
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  
+  /* Kaydırma çubuğunun hareket eden kısmı (thumb) */
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-bg); /* Tema değişkeni */
+    border-radius: 10px; /* Kenarları yuvarlat */
+    /* Kenarlık, track ile aynı renkte olursa daha temiz görünür */
+    border: 2px solid var(--scrollbar-track-bg);
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  
+  /* Kaydırma çubuğu üzerine gelince thumb rengi */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover-bg); /* Tema değişkeni */
+  }
+  
+  /* Kaydırma çubuğunun köşesi (genellikle görünmez) */
+  ::-webkit-scrollbar-corner {
+    background: transparent; /* Şeffaf yap */
+  }
+  
+  /* Not: Firefox için özel scrollbar stilleri farklıdır (scrollbar-width, scrollbar-color)
+     ve gerekirse buraya eklenebilir, ancak WebKit stilleri daha yaygın kullanılır. */
+  /*
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb-bg) var(--scrollbar-track-bg);
+  }
+  */
+  
+  /* Scrollbar İçin Karanlık Mod (Değişkenler zaten dark_mode.css içinde tanımlı olmalı) */
+  /* Bu dosyada özel bir override gerekmez, çünkü değişkenler kullanılır. */
+  /* Ancak değişkenlerin dark_mode.css içinde tanımlandığından emin olunmalı: */
+  /*
+  html[data-theme="dark"] {
+    --scrollbar-track-bg: var(--gray-200);
+    --scrollbar-thumb-bg: var(--gray-500);
+    --scrollbar-thumb-hover-bg: var(--gray-600);
+  }
+  */

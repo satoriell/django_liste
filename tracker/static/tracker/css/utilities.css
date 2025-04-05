@@ -1,0 +1,15 @@
+/* tracker/static/tracker/css/utilities.css */
+/* Genel yardımcı CSS sınıfları */
+
+/* ==========================================================================
+   6. Yardımcı Sınıflar (Utilities)
+   ========================================================================== */
+
+/* Fare imlecini işaretçi yapar */
+.cursor-pointer {
+    cursor: pointer;
+  }
+  
+  /* Buraya ihtiyaç duydukça başka yardımcı sınıflar eklenebilir. */
+  /* Örn: .no-select { user-select: none; } */
+  /* Örn: .smooth-scroll { scroll-behavior: smooth; } */

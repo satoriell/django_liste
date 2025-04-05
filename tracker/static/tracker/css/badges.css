@@ -1,0 +1,68 @@
+/* tracker/static/tracker/css/badges.css */
+/* Rozet (badge) bileşeni stilleri */
+
+/* ==========================================================================
+   5.5 Rozetler (Badges)
+   ========================================================================== */
+
+/* Genel Rozet Stilleri (Bootstrap .badge temel alınarak) */
+.badge {
+    /* Bootstrap varsayılanlarını kullanır */
+    font-weight: var(--font-weight-bold); /* Rozet metni kalın */
+    padding: 0.4em 0.65em; /* İç boşluk */
+    /* transition: background-color var(--theme-transition-duration) var(--base-transition-timing), color var(--theme-transition-duration) var(--base-transition-timing); */ /* Temel renkler için geçiş eklenebilir */
+  }
+  
+  /* Durum Rozetleri İçin Ekstra Stil */
+  .badge-status {
+    font-size: 0.78em; /* Durum rozetleri biraz daha küçük */
+    /* text-transform: uppercase; */ /* İsteğe bağlı: Harfleri büyük yap */
+  }
+  
+  /* Durum Rozet Renkleri (Arkaplan ve Metin) */
+  .badge-status-watching {
+    background-color: var(--success-color) !important; /* !important Bootstrap'in inline stilini geçersiz kılabilir */
+    color: var(--white-color) !important;
+  }
+  .badge-status-completed {
+    background-color: var(--primary-color) !important;
+    color: var(--white-color) !important;
+  }
+  .badge-status-onhold {
+    background-color: var(--warning-color) !important;
+    color: var(--warning-text-color) !important; /* Açık temada koyu, koyu temada siyah */
+  }
+  .badge-status-dropped {
+    background-color: var(--danger-color) !important;
+    color: var(--white-color) !important;
+  }
+  .badge-status-plantowatch {
+    background-color: var(--info-color) !important;
+    color: var(--info-text-color) !important; /* Açık temada koyu, koyu temada siyah */
+  }
+  .badge-status-default { /* Tanımsız durumlar için */
+    background-color: var(--secondary-color) !important;
+    color: var(--white-color) !important;
+  }
+  
+  /* Puan Rozeti (Genellikle .bg-dark kullanılır) */
+  /* .badge.bg-dark { ... } Bootstrap varsayılanı genellikle yeterli */
+  
+  
+  /* Rozetler İçin Karanlık Mod Override'ları (dark_mode.css'e de eklenecek) */
+  html[data-theme="dark"] .badge-status-onhold {
+     color: var(--warning-text-color) !important; /* Koyu tema için özel metin rengi */
+  }
+  html[data-theme="dark"] .badge-status-plantowatch {
+     color: var(--info-text-color) !important; /* Koyu tema için özel metin rengi */
+  }
+  
+  /* Koyu tema için bg-dark ve bg-light rozetlerinin görünümü */
+  html[data-theme="dark"] .badge.bg-dark {
+    background-color: var(--gray-500) !important; /* Koyu tema için daha açık gri */
+    color: var(--gray-900) !important; /* Üzerine çok açık gri yazı */
+  }
+  html[data-theme="dark"] .badge.bg-light {
+    background-color: var(--gray-600) !important; /* Koyu tema için orta gri */
+    color: var(--gray-100) !important; /* Üzerine koyu gri yazı */
+  }

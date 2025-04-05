@@ -1,0 +1,136 @@
+/* tracker/static/tracker/css/alerts.css */
+/* Uyarı/mesaj (alert) bileşeni stilleri */
+
+/* ==========================================================================
+   5.7 Uyarılar/Mesajlar (Bootstrap .alert temel alınarak)
+   ========================================================================== */
+
+/* Django Mesajları Konteyneri (Sayfanın üstüne yapışık) */
+.bootstrap-messages {
+    padding-top: var(--spacer-2); /* Navbar'dan biraz boşluk */
+    position: sticky; /* Sayfayı kaydırınca üstte kalır */
+    /* Navbar yüksekliği + biraz boşluk */
+    /* body padding-top değeriyle senkronize olmalı (layout.css) */
+    top: calc(70px + var(--spacer-1));
+    z-index: 1050; /* Diğer öğelerin üzerinde */
+    margin-bottom: var(--spacer-3); /* Altındaki içerikle arası */
+  }
+  
+  /* Genel Alert Stili */
+  .alert {
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing),
+                color var(--theme-transition-duration) var(--base-transition-timing),
+                border-color var(--theme-transition-duration) var(--base-transition-timing);
+    margin: 0 var(--spacer-3) var(--spacer-3) var(--spacer-3); /* Kenarlardan ve alttan boşluk */
+    border-radius: var(--border-radius); /* Köşe yuvarlaklığı */
+    border-width: 1px; /* Genel kenarlık */
+    border-style: solid;
+    border-left-width: 4px; /* Sol kenarlık vurgusu */
+    padding: var(--spacer-3) var(--spacer-4); /* İç boşluk */
+    box-shadow: var(--box-shadow); /* Gölge */
+    display: flex; /* İkon ve metni hizalamak için */
+    align-items: center; /* Dikeyde ortala */
+    font-weight: var(--font-weight-semibold); /* Metin biraz kalın */
+  }
+  
+  /* Alert İkonu (Font Awesome ::before ile) */
+  .alert::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900; /* Solid ikonlar */
+    margin-right: var(--spacer-3); /* İkon ve metin arası boşluk */
+    font-size: 1.1em; /* İkon boyutu */
+    transition: color var(--theme-transition-duration) var(--base-transition-timing);
+    line-height: 1; /* Hizalama için */
+  }
+  
+  /* Renk Varyasyonları */
+  .alert-success {
+    color: color-mix(in srgb, var(--success-color) 90%, black);
+    background-color: color-mix(in srgb, var(--success-color) 10%, white);
+    border-color: color-mix(in srgb, var(--success-color) 30%, transparent);
+    border-left-color: var(--success-color);
+  }
+  .alert-success::before { content: "\f058"; color: var(--success-color); } /* check-circle */
+  .alert-success .alert-link { color: color-mix(in srgb, var(--success-color) 80%, black); font-weight: var(--font-weight-bold); }
+  
+  .alert-info {
+    color: var(--info-text-color); /* Açık temada koyu */
+    background-color: color-mix(in srgb, var(--info-color) 10%, white);
+    border-color: color-mix(in srgb, var(--info-color) 30%, transparent);
+    border-left-color: var(--info-color);
+  }
+  .alert-info::before { content: "\f05a"; color: var(--info-color); } /* info-circle */
+  .alert-info .alert-link { color: color-mix(in srgb, var(--info-text-color) 90%, black); font-weight: var(--font-weight-bold); }
+  
+  .alert-warning {
+    color: var(--warning-text-color); /* Açık temada koyu */
+    background-color: color-mix(in srgb, var(--warning-color) 12%, white);
+    border-color: color-mix(in srgb, var(--warning-color) 30%, transparent);
+    border-left-color: var(--warning-color);
+  }
+  .alert-warning::before { content: "\f071"; color: var(--warning-color); } /* exclamation-triangle */
+  .alert-warning .alert-link { color: color-mix(in srgb, var(--warning-text-color) 90%, black); font-weight: var(--font-weight-bold); }
+  
+  .alert-danger {
+    color: color-mix(in srgb, var(--danger-color) 90%, black);
+    background-color: color-mix(in srgb, var(--danger-color) 10%, white);
+    border-color: color-mix(in srgb, var(--danger-color) 30%, transparent);
+    border-left-color: var(--danger-color);
+  }
+  .alert-danger::before { content: "\f057"; color: var(--danger-color); } /* times-circle */
+  .alert-danger .alert-link { color: color-mix(in srgb, var(--danger-color) 80%, black); font-weight: var(--font-weight-bold); }
+  
+  /* Kapatma Butonu */
+  .alert .btn-close {
+    margin-left: auto; /* Sağa yasla */
+    padding-left: var(--spacer-3); /* Metinle arasına boşluk */
+    /* Bootstrap varsayılan stillerini kullanır */
+  }
+  
+  
+  /* Alertler İçin Karanlık Mod Override'ları (dark_mode.css'e de eklenecek) */
+  html[data-theme="dark"] .alert {
+      border-width: 0; /* Karanlık temada genel kenarlığı kaldır */
+      border-left-width: 4px; /* Sadece sol kenarlık kalsın */
+  }
+  
+  html[data-theme="dark"] .alert-info {
+      background-color: color-mix(in srgb, var(--info-color) 15%, var(--card-bg));
+      border-left-color: var(--info-color);
+      color: var(--info-text-color); /* Koyu tema özel renk */
+  }
+  html[data-theme="dark"] .alert-info .alert-link {
+      color: color-mix(in srgb, var(--info-text-color) 95%, white);
+  }
+  
+  html[data-theme="dark"] .alert-warning {
+      background-color: color-mix(in srgb, var(--warning-color) 15%, var(--card-bg));
+      border-left-color: var(--warning-color);
+      color: var(--warning-text-color); /* Koyu tema özel renk */
+  }
+  html[data-theme="dark"] .alert-warning .alert-link {
+      color: color-mix(in srgb, var(--warning-text-color) 95%, white);
+  }
+  
+  html[data-theme="dark"] .alert-danger {
+      background-color: color-mix(in srgb, var(--danger-color) 15%, var(--card-bg));
+      border-left-color: var(--danger-color);
+      color: color-mix(in srgb, var(--danger-color) 95%, white); /* Koyu tema için daha açık */
+  }
+  html[data-theme="dark"] .alert-danger .alert-link {
+      color: color-mix(in srgb, var(--danger-color) 90%, white);
+  }
+  
+  html[data-theme="dark"] .alert-success {
+      background-color: color-mix(in srgb, var(--success-color) 15%, var(--card-bg));
+      border-left-color: var(--success-color);
+      color: color-mix(in srgb, var(--success-color) 95%, white); /* Koyu tema için daha açık */
+  }
+  html[data-theme="dark"] .alert-success .alert-link {
+      color: color-mix(in srgb, var(--success-color) 90%, white);
+  }
+  
+  /* Kapatma Butonu (Koyu Tema) */
+  html[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+  }

@@ -1,0 +1,76 @@
+/* tracker/static/tracker/css/preloader.css */
+/* Sayfa yükleme animasyonu (preloader) stilleri */
+
+/* ==========================================================================
+   2. Preloader Stilleri
+   ========================================================================== */
+
+   #preloader {
+    position: fixed; /* Sayfayı kaplar ve kaydırmadan etkilenmez */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--body-bg-start); /* Açık tema başlangıç arkaplanı */
+    z-index: 9999; /* En üstte görünür */
+    display: flex; /* İçeriği (spinner) ortalamak için */
+    justify-content: center;
+    align-items: center;
+    opacity: 1; /* Başlangıçta görünür */
+    visibility: visible;
+    /* Kaybolma efekti (JS ile .loaded sınıfı eklenince tetiklenir) */
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0s linear 0.5s, /* Gecikmeli gizleme */
+                background-color var(--theme-transition-duration) var(--base-transition-timing); /* Tema geçişi */
+  }
+  
+  #preloader.loaded {
+    opacity: 0; /* Gizlenirken şeffaflaşır */
+    visibility: hidden; /* Gizlenir */
+  }
+  
+  /* Spinner Animasyonu */
+  .bounce-spinner {
+    width: 70px; /* Spinner alanı genişliği */
+    text-align: center;
+  }
+  
+  .bounce-spinner > div {
+    width: 18px; /* Nokta boyutu */
+    height: 18px;
+    background-color: var(--primary-color); /* Ana renk */
+    border-radius: 100%; /* Yuvarlak noktalar */
+    display: inline-block; /* Yan yana */
+    /* Animasyon tanımı */
+    animation: bounce-delay 1.4s infinite ease-in-out both;
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing); /* Tema geçişi */
+  }
+  
+  /* Farklı noktalara animasyon gecikmesi */
+  .bounce-spinner .bounce1 {
+    animation-delay: -0.32s;
+  }
+  .bounce-spinner .bounce2 {
+    animation-delay: -0.16s;
+  }
+  /* bounce3 için gecikme yok */
+  
+  /* Zıplama animasyonunun keyframe'leri */
+  @keyframes bounce-delay {
+    0%, 80%, 100% {
+      transform: scale(0); /* Başlangıçta, sonda ve %80'de küçük */
+    }
+    40% {
+      transform: scale(1.0); /* Ortada büyük */
+    }
+  }
+  
+  
+  /* Preloader İçin Karanlık Mod Override'ları (dark_mode.css'e de eklenecek) */
+  html[data-theme="dark"] #preloader {
+    background-color: var(--body-bg-start); /* Koyu tema başlangıç arkaplanı */
+  }
+  
+  html[data-theme="dark"] .bounce-spinner > div {
+    background-color: var(--primary-color); /* Koyu temada spinner rengi (aynı olabilir) */
+  }

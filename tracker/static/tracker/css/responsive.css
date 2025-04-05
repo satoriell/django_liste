@@ -1,0 +1,157 @@
+/* tracker/static/tracker/css/responsive.css */
+/* Farklı ekran boyutları için duyarlılık (responsiveness) stilleri */
+
+/* ==========================================================================
+   7. Duyarlılık (Responsiveness) - Media Queries
+   ========================================================================== */
+
+/* Orta Boy Ekranlar (Tabletler - 992px altı) */
+@media (max-width: 991.98px) {
+    /* Daha küçük başlık boyutları */
+    h1, .h1 { font-size: calc(1.35rem + 1.2vw); } /* ~2rem civarı */
+    h2, .h2 { font-size: calc(1.3rem + .6vw); }  /* ~1.75rem civarı */
+    h3, .h3 { font-size: calc(1.275rem + .3vw); }/* ~1.5rem civarı */
+  
+    /* Kontrol alanı sütunları (yan yana sığmazsa alt alta) */
+    .controls-container .col-md {
+      margin-bottom: var(--spacer-2); /* Sütunlar arası dikey boşluk */
+    }
+    /* Input group butonları tam genişlik kaplayabilir */
+    .controls-container .input-group .btn {
+        width: 100%; /* İsteğe bağlı */
+    }
+  }
+  
+  /* Küçük Ekranlar (Büyük Telefonlar/Küçük Tabletler - 768px altı) */
+  @media (max-width: 767.98px) {
+    /* Navbar yüksekliği azaldığı için body padding'i de azalt */
+    body {
+      padding-top: 60px; /* layout.css'teki ile senkronize */
+    }
+  
+    /* Navbar padding'ini azalt */
+    .navbar {
+      padding-top: var(--spacer-1);
+      padding-bottom: var(--spacer-1);
+    }
+    .navbar-brand {
+      font-size: 1.1rem; /* Marka yazısı biraz küçülsün */
+    }
+  
+    /* Başlık boyutları daha da küçülebilir */
+    h1, .h1 { font-size: calc(1.3rem + .6vw); } /* ~1.75rem civarı */
+    h2, .h2 { font-size: 1.4rem; }
+    h3, .h3 { font-size: 1.2rem; }
+    h4, .h4 { font-size: 1.1rem; }
+  
+    /* Form/Kart iç boşluklarını azalt */
+    .form-container,
+    .dashboard-card .card-body,
+    .detail-content-wrapper .card-body,
+    .card-body,
+    .card-header,
+    .card-footer {
+      padding: var(--spacer-3);
+    }
+  
+    /* Liste öğesi iç boşluklarını azalt */
+    .list-group-item {
+      padding: var(--spacer-3);
+    }
+  
+    /* Liste öğesi aksiyon butonlarını yatay yap ve sola yasla */
+    .list-group-item .action-buttons {
+      flex-direction: row !important; /* Yatay sıralama */
+      justify-content: flex-start !important; /* Sola yasla */
+      align-items: center !important; /* Dikeyde ortala */
+      margin-top: var(--spacer-2) !important; /* Üstten boşluk */
+      gap: var(--spacer-2) !important; /* Buton arası boşluk */
+      width: auto !important; /* Otomatik genişlik */
+    }
+    /* Aksiyon butonlarını küçült */
+    .list-group-item .action-buttons .btn {
+      width: auto !important; /* Otomatik genişlik */
+      padding: .3rem .6rem;
+      font-size: var(--small-font-size);
+    }
+  
+    /* Sayfalama linklerini küçült */
+    .page-item .page-link {
+      padding: 0.35rem 0.6rem;
+      font-size: var(--small-font-size);
+      margin: 0 1px; /* Daha yakın */
+    }
+  
+    /* Django mesajları kutusunun üst boşluğunu azalt */
+    .bootstrap-messages {
+      top: calc(60px + var(--spacer-1)); /* Yeni navbar yüksekliğine göre */
+    }
+  
+    /* Dashboard özet kartı yazı boyutunu küçült */
+    .summary-card .card-body p.fs-2 {
+      font-size: 1.8rem !important;
+    }
+  
+    /* Grafik konteyner yüksekliğini azalt (isteğe bağlı) */
+    #typeDistributionChartContainer,
+    #statusDistributionChartContainer {
+       height: 320px;
+    }
+  }
+  
+  /* Çok Küçük Ekranlar (Telefonlar - 576px altı) */
+  @media (max-width: 575.98px) {
+    /* Başlık boyutları */
+    h1, .h1 { font-size: 1.6rem; }
+    h2, .h2 { font-size: 1.3rem; }
+    h3, .h3 { font-size: 1.15rem; }
+    h4, .h4 { font-size: 1.05rem; }
+  
+    /* Form/Kart iç boşlukları (aynı kalabilir veya biraz daha azaltılabilir) */
+    .form-container,
+    .dashboard-card .card-body,
+    .detail-content-wrapper .card-body,
+    .card-body,
+    .card-header,
+    .card-footer {
+      padding: var(--spacer-3);
+    }
+  
+    /* Liste öğesi iç boşlukları */
+    .list-group-item {
+      padding: var(--spacer-2) var(--spacer-3);
+    }
+  
+    /* Liste öğesi resim/içerik sütun oranlarını ayarla */
+    .list-group-item .col-4 { /* Resim alanı */
+      flex: 0 0 auto;
+      width: 35%;
+    }
+    .list-group-item .col-8 { /* İçerik alanı */
+      flex: 0 0 auto;
+      width: 65%;
+    }
+  
+    /* Liste öğesi aksiyon butonlarını sığmazsa alt satıra indir */
+    .list-group-item .action-buttons {
+      flex-wrap: wrap;
+    }
+  
+    /* Detay sayfası butonlarını küçült */
+    .detail-content-wrapper .btn-group .btn {
+      font-size: var(--small-font-size);
+      padding: .3rem .6rem;
+    }
+  
+     /* Grafik konteyner yüksekliğini daha da azalt (isteğe bağlı) */
+    #typeDistributionChartContainer,
+    #statusDistributionChartContainer {
+       height: 280px;
+    }
+  
+    /* Mesaj kutularının yan boşluklarını azalt */
+    .alert {
+        margin-left: var(--spacer-2);
+        margin-right: var(--spacer-2);
+    }
+  }

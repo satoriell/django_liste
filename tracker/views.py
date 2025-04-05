@@ -1,6 +1,8 @@
 # tracker/views.py
 # Konum: /home/admin/App/django_liste/tracker/views.py
 # Kapsamlı Refactoring: Yardımcı fonksiyonlar, query optimizasyonu, logging, hata yönetimi.
+# GÜNCELLEME: API şablon yolları kullanıcı tarafından belirtilen
+# 'tracker/anime_manga_weptoon_novel_api/' altına göre güncellendi.
 
 import csv
 import datetime
@@ -481,11 +483,6 @@ def _process_edit_view(request, pk, model, form_class, template_name):
     return render(request, template_name, context)
 
 @login_required
-# tracker/views.py içindeki _process_delete_view fonksiyonu
-
-# ... (importlar ve diğer view/helper fonksiyonları) ...
-
-@login_required
 def _process_delete_view(request, pk, model, redirect_url_name):
     """Silme görünümünü işler (Refactored - item_type eklendi)."""
     # 1. Öğeyi getir (veya 404) - Sadece kullanıcıya ait olanı
@@ -520,28 +517,6 @@ def _process_delete_view(request, pk, model, redirect_url_name):
         "item": instance, # Silinecek öğe (başlığını göstermek için)
         "model_name": name, # Model adı (örn: Anime)
         "item_type": item_type # -> **YENİ EKLENDİ** (Template'in URL oluşturması için)
-    }
-    # Ortak silme onay template'ini kullan
-    return render(request, "tracker/confirm_delete_base.html", context)
-
-# ... (views.py dosyasının geri kalanı aynı) ...
-
-# ==============================================================================
-# CRUD VIEW'LARI (Refactored - İşleyici Fonksiyonları Kullanıyor)
-# ==============================================================================
-# Örnek: webtoon_delete view'ı _process_delete_view'ı çağırır
-@login_required
-def webtoon_delete(request, pk):
-    # Bu view artık _process_delete_view'ı çağırıyor ve _process_delete_view
-    # yukarıda düzeltildiği gibi item_type'ı context'e ekleyecek.
-    return _process_delete_view(request, pk, Webtoon, "tracker:webtoon_list_view")
-
-# ... (Diğer delete view'ları da _process_delete_view'ı kullanır) ...
-
-    # 3. GET isteği ise, onay sayfasını göster
-    context = {
-        "item": instance, # Silinecek öğe (başlığını göstermek için)
-        "model_name": name # Model adı (örn: Anime)
     }
     # Ortak silme onay template'ini kullan
     return render(request, "tracker/confirm_delete_base.html", context)
@@ -924,7 +899,8 @@ def manga_api_search_view(request):
     if request.method == 'POST' and not query:
         messages.warning(request, "Lütfen aramak için bir başlık girin.")
         # Boş arama formuyla template'i tekrar göster
-        return render(request, 'tracker/manga_api_search.html', context)
+        # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+        return render(request, 'tracker/anime_manga_weptoon_novel_api/manga_api_search.html', context)
 
     if query: # Eğer bir arama sorgusu varsa
         context['query'] = query # Context'i güncelle
@@ -946,7 +922,8 @@ def manga_api_search_view(request):
             context['existing_ids_in_db'] = _get_existing_mangadex_ids(request, results)
 
     # Template'i render et
-    return render(request, 'tracker/manga_api_search.html', context)
+    # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+    return render(request, 'tracker/anime_manga_weptoon_novel_api/manga_api_search.html', context)
 
 @login_required
 def anime_api_search_view(request):
@@ -963,7 +940,8 @@ def anime_api_search_view(request):
 
     if request.method == 'POST' and not query:
         messages.warning(request, "Lütfen aramak için bir anime başlığı girin.")
-        return render(request, 'tracker/anime_api_search.html', context)
+        # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+        return render(request, 'tracker/anime_manga_weptoon_novel_api/anime_api_search.html', context)
 
     if query:
         context['query'] = query
@@ -983,7 +961,8 @@ def anime_api_search_view(request):
              # Listede var olan MAL ID'lerini bul (Optimize Edildi)
              context['existing_ids_in_db'] = _get_existing_mal_ids(request, results, Anime)
 
-    return render(request, 'tracker/anime_api_search.html', context)
+    # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+    return render(request, 'tracker/anime_manga_weptoon_novel_api/anime_api_search.html', context)
 
 @login_required
 def novel_api_search_view(request):
@@ -1000,7 +979,8 @@ def novel_api_search_view(request):
 
     if request.method == 'POST' and not query:
         messages.warning(request, "Lütfen aramak için bir novel başlığı girin.")
-        return render(request, 'tracker/novel_api_search.html', context)
+        # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+        return render(request, 'tracker/anime_manga_weptoon_novel_api/novel_api_search.html', context)
 
     if query:
         context['query'] = query
@@ -1020,7 +1000,8 @@ def novel_api_search_view(request):
              # Listede var olan MAL ID'lerini bul (Optimize Edildi)
              context['existing_ids_in_db'] = _get_existing_mal_ids(request, results, Novel)
 
-    return render(request, 'tracker/novel_api_search.html', context)
+    # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+    return render(request, 'tracker/anime_manga_weptoon_novel_api/novel_api_search.html', context)
 
 
 # --- API Ekleme View'ları (Optimize Edilmiş Kontroller) ---
@@ -1047,13 +1028,15 @@ def md_add_item_view(request, mangadex_id):
         name = "Webtoon"
         list_url_name = 'tracker:webtoon_list_view'
         detail_url_name = 'tracker:webtoon_detail'
-        template = 'tracker/md_form_api.html' # Ortak template
+        # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+        template = 'tracker/anime_manga_weptoon_novel_api/md_form_api.html'
     else: # Varsayılan Manga
         ModelClass, FormClass = Manga, MangaForm
         name = "Manga"
         list_url_name = 'tracker:manga_list_view'
         detail_url_name = 'tracker:manga_detail'
-        template = 'tracker/md_form_api.html' # Ortak template
+        # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+        template = 'tracker/anime_manga_weptoon_novel_api/md_form_api.html'
 
     # 3. Bu öğe kullanıcının listesinde zaten var mı kontrol et
     existing_item = ModelClass.objects.filter(mangadex_id=md_id_uuid, user=request.user).first()
@@ -1126,7 +1109,8 @@ def jikan_add_anime_view(request, mal_id):
     name = "Anime"
     list_url_name = 'tracker:anime_list_view'
     detail_url_name = 'tracker:anime_detail'
-    template = 'tracker/jikan_form_api.html' # Ortak Jikan formu template'i
+    # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+    template = 'tracker/anime_manga_weptoon_novel_api/jikan_form_api.html'
 
     # 2. Bu öğe kullanıcının listesinde zaten var mı kontrol et
     existing_item = ModelClass.objects.filter(mal_id=mal_id, user=request.user).first()
@@ -1186,7 +1170,8 @@ def jikan_add_novel_view(request, mal_id):
     name = "Novel"
     list_url_name = 'tracker:novel_list_view'
     detail_url_name = 'tracker:novel_detail'
-    template = 'tracker/jikan_novel_form_api.html' # Novel'e özel Jikan formu template'i
+    # === GÜNCELLEME: Template yolu değişti (Kullanıcının belirttiği yol) ===
+    template = 'tracker/anime_manga_weptoon_novel_api/jikan_novel_form_api.html'
 
     # 2. Bu öğe kullanıcının listesinde zaten var mı kontrol et
     existing_item = ModelClass.objects.filter(mal_id=mal_id, user=request.user).first()

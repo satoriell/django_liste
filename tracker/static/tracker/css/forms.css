@@ -1,0 +1,174 @@
+/* tracker/static/tracker/css/forms.css */
+/* Form elemanları, etiketler, yardım metinleri ve focus stilleri */
+
+/* ==========================================================================
+   Form Stilleri (Bootstrap Temel Alınarak)
+   ========================================================================== */
+
+/* Genel Form Kontrol (Input, Select, Textarea) */
+.form-control,
+.form-select {
+  /* Bootstrap'in temel stillerini kullanır, ancak bazı geçişler ekleyebiliriz */
+  transition: border-color var(--base-transition-duration) var(--base-transition-timing),
+              box-shadow var(--base-transition-duration) var(--base-transition-timing),
+              background-color var(--theme-transition-duration) var(--base-transition-timing),
+              color var(--theme-transition-duration) var(--base-transition-timing);
+   /* Temel renkler ve kenarlıklar base.css'teki değişkenlerden veya Bootstrap'ten gelir */
+   background-color: var(--form-control-bg);
+   border: var(--border-width) solid var(--border-color);
+   color: var(--text-color);
+   border-radius: var(--border-radius); /* Köşe yuvarlaklığı */
+}
+
+/* Form Kontrol Focus Stili */
+.form-control:focus,
+.form-select:focus {
+  color: var(--text-color); /* Focus sırasında metin rengi değişmesin (tema) */
+  background-color: var(--form-control-bg); /* Focus sırasında arkaplan rengi */
+  border-color: var(--form-focus-border-color); /* base.css'teki değişken */
+  outline: 0;
+  box-shadow: var(--form-focus-box-shadow), var(--box-shadow-inset); /* base.css'teki değişkenler */
+}
+
+/* Placeholder Metni */
+.form-control::placeholder {
+  color: var(--muted-text-color);
+  opacity: 1; /* Tarayıcı varsayılanını geçersiz kıl */
+  transition: color var(--theme-transition-duration) var(--base-transition-timing);
+}
+
+/* Form Etiketi */
+.form-label {
+  margin-bottom: var(--spacer-2); /* Etiket altı boşluk */
+  display: inline-block;
+  font-weight: var(--font-weight-semibold); /* Etiketler biraz daha belirgin */
+  color: var(--heading-color); /* Etiket rengi */
+  transition: color var(--theme-transition-duration) var(--base-transition-timing);
+}
+
+/* Yardım Metni */
+.form-text {
+  font-size: var(--small-font-size);
+  color: var(--muted-text-color);
+  margin-top: var(--spacer-1);
+  transition: color var(--theme-transition-duration) var(--base-transition-timing);
+}
+
+/* Checkbox ve Radio Butonları */
+.form-check-input {
+  background-color: var(--gray-200); /* İşaretlenmemiş arkaplan */
+  border-color: var(--gray-400);
+  transition: background-color var(--theme-transition-duration) var(--base-transition-timing),
+              border-color var(--theme-transition-duration) var(--base-transition-timing);
+}
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+.form-check-input:focus {
+  border-color: var(--form-focus-border-color);
+  outline: 0;
+  box-shadow: var(--form-focus-box-shadow);
+}
+.form-check-label {
+    color: var(--text-color); /* Etiket rengi */
+    transition: color var(--theme-transition-duration) var(--base-transition-timing);
+}
+
+/* Input Grupları (Arama Kutusu vb.) */
+.input-group-text {
+  background-color: var(--gray-200);
+  border-color: var(--border-color);
+  color: var(--text-color);
+  transition: background-color var(--theme-transition-duration) var(--base-transition-timing),
+              border-color var(--theme-transition-duration) var(--base-transition-timing),
+              color var(--theme-transition-duration) var(--base-transition-timing);
+}
+
+/* Devre Dışı / Salt Okunur Alanlar */
+.form-control:disabled,
+.form-control[readonly] {
+  background-color: var(--gray-200) !important; /* Arkaplan rengi */
+  opacity: 0.7;
+}
+
+/* Form Konteyneri (custom.css'te vardı, isteğe bağlı) */
+.form-container {
+  background-color: var(--card-bg); /* Kart arkaplanını kullanabilir */
+  padding: var(--spacer-4);
+  border-radius: var(--border-radius-lg);
+  transition: background-color var(--theme-transition-duration) var(--base-transition-timing);
+  /* box-shadow: var(--box-shadow-sm); İsteğe bağlı, şablonda zaten olabilir */
+}
+/* Liste sayfalarındaki filtre/arama alanı için */
+.controls-container {
+   background-color: var(--card-bg);
+   transition: background-color var(--theme-transition-duration) var(--base-transition-timing);
+   /* padding, border, shadow şablonda olabilir */
+}
+
+/* Taggit Etiket Alanı (Görünümü iyileştirmek için opsiyonel) */
+/* input[name="tags"] { } */
+
+/* Hata Mesajları (Bootstrap .invalid-feedback kullanılır) */
+.invalid-feedback {
+    color: var(--danger-color); /* Hata mesajı rengi */
+    font-size: var(--small-font-size); /* Küçük yazı boyutu */
+    margin-top: var(--spacer-1); /* Üst boşluk */
+}
+
+/* Formlar İçin Karanlık Mod Override'ları (dark_mode.css'e de eklenecek) */
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select {
+  background-color: var(--form-control-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--heading-color) !important; /* Koyu temada yazı rengi daha açık */
+}
+
+html[data-theme="dark"] .form-control:focus,
+html[data-theme="dark"] .form-select:focus {
+  color: var(--heading-color);
+  background-color: var(--form-control-bg);
+  border-color: var(--form-focus-border-color);
+}
+
+html[data-theme="dark"] .form-control::placeholder {
+  color: var(--muted-text-color) !important;
+}
+
+html[data-theme="dark"] .form-label {
+   color: var(--heading-color) !important;
+}
+
+html[data-theme="dark"] .form-text {
+   color: var(--muted-text-color) !important;
+}
+
+html[data-theme="dark"] .form-check-input {
+  background-color: var(--gray-400);
+  border-color: var(--gray-500);
+}
+html[data-theme="dark"] .form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+html[data-theme="dark"] .form-check-label {
+   color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .input-group-text {
+  background-color: var(--gray-400);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+html[data-theme="dark"] .form-control:disabled,
+html[data-theme="dark"] .form-control[readonly] {
+  background-color: var(--gray-400) !important;
+  opacity: 0.7;
+}
+
+html[data-theme="dark"] .form-container,
+html[data-theme="dark"] .controls-container {
+    background-color: var(--card-bg) !important;
+}

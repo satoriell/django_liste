@@ -1,0 +1,54 @@
+/* tracker/static/tracker/css/layout.css */
+/* Sayfa düzeni, ana konteyner ve footer stilleri */
+
+/* ==========================================================================
+   4. Düzen (Layout)
+   ========================================================================== */
+
+/* Navbar için üst boşluk (base.css'ten buraya taşınabilir) */
+body {
+    padding-top: 70px; /* Sabit navbar yüksekliği kadar */
+  }
+  
+  /* Ana içerik alanının minimum yüksekliği ve esnek büyümesi */
+  .main-container {
+    flex: 1; /* Footer'ı sayfa altına itmek için */
+  }
+  
+  /* Footer Stilleri */
+  footer {
+    margin-top: var(--spacer-5); /* Üstten boşluk */
+    padding: var(--spacer-3) 0; /* İç dikey boşluk */
+    border-top: var(--border-width) solid var(--border-color);
+    background-color: var(--footer-bg); /* Açık tema için */
+    flex-shrink: 0; /* İçerik az olsa bile küçülmesin */
+    transition: background-color var(--theme-transition-duration) var(--base-transition-timing),
+                border-color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  
+  footer small {
+    line-height: 1.5;
+    color: var(--muted-text-color);
+    transition: color var(--theme-transition-duration) var(--base-transition-timing);
+  }
+  
+  /* Responsive Ayarlamalar (Layout ile ilgili olanlar buraya gelebilir
+     veya responsive.css'te toplanabilir) */
+  @media (max-width: 767.98px) {
+    body {
+      padding-top: 60px; /* Daha küçük navbar için */
+    }
+  }
+  
+  /* Not: .container sınıfı için özel bir stil gerekmiyorsa (Bootstrap varsayılanı yeterliyse)
+     buraya eklemeye gerek yoktur. */
+  
+  /* Karanlık Tema için Footer Arkaplanı (dark_mode.css'e de eklenecek) */
+  html[data-theme="dark"] footer {
+    background-color: var(--footer-bg); /* Koyu tema footer arkaplanı */
+    border-top-color: var(--border-color);
+  }
+  
+  html[data-theme="dark"] footer small {
+     color: var(--muted-text-color); /* Koyu tema footer metin rengi */
+  }

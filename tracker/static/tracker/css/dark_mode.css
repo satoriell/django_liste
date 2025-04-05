@@ -1,0 +1,234 @@
+/* tracker/static/tracker/css/dark_mode.css */
+/* Karanlık tema için değişkenler ve override kuralları */
+
+html[data-theme="dark"] {
+    /* ========================================= */
+    /* 1. Karanlık Tema Değişken Tanımları      */
+    /* ========================================= */
+    --primary-color: #938dff;
+    --secondary-color: #a0a8b1;
+    --success-color: #2dc284;
+    --danger-color: #ff717e;
+    --warning-color: #ffca2c;
+    --info-color: #4ee0fc;
+    --light-color: #495057; /* Açık renkler koyulaşır */
+    --dark-color: #dee2e6; /* Koyu renkler açılır */
+  
+    /* Gri Tonları (Tersine Çevrilmiş) */
+    --gray-100: #181a1d; --gray-200: #212529; --gray-300: #2c3034; --gray-400: #495057; --gray-500: #6c757d; --gray-600: #adb5bd; --gray-700: #dee2e6; --gray-800: #e9ecef; --gray-900: #f8f9fa;
+  
+    /* RGB Renkleri (Karanlık Tema) */
+    --primary-color-rgb: 147, 141, 255; --secondary-color-rgb: 160, 168, 177; --success-color-rgb: 45, 194, 132; --danger-color-rgb: 255, 113, 126; --warning-color-rgb: 255, 202, 44; --info-color-rgb: 78, 224, 252; --light-color-rgb: 73, 80, 87; --dark-color-rgb: 222, 226, 230;
+  
+    /* Metin Renkleri (Karanlık Tema) */
+    --text-color: var(--gray-600); /* Ana metin */
+    --heading-color: var(--gray-800); /* Başlıklar */
+    --link-color: var(--primary-color); /* Linkler */
+    --link-hover-color: color-mix(in srgb, var(--primary-color) 85%, var(--white-color)); /* Link hover */
+    --light-text-color: var(--gray-900); /* Açık arkaplan üzerindeki metin (nadiren kullanılır) */
+    --dark-text-color: var(--gray-100); /* Koyu arkaplan üzerindeki metin (nadiren kullanılır) */
+    --muted-text-color: var(--gray-500); /* Soluk metin */
+    --warning-text-color: var(--black-color); /* Uyarı butonu/alert metni */
+    --info-text-color: var(--black-color); /* Bilgi butonu/alert metni */
+  
+    /* Arkaplan Renkleri (Karanlık Tema) */
+    --body-bg-start: var(--gray-100);
+    --body-bg-end: var(--gray-200);
+    --body-bg: linear-gradient(170deg, var(--body-bg-start) 0%, var(--body-bg-end) 100%);
+    --card-bg: var(--gray-200);
+    --header-bg: var(--gray-300);
+    --footer-bg: var(--gray-200);
+    --hover-bg: var(--gray-300); /* Liste öğesi hover vb. */
+    --form-control-bg: var(--gray-300); /* Form elemanları arkaplanı */
+  
+    /* Scrollbar Renkleri (Karanlık Tema) */
+    --scrollbar-track-bg: var(--gray-200);
+    --scrollbar-thumb-bg: var(--gray-500);
+    --scrollbar-thumb-hover-bg: var(--gray-600);
+  
+    /* Kenarlıklar (Karanlık Tema) */
+    --border-color: var(--gray-400);
+  
+    /* Gölgeler (Karanlık Tema - Daha belirgin) */
+    --box-shadow-sm: 0 .125rem .25rem rgba(var(--black-color-rgb), .15);
+    --box-shadow: 0 .5rem 1.2rem rgba(var(--black-color-rgb), .3);
+    --box-shadow-lg: 0 1rem 3rem rgba(var(--black-color-rgb), .4);
+    --box-shadow-inset: inset 0 1px 2px rgba(var(--black-color-rgb), .2);
+  
+    /* Form Focus (Karanlık Tema) */
+    --form-focus-box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.4);
+    --form-focus-border-color: var(--primary-color); /* Primary rengi daha belirgin */
+  
+    /* Buton Hover Renkleri (Karanlık Tema) */
+    --primary-hover-color: color-mix(in srgb, var(--primary-color) 85%, var(--white-color));
+    --secondary-hover-color: color-mix(in srgb, var(--secondary-color) 85%, var(--white-color));
+    --success-hover-color: color-mix(in srgb, var(--success-color) 85%, var(--white-color));
+    --danger-hover-color: color-mix(in srgb, var(--danger-color) 85%, var(--white-color));
+    --warning-hover-color: color-mix(in srgb, var(--warning-color) 85%, var(--black-color));
+    --info-hover-color: color-mix(in srgb, var(--info-color) 85%, var(--black-color));
+  
+    /* ========================================= */
+    /* 2. Karanlık Tema Override Kuralları       */
+    /* ========================================= */
+  
+    /* Base & Layout */
+    body, p, .card-body, .card-body p, .modal-body, .list-group-item, .table th, .table td, .form-text, .form-check-label {
+      color: var(--text-color) !important;
+    }
+    h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .card-title, .modal-title, .list-item-title a, .navbar-dark .navbar-brand, .form-label, .fw-bold, strong, .link-dark {
+      color: var(--heading-color) !important;
+    }
+    .link-dark:hover {
+        color: var(--link-hover-color) !important;
+    }
+    .text-muted, small.text-muted, .card-footer.text-muted, .breadcrumb-item.active, footer small {
+        color: var(--muted-text-color) !important;
+    }
+    .text-primary { color: var(--primary-color) !important; }
+    .text-success { color: var(--success-color) !important; }
+    .text-danger { color: var(--danger-color) !important; }
+    .text-warning { color: var(--warning-color) !important; }
+    .text-info { color: var(--info-color) !important; }
+    .text-secondary { color: var(--secondary-color) !important; }
+    footer {
+      background-color: var(--footer-bg);
+      border-top-color: var(--border-color);
+    }
+    img { /* İsteğe bağlı: Karanlık temada resimleri hafif soluklaştır */
+        opacity: 0.85;
+    }
+    img:hover {
+        opacity: 1;
+    }
+  
+  
+    /* Navbar */
+    .navbar-dark.bg-dark { background-color: var(--gray-300) !important; }
+    .navbar-dark .navbar-brand { color: var(--heading-color) !important; } /* Navbar brand de heading gibi */
+    .navbar-dark .navbar-nav .nav-link { color: rgba(var(--heading-color-rgb, 233, 236, 239), 0.85); } /* Heading'den türetilmiş */
+    .navbar-dark .navbar-nav .nav-link.active { color: var(--heading-color); }
+    .navbar-dark .navbar-nav .nav-link:hover,
+    .navbar-dark .navbar-nav .nav-link:focus { background-color: rgba(var(--dark-color-rgb), 0.15); color: var(--heading-color); }
+    .navbar-dark .navbar-toggler { border-color: rgba(var(--dark-color-rgb), 0.1); }
+    .navbar-dark .navbar-toggler-icon { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28222, 226, 230, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); }
+    .navbar-dark .navbar-nav .dropdown-menu { background-color: var(--gray-300); border-color: rgba(var(--dark-color-rgb), 0.15); }
+    .navbar-dark .navbar-nav .dropdown-item { color: rgba(var(--heading-color-rgb, 233, 236, 239), 0.85); }
+    .navbar-dark .navbar-nav .dropdown-item:hover,
+    .navbar-dark .navbar-nav .dropdown-item:focus { color: var(--heading-color); background-color: rgba(var(--dark-color-rgb), 0.15); }
+    .navbar-dark .navbar-nav .dropdown-menu .dropdown-item.active,
+    .navbar-dark .navbar-nav .dropdown-menu .dropdown-item:active { background-color: rgba(var(--primary-color-rgb), 0.25) !important; color: var(--heading-color) !important; }
+    .navbar.navbar-scrolled { background-color: rgba(var(--gray-300-rgb, 44, 48, 52), 0.9) !important; box-shadow: var(--box-shadow) !important; }
+  
+  
+    /* Kartlar */
+    .card, .form-container, .controls-container, .modal-content { background-color: var(--card-bg) !important; }
+    .card-header, .modal-header { background-color: var(--header-bg) !important; border-bottom-color: var(--border-color) !important; color: var(--heading-color) !important; }
+    .card-footer, .modal-footer { background-color: transparent !important; border-top-color: var(--border-color) !important; }
+    .summary-card .card-body p.fs-2 { color: var(--heading-color) !important; }
+    .dashboard-card .card-header { background-color: var(--header-bg) !important; border-bottom-color: var(--border-color) !important; }
+    .fixed-height-image-container { background-color: var(--gray-300); }
+    .favorite-card-title a { color: var(--heading-color); }
+    .favorite-card-title a:hover { color: var(--link-hover-color); }
+  
+  
+    /* Listeler */
+    .list-group { border-color: var(--border-color) !important; }
+    .list-group-item { background-color: var(--card-bg) !important; border-bottom-color: var(--border-color) !important; }
+    .dashboard-card .list-group-item { border-bottom-color: var(--border-color) !important; }
+    .dashboard-card .list-group-item a { color: var(--link-color) !important; }
+    .dashboard-card .list-group-item a:hover { color: var(--link-hover-color) !important; }
+    .dashboard-card .list-group-item small.text-muted { color: var(--muted-text-color) !important; }
+    .list-item-title a { color: var(--heading-color) !important; }
+    .list-item-title a:hover { color: var(--link-hover-color) !important; }
+    .item-details-list span:first-child { color: var(--muted-text-color); }
+    .item-details-list span:first-child .fw-normal { color: var(--text-color); }
+    .item-details-list span:last-child { color: var(--text-color); }
+    .item-details-list .list-group-item { border-bottom-color: var(--border-color); }
+    .item-details-list .list-group-item i.fa-fw { color: var(--muted-text-color); }
+    .list-item-image-link .bg-light { background-color: var(--gray-300) !important; }
+    .list-item-image-link .bg-light i { color: var(--gray-600) !important; }
+  
+  
+    /* Formlar */
+    .form-control, .form-select { background-color: var(--form-control-bg) !important; border-color: var(--border-color) !important; color: var(--heading-color) !important; }
+    .form-control:focus, .form-select:focus { color: var(--heading-color); background-color: var(--form-control-bg); border-color: var(--form-focus-border-color); }
+    .form-control::placeholder { color: var(--muted-text-color) !important; }
+    .form-label { color: var(--heading-color) !important; }
+    .form-text { color: var(--muted-text-color) !important; }
+    .form-check-input { background-color: var(--gray-400); border-color: var(--gray-500); }
+    .form-check-input:checked { background-color: var(--primary-color); border-color: var(--primary-color); }
+    .input-group-text { background-color: var(--gray-400); border-color: var(--border-color); color: var(--text-color); }
+    .form-control:disabled, .form-control[readonly] { background-color: var(--gray-400) !important; opacity: 0.7; }
+  
+  
+    /* Butonlar */
+    .btn-warning { color: var(--warning-text-color); }
+    .btn-warning:hover { color: var(--warning-text-color); background-color: var(--warning-hover-color); border-color: var(--warning-hover-color); }
+    .btn-info { color: var(--info-text-color); }
+    .btn-info:hover { color: var(--info-text-color); background-color: var(--info-hover-color); border-color: var(--info-hover-color); }
+    .btn-light { background-color: var(--light-color); border-color: var(--light-color); color: var(--white-color); }
+    .btn-light:hover { background-color: color-mix(in srgb, var(--light-color) 85%, var(--white-color)); border-color: color-mix(in srgb, var(--light-color) 85%, var(--white-color)); color: var(--white-color); }
+    .btn-dark { background-color: var(--dark-color); border-color: var(--dark-color); color: var(--black-color); }
+    .btn-dark:hover { background-color: color-mix(in srgb, var(--dark-color) 85%, var(--white-color)); border-color: color-mix(in srgb, var(--dark-color) 80%, var(--white-color)); color: var(--black-color); }
+    .btn-outline-warning { color: var(--warning-color); border-color: var(--warning-color); }
+    .btn-outline-warning:hover { color: var(--warning-text-color); background-color: var(--warning-color); border-color: var(--warning-color); }
+    .btn-outline-info { color: var(--info-color); border-color: var(--info-color); }
+    .btn-outline-info:hover { color: var(--info-text-color); background-color: var(--info-color); border-color: var(--info-color); }
+    .btn-outline-light { color: var(--light-color); border-color: var(--light-color); }
+    .btn-outline-light:hover { color: var(--dark-text-color); background-color: var(--light-color); border-color: var(--light-color); }
+    .btn-outline-dark { color: var(--dark-color); border-color: var(--dark-color); }
+    .btn-outline-dark:hover { color: var(--gray-100); background-color: var(--dark-color); border-color: var(--dark-color); }
+    .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+  
+  
+    /* Rozetler */
+    .badge-status-onhold { color: var(--warning-text-color) !important; }
+    .badge-status-plantowatch { color: var(--info-text-color) !important; }
+    .badge.bg-dark { background-color: var(--gray-500) !important; color: var(--gray-900) !important; }
+    .badge.bg-light { background-color: var(--gray-600) !important; color: var(--gray-100) !important; }
+  
+  
+    /* Sayfalama */
+    .page-item .page-link { background-color: var(--card-bg); border-color: var(--border-color); color: var(--link-color); }
+    .page-item.active .page-link { background-color: var(--primary-color); border-color: var(--primary-color); color: var(--white-color); }
+    .page-item:not(.active) .page-link:hover { background-color: var(--hover-bg); border-color: var(--border-color); color: var(--link-hover-color); }
+    .page-item.disabled .page-link { background-color: var(--gray-300); border-color: var(--border-color); color: var(--secondary-color); }
+  
+  
+    /* Alertler */
+    .alert { border-width: 0; border-left-width: 4px; }
+    .alert-info { background-color: color-mix(in srgb, var(--info-color) 15%, var(--card-bg)); border-left-color: var(--info-color); color: var(--info-text-color); }
+    .alert-info .alert-link { color: color-mix(in srgb, var(--info-text-color) 95%, white); }
+    .alert-warning { background-color: color-mix(in srgb, var(--warning-color) 15%, var(--card-bg)); border-left-color: var(--warning-color); color: var(--warning-text-color); }
+    .alert-warning .alert-link { color: color-mix(in srgb, var(--warning-text-color) 95%, white); }
+    .alert-danger { background-color: color-mix(in srgb, var(--danger-color) 15%, var(--card-bg)); border-left-color: var(--danger-color); color: color-mix(in srgb, var(--danger-color) 95%, white); }
+    .alert-danger .alert-link { color: color-mix(in srgb, var(--danger-color) 90%, white); }
+    .alert-success { background-color: color-mix(in srgb, var(--success-color) 15%, var(--card-bg)); border-left-color: var(--success-color); color: color-mix(in srgb, var(--success-color) 95%, white); }
+    .alert-success .alert-link { color: color-mix(in srgb, var(--success-color) 90%, white); }
+  
+  
+    /* Grafikler */
+    #typeDistributionChartContainer, #statusDistributionChartContainer { background-color: var(--card-bg); }
+    .chart-title { color: var(--heading-color); border-bottom-color: var(--border-color); }
+    .chartjs-tooltip { background: rgba(var(--gray-100-rgb), 0.9) !important; color: var(--heading-color) !important; border: 1px solid var(--border-color) !important; }
+  
+  
+    /* Preloader */
+    #preloader { background-color: var(--body-bg-start); }
+    .bounce-spinner > div { background-color: var(--primary-color); }
+  
+  
+    /* Diğerleri (custom.css'ten taşınan) */
+    .table { --bs-table-color: var(--text-color); --bs-table-bg: transparent; --bs-table-border-color: var(--border-color); --bs-table-striped-color: var(--text-color); --bs-table-striped-bg: rgba(var(--white-color-rgb), 0.03); --bs-table-active-color: var(--heading-color); --bs-table-active-bg: rgba(var(--white-color-rgb), 0.06); --bs-table-hover-color: var(--heading-color); --bs-table-hover-bg: rgba(var(--white-color-rgb), 0.045); }
+    .breadcrumb-item a { color: var(--link-color); }
+    .breadcrumb.bg-light { background-color: var(--header-bg) !important; }
+    .dropdown-menu { background-color: var(--gray-300); border-color: var(--border-color); --bs-dropdown-link-color: var(--text-color); --bs-dropdown-link-hover-color: var(--heading-color); --bs-dropdown-link-hover-bg: var(--hover-bg); --bs-dropdown-link-active-color: var(--white-color); --bs-dropdown-link-active-bg: var(--primary-color); --bs-dropdown-divider-bg: var(--border-color); }
+    .progress { background-color: var(--gray-400); }
+    .detail-image-placeholder { background-color: var(--gray-300) !important; color: var(--gray-600) !important; }
+    .item-notes-section .bg-light { background-color: var(--gray-300) !important; }
+    .card-body form ul.helptext, .card-body form ul.helptext li { color: var(--muted-text-color) !important; list-style-position: inside; margin-left: 0; padding-left: 0; }
+    .card-body > hr + .small { color: var(--muted-text-color) !important; }
+    .card-body > hr + .small a { color: var(--link-color) !important; }
+    .card-body > hr + .small a:hover { color: var(--link-hover-color) !important; }
+  
+  } /* html[data-theme="dark"] sonu */

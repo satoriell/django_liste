@@ -1,0 +1,71 @@
+/* tracker/static/tracker/css/charts.css */
+/* Dashboard Chart.js grafikleri için stiller */
+
+/* Grafik Konteynerleri */
+#typeDistributionChartContainer,
+#statusDistributionChartContainer {
+  position: relative; /* Tooltip konumlandırması için */
+  height: 380px; /* Sabit yükseklik (JS'deki ile tutarlı olmalı) */
+  width: 100%; /* Bulunduğu sütunu doldurur */
+  padding: var(--spacer-3); /* İç boşluk */
+  background-color: var(--card-bg); /* Kart arkaplanı */
+  border-radius: var(--border-radius); /* Köşe yuvarlaklığı */
+  box-shadow: var(--box-shadow-sm); /* Hafif gölge */
+  transition: background-color var(--theme-transition-duration) ease;
+  text-align: center; /* Canvas'ı ortalamak için */
+}
+
+/* Grafik Başlığı */
+.chart-title {
+  padding-bottom: var(--spacer-2);
+  border-bottom: var(--border-width) solid var(--border-color);
+  margin-bottom: var(--spacer-3) !important; /* Bootstrap mb-3'ü geçersiz kılabilir */
+  transition: border-color var(--theme-transition-duration) var(--base-transition-timing),
+              color var(--theme-transition-duration) var(--base-transition-timing);
+  font-weight: var(--font-weight-semibold); /* Başlık biraz daha belirgin */
+  width: 100%;
+  text-align: center;
+  color: var(--heading-color); /* Başlık rengi */
+}
+
+/* Canvas Elementi (JS tarafından oluşturulur ama stil verilebilir) */
+#typeDistributionChartContainer canvas,
+#statusDistributionChartContainer canvas {
+    max-width: 100%; /* Konteynerden taşmasın */
+    display: block; /* block element yap */
+    margin: 0 auto; /* Yatayda ortala */
+    /* Yükseklik/genişlik JS tarafından ayarlanır veya konteynerden alınır */
+}
+
+/* Chart.js Tooltip (custom.css'ten alındı, JS'de de ayarlar var) */
+.chartjs-tooltip {
+  background: rgba(var(--black-color-rgb), 0.8) !important; /* Açık tema tooltip arkaplanı */
+  color: var(--white-color) !important; /* Açık tema tooltip metni */
+  border: 1px solid rgba(var(--black-color-rgb), 0.1) !important;
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacer-2);
+  opacity: 1;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 0.1s ease;
+  /* Diğer tooltip stilleri JS tarafından yönetilebilir */
+}
+
+/* Grafikler İçin Karanlık Mod Override'ları (dark_mode.css'e de eklenecek) */
+html[data-theme="dark"] #typeDistributionChartContainer,
+html[data-theme="dark"] #statusDistributionChartContainer {
+  background-color: var(--card-bg); /* Koyu tema kart arkaplanı */
+  /* Gölge değişkenleri zaten koyu temada ayarlı */
+}
+
+html[data-theme="dark"] .chart-title {
+  color: var(--heading-color); /* Koyu tema başlık rengi */
+  border-bottom-color: var(--border-color); /* Koyu tema kenarlık rengi */
+}
+
+/* Koyu Tema Chart.js Tooltip */
+html[data-theme="dark"] .chartjs-tooltip {
+  background: rgba(var(--gray-100-rgb), 0.9) !important; /* Koyu tema tooltip arkaplanı */
+  color: var(--heading-color) !important; /* Koyu tema tooltip metni */
+  border: 1px solid var(--border-color) !important; /* Koyu tema kenarlık */
+}

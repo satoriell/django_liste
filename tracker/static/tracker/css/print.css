@@ -1,0 +1,96 @@
+/* tracker/static/tracker/css/print.css */
+/* Sayfa yazdırma stilleri */
+
+/* ==========================================================================
+   9. Yazdırma Stilleri (Print)
+   ========================================================================== */
+
+   @media print {
+    /* Temel sayfa ayarları */
+    body {
+      background: var(--white-color) !important; /* Arkaplan her zaman beyaz */
+      color: var(--black-color) !important; /* Yazı her zaman siyah */
+      padding-top: 0 !important; /* Navbar boşluğunu kaldır */
+      font-size: 10pt; /* Daha küçük font boyutu */
+      min-height: auto !important; /* Minimum yükseklik gereksiz */
+      display: block !important; /* Flexbox'ı kaldır */
+    }
+  
+    /* Yazdırılmayacak öğeleri gizle */
+    .navbar,
+    footer,
+    .action-buttons, /* Liste öğesi butonları */
+    .list-group-item .action-buttons, /* Liste öğesi butonları (mobil) */
+    form button[type="submit"], /* Form gönderim butonları */
+    .btn, /* Genel butonlar */
+    .pagination, /* Sayfalama */
+    .bootstrap-messages, /* Mesaj/Uyarı kutuları */
+    [data-aos], /* AOS animasyon elemanları */
+    #theme-toggle-button, /* Tema değiştirme butonu */
+    #preloader, /* Yükleme animasyonu */
+    .controls-container /* Filtre/arama alanı */
+     {
+      display: none !important;
+    }
+  
+    /* Linkleri basitleştir */
+    a {
+      text-decoration: none !important; /* Alt çizgiyi kaldır */
+      color: var(--black-color) !important; /* Linkler siyah */
+    }
+    /* Linklerin URL'lerini yanlarında göster (opsiyonel) */
+    a[href^="http"]::after,
+    a[href^="/"]::after {
+      /* content: " (" attr(href) ")"; */ /* URL'yi göstermek isterseniz açın */
+      font-size: 90%;
+      color: #555;
+    }
+  
+    /* Kartları ve listeleri basitleştir */
+    .card,
+    .list-group-item,
+    .form-container {
+      border: 1px solid var(--gray-400) !important; /* Basit kenarlık */
+      box-shadow: none !important; /* Gölgeyi kaldır */
+      background-color: var(--white-color) !important; /* Arkaplan beyaz */
+      page-break-inside: avoid; /* Mümkünse sayfa ortasında bölme */
+    }
+    .card-header, .card-footer {
+        background-color: #eee !important; /* Hafif gri arkaplan */
+        border-color: var(--gray-400) !important;
+    }
+  
+    /* Başlıkların sayfa sonunda tek kalmasını engelle */
+    h1, h2, h3, h4, h5, h6 {
+      page-break-after: avoid;
+      color: var(--black-color) !important;
+    }
+  
+    /* Grafikleri gizle */
+    #typeDistributionChartContainer,
+    #statusDistributionChartContainer {
+      display: none !important;
+    }
+  
+    /* Resimleri küçült ve siyah-beyaz yap */
+    .detail-image,
+    .list-item-image {
+      max-width: 150px !important; /* Daha küçük resim boyutu */
+      box-shadow: none !important;
+      filter: grayscale(1); /* Siyah-beyaz */
+      border: 1px solid #ccc; /* Kenarlık ekle */
+    }
+    /* Resim yoksa görünen placeholder ikonunu gizle */
+    .detail-image-placeholder i,
+    .list-item-image-link .bg-light i {
+        display: none;
+    }
+  
+    /* Rozetleri basitleştir */
+    .badge {
+      border: 1px solid #ccc;
+      color: #333 !important;
+      background-color: #eee !important;
+      font-weight: normal; /* Kalınlığı kaldır */
+    }
+  }

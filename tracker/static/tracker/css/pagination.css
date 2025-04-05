@@ -1,0 +1,81 @@
+/* tracker/static/tracker/css/pagination.css */
+/* Sayfalama (pagination) bileşeni stilleri */
+
+/* ==========================================================================
+   5.6 Sayfalama (Pagination)
+   ========================================================================== */
+
+   .pagination {
+    /* Bootstrap varsayılanlarını kullanır, flex-wrap şablonda ayarlanmıştır */
+    --bs-pagination-border-radius: var(--border-radius); /* Köşe yuvarlaklığı */
+    margin-top: var(--spacer-4); /* Üstten boşluk */
+    /* justify-content-center şablonda ayarlanmıştır */
+  }
+  
+  /* Sayfa Numarası Kutusu (Link veya Span) */
+  .page-item .page-link {
+    transition: var(--base-transition);
+    border: var(--border-width) solid var(--border-color);
+    background-color: var(--card-bg); /* Kart arkaplanıyla uyumlu */
+    color: var(--link-color); /* Link rengi */
+    box-shadow: var(--box-shadow-sm); /* Hafif gölge */
+    margin: 0 3px; /* Sayfa kutuları arası yatay boşluk */
+    padding: 0.4rem 0.8rem; /* İç boşluk */
+    /* Bootstrap'in kendi köşe yuvarlaklığını kullanır (--bs-pagination-border-radius) */
+  }
+  
+  /* Aktif Sayfa */
+  .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white-color);
+    box-shadow: var(--box-shadow-sm); /* Gölgeyi koru */
+    z-index: 3; /* Aktif sayfa önde görünsün */
+    transform: scale(1.03); /* Hafif vurgu */
+  }
+  
+  /* Hover Durumu (Aktif olmayanlar için) */
+  .page-item:not(.active) .page-link:hover {
+    background-color: var(--hover-bg); /* Hover arkaplanı */
+    color: var(--link-hover-color);
+    border-color: var(--border-color); /* Kenarlık rengi değişmesin */
+    z-index: 2;
+    transform: translateY(-2px); /* Hafif yukarı kalkma efekti */
+    box-shadow: var(--box-shadow); /* Hover'da gölge belirginleşsin */
+  }
+  
+  /* Devre Dışı Sayfa (İlk/Son sayfadaysa) */
+  .page-item.disabled .page-link {
+    background-color: var(--gray-100); /* Açık tema için */
+    border-color: var(--border-color);
+    color: var(--secondary-color); /* Soluk renk */
+    box-shadow: none; /* Gölge yok */
+    opacity: 0.6;
+    /* pointer-events: none; Bootstrap bunu zaten yapar */
+  }
+  
+  
+  /* Pagination İçin Karanlık Mod Override'ları (dark_mode.css'e de eklenecek) */
+  html[data-theme="dark"] .page-item .page-link {
+    background-color: var(--card-bg); /* Koyu tema kart arkaplanı */
+    border-color: var(--border-color);
+    color: var(--link-color); /* Koyu tema link rengi */
+  }
+  
+  html[data-theme="dark"] .page-item.active .page-link {
+    background-color: var(--primary-color); /* Koyu temada da aynı */
+    border-color: var(--primary-color);
+    color: var(--white-color); /* Genellikle beyaz kalır */
+  }
+  
+  html[data-theme="dark"] .page-item:not(.active) .page-link:hover {
+    background-color: var(--hover-bg); /* Koyu tema hover arkaplanı */
+    border-color: var(--border-color);
+    color: var(--link-hover-color); /* Koyu tema link hover rengi */
+  }
+  
+  html[data-theme="dark"] .page-item.disabled .page-link {
+    background-color: var(--gray-300); /* Koyu tema için disable arkaplanı */
+    border-color: var(--border-color);
+    color: var(--secondary-color); /* Soluk renk aynı kalabilir */
+  }

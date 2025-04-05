@@ -1,0 +1,284 @@
+/* tracker/static/tracker/css/buttons.css */
+/* Buton stilleri (Bootstrap temel alınarak) */
+
+/* ==========================================================================
+   5.8 Butonlar (Bootstrap .btn temel alınarak)
+   ========================================================================== */
+
+   .btn {
+    /* Bootstrap varsayılanlarını kullanır */
+    /* Eklemek istediğimiz genel geçişler */
+    transition: color var(--base-transition-duration) var(--base-transition-timing),
+                background-color var(--base-transition-duration) var(--base-transition-timing),
+                border-color var(--base-transition-duration) var(--base-transition-timing),
+                box-shadow var(--base-transition-duration) var(--base-transition-timing),
+                transform var(--base-transition-duration) var(--base-transition-timing);
+    border-radius: var(--border-radius); /* base.css'teki değişken */
+    border-width: var(--border-width);
+    font-weight: var(--font-weight-semibold); /* Butonlar biraz daha kalın */
+    padding: 0.4rem 0.9rem; /* Biraz daha dolgun padding */
+    /* Butona tıklama efekti */
+    /* &:active { transform: scale(0.98); } */
+  }
+  
+  /* Renk Varyasyonları */
+  .btn-primary {
+    color: var(--white-color);
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  .btn-primary:hover {
+    color: var(--white-color);
+    background-color: var(--primary-hover-color); /* base.css'teki değişken */
+    border-color: var(--primary-hover-color);
+  }
+  
+  .btn-secondary {
+    color: var(--white-color);
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+  .btn-secondary:hover {
+    color: var(--white-color);
+    background-color: var(--secondary-hover-color);
+    border-color: var(--secondary-hover-color);
+  }
+  
+  .btn-success {
+    color: var(--white-color);
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+  }
+  .btn-success:hover {
+    color: var(--white-color);
+    background-color: var(--success-hover-color);
+    border-color: var(--success-hover-color);
+  }
+  
+  .btn-danger {
+    color: var(--white-color);
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+  }
+  .btn-danger:hover {
+    color: var(--white-color);
+    background-color: var(--danger-hover-color);
+    border-color: var(--danger-hover-color);
+  }
+  
+  .btn-warning {
+    color: var(--warning-text-color); /* Açık tema için */
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+  }
+  .btn-warning:hover {
+    color: var(--warning-text-color);
+    background-color: var(--warning-hover-color);
+    border-color: var(--warning-hover-color);
+  }
+  
+  .btn-info {
+    color: var(--info-text-color); /* Açık tema için */
+    background-color: var(--info-color);
+    border-color: var(--info-color);
+  }
+  .btn-info:hover {
+    color: var(--info-text-color);
+    background-color: var(--info-hover-color);
+    border-color: var(--info-hover-color);
+  }
+  
+  .btn-light { /* Açık tema için */
+    color: var(--dark-color);
+    background-color: var(--light-color);
+    border-color: var(--gray-300); /* Hafif border */
+  }
+  .btn-light:hover {
+    color: var(--dark-color);
+    background-color: var(--gray-200);
+    border-color: var(--gray-400);
+  }
+  
+  .btn-dark {
+    color: var(--white-color);
+    background-color: var(--dark-color);
+    border-color: var(--dark-color);
+  }
+  .btn-dark:hover {
+    color: var(--white-color);
+    background-color: color-mix(in srgb, var(--dark-color) 85%, var(--black-color));
+    border-color: color-mix(in srgb, var(--dark-color) 80%, var(--black-color));
+  }
+  
+  /* Outline Butonlar */
+  .btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  .btn-outline-primary:hover {
+    color: var(--white-color);
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-outline-secondary {
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+  .btn-outline-secondary:hover {
+    color: var(--white-color);
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+  
+  .btn-outline-success {
+    color: var(--success-color);
+    border-color: var(--success-color);
+  }
+  .btn-outline-success:hover {
+    color: var(--white-color);
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+  }
+  
+  .btn-outline-danger {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+  }
+  .btn-outline-danger:hover {
+    color: var(--white-color);
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+  }
+  
+  .btn-outline-warning {
+    color: var(--warning-color);
+    border-color: var(--warning-color);
+  }
+  .btn-outline-warning:hover {
+    color: var(--warning-text-color); /* Açık tema için */
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+  }
+  
+  .btn-outline-info {
+    color: var(--info-color);
+    border-color: var(--info-color);
+  }
+  .btn-outline-info:hover {
+    color: var(--info-text-color); /* Açık tema için */
+    background-color: var(--info-color);
+    border-color: var(--info-color);
+  }
+  
+  .btn-outline-light { /* Açık tema için */
+    color: var(--light-color);
+    border-color: var(--light-color);
+  }
+  .btn-outline-light:hover {
+    color: var(--dark-color);
+    background-color: var(--light-color);
+    border-color: var(--light-color);
+  }
+  
+  .btn-outline-dark { /* Açık tema için */
+    color: var(--dark-color);
+    border-color: var(--dark-color);
+  }
+  .btn-outline-dark:hover {
+    color: var(--white-color);
+    background-color: var(--dark-color);
+    border-color: var(--dark-color);
+  }
+  
+  /* Buton Boyutları (Bootstrap'ten alınır, özelleştirilebilir) */
+  /* .btn-sm { ... } */
+  /* .btn-lg { ... } */
+  
+  /* Buton Grupları (Bootstrap'ten alınır, özelleştirilebilir) */
+  /* .btn-group { ... } */
+  /* .btn-group-sm { ... } */
+  /* .btn-group-lg { ... } */
+  
+  
+  /* Butonlar İçin Karanlık Mod Override'ları (dark_mode.css'e de eklenecek) */
+  html[data-theme="dark"] .btn-warning {
+    color: var(--warning-text-color); /* Koyu tema için */
+  }
+  html[data-theme="dark"] .btn-warning:hover {
+    color: var(--warning-text-color);
+    background-color: var(--warning-hover-color); /* base.css'teki değişken */
+    border-color: var(--warning-hover-color);
+  }
+  
+  html[data-theme="dark"] .btn-info {
+    color: var(--info-text-color); /* Koyu tema için */
+  }
+  html[data-theme="dark"] .btn-info:hover {
+    color: var(--info-text-color);
+    background-color: var(--info-hover-color);
+    border-color: var(--info-hover-color);
+  }
+  
+  html[data-theme="dark"] .btn-light { /* Koyu tema için btn-light */
+    background-color: var(--light-color); /* Koyu temadaki --light-color */
+    border-color: var(--light-color);
+    color: var(--white-color); /* Koyu temada --light-color üzerine beyaz yazı */
+  }
+  html[data-theme="dark"] .btn-light:hover {
+    background-color: color-mix(in srgb, var(--light-color) 85%, var(--white-color));
+    border-color: color-mix(in srgb, var(--light-color) 85%, var(--white-color));
+    color: var(--white-color);
+  }
+  
+  html[data-theme="dark"] .btn-dark { /* Koyu tema için btn-dark */
+      background-color: var(--dark-color); /* Koyu temadaki --dark-color */
+      border-color: var(--dark-color);
+      color: var(--black-color); /* Koyu temada --dark-color üzerine siyah yazı */
+  }
+  html[data-theme="dark"] .btn-dark:hover {
+      background-color: color-mix(in srgb, var(--dark-color) 85%, var(--white-color));
+      border-color: color-mix(in srgb, var(--dark-color) 80%, var(--white-color));
+      color: var(--black-color);
+  }
+  
+  
+  html[data-theme="dark"] .btn-outline-warning {
+    color: var(--warning-color);
+    border-color: var(--warning-color);
+  }
+  html[data-theme="dark"] .btn-outline-warning:hover {
+    color: var(--warning-text-color); /* Koyu tema için */
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+  }
+  
+  html[data-theme="dark"] .btn-outline-info {
+    color: var(--info-color);
+    border-color: var(--info-color);
+  }
+  html[data-theme="dark"] .btn-outline-info:hover {
+    color: var(--info-text-color); /* Koyu tema için */
+    background-color: var(--info-color);
+    border-color: var(--info-color);
+  }
+  
+  html[data-theme="dark"] .btn-outline-light { /* Koyu tema için */
+    color: var(--light-color);
+    border-color: var(--light-color);
+  }
+  html[data-theme="dark"] .btn-outline-light:hover {
+    color: var(--dark-text-color); /* Koyu temadaki --dark-text-color */
+    background-color: var(--light-color);
+    border-color: var(--light-color);
+  }
+  
+  html[data-theme="dark"] .btn-outline-dark { /* Koyu tema için */
+    color: var(--dark-color); /* Koyu temadaki --dark-color (açık renk) */
+    border-color: var(--dark-color);
+  }
+  html[data-theme="dark"] .btn-outline-dark:hover {
+    color: var(--gray-100); /* Koyu temadaki --gray-100 (koyu renk) */
+    background-color: var(--dark-color);
+    border-color: var(--dark-color);
+  }
