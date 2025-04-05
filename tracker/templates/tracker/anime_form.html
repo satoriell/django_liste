@@ -1,24 +1,19 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
-{% comment %}
-Konum: /home/admin/App/django_liste/tracker/templates/tracker/anime_form.html
-AOS animasyonları eklendi. Form render yapısı korundu.
-{% endcomment %}
+{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/anime_form.html (Güncellendi: _form_fields.html partial'ı kullanıldı) {% endcomment %}
 
 {% block title %}Anime Düzenle: {{ item.title }} - Kişisel Liste{% endblock title %}
 
 {% block content %}
-    {# Ana satıra animasyon #}
     <div class="row justify-content-center mt-4 mb-5" data-aos="fade-up">
         <div class="col-md-10 col-lg-8">
-             {# Form konteynerine animasyon #}
             <div class="form-container shadow-sm" data-aos="zoom-in-up" data-aos-delay="100">
-                {# Başlıklara animasyon #}
                 <h2 class="mb-3 text-primary" data-aos="fade-down" data-aos-delay="150">Anime Düzenle</h2>
                 <h4 class="mb-4 text-secondary" data-aos="fade-down" data-aos-delay="200">{{ item.title }}</h4>
 
                 <form method="post" action="">
-                    {% csrf_token %}
+                    {# CSRF token'ı _form_fields.html içinde render edilir #}
+                    {# {% csrf_token %} #}
 
                     {# Genel Form Hataları #}
                     {% if form.non_field_errors %}
@@ -27,91 +22,13 @@ AOS animasyonları eklendi. Form render yapısı korundu.
                         </div>
                     {% endif %}
 
-                    {# --- Form Alanları (Mevcut Grid Yapısı Korundu) --- #}
-                    {# Title - Tam Satır #}
-                    <div class="mb-3">
-                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}{% if form.title.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                        {{ form.title }}
-                        {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors|striptags }}</div>{% endif %}
-                        {% if form.title.help_text %}<div class="form-text">{{ form.title.help_text|safe }}</div>{% endif %}
-                    </div>
-
-                    {# Status ve Rating Yan Yana #}
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}{% if form.status.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                            {{ form.status }}
-                            {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors|striptags }}</div>{% endif %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.rating.id_for_label }}" class="form-label">{{ form.rating.label }}{% if form.rating.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                            {{ form.rating }}
-                            {% if form.rating.errors %}<div class="invalid-feedback d-block">{{ form.rating.errors|striptags }}</div>{% endif %}
-                        </div>
-                    </div>
-
-                     {# Başlama ve Bitiş Tarihi Yan Yana #}
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                             <label for="{{ form.start_date.id_for_label }}" class="form-label">{{ form.start_date.label }}</label>
-                             {{ form.start_date }}
-                             {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors|striptags }}</div>{% endif %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                             <label for="{{ form.end_date.id_for_label }}" class="form-label">{{ form.end_date.label }}</label>
-                             {{ form.end_date }}
-                             {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors|striptags }}</div>{% endif %}
-                        </div>
-                    </div>
-
-                    {# Kapak Resmi URL - Tam Satır #}
-                    <div class="mb-3">
-                        <label for="{{ form.cover_image_url.id_for_label }}" class="form-label">{{ form.cover_image_url.label }}</label>
-                        {{ form.cover_image_url }}
-                        {% if form.cover_image_url.errors %}<div class="invalid-feedback d-block">{{ form.cover_image_url.errors|striptags }}</div>{% endif %}
-                    </div>
-
-                    {# İzlenen ve Toplam Bölüm Yan Yana #}
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.episodes_watched.id_for_label }}" class="form-label">{{ form.episodes_watched.label }}</label>
-                            {{ form.episodes_watched }}
-                            {% if form.episodes_watched.errors %}<div class="invalid-feedback d-block">{{ form.episodes_watched.errors|striptags }}</div>{% endif %}
-                        </div>
-                         <div class="col-md-6 mb-3">
-                            <label for="{{ form.total_episodes.id_for_label }}" class="form-label">{{ form.total_episodes.label }}</label>
-                            {{ form.total_episodes }}
-                            {% if form.total_episodes.errors %}<div class="invalid-feedback d-block">{{ form.total_episodes.errors|striptags }}</div>{% endif %}
-                        </div>
-                    </div>
-
-                    {# Stüdyo - Tam Satır #}
-                    <div class="mb-3">
-                        <label for="{{ form.studio.id_for_label }}" class="form-label">{{ form.studio.label }}</label>
-                        {{ form.studio }}
-                        {% if form.studio.errors %}<div class="invalid-feedback d-block">{{ form.studio.errors|striptags }}</div>{% endif %}
-                    </div>
-
-                    {# Notlar - Tam Satır #}
-                    <div class="mb-3">
-                        <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label>
-                        {{ form.notes }}
-                        {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors|striptags }}</div>{% endif %}
-                    </div>
-
-                     {# Etiketler - Tam Satır #}
-                    <div class="mb-3">
-                        <label for="{{ form.tags.id_for_label }}" class="form-label">{{ form.tags.label }}</label>
-                        {{ form.tags }}
-                        {% if form.tags.errors %}<div class="invalid-feedback d-block">{{ form.tags.errors|striptags }}</div>{% endif %}
-                        {% if form.tags.help_text %}<div class="form-text">{{ form.tags.help_text|safe }}</div>{% endif %}
-                    </div>
+                    {# --- Form Alanları (Partial ile) --- #}
+                    {% include 'tracker/partials/_form_fields.html' with form=form %}
                     {# --- Form Alanları Sonu --- #}
 
                     <hr class="mt-4 mb-3">
                     {# Butonlar #}
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        {# İptal butonu liste sayfasına döner #}
                         <a href="{% url 'tracker:anime_list_view' %}" class="btn btn-secondary">İptal</a>
                         <button type="submit" class="btn btn-success"><i class="fas fa-save me-1" aria-hidden="true"></i>Değişiklikleri Kaydet</button>
                     </div>

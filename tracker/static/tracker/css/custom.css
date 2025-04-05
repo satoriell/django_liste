@@ -346,3 +346,18 @@ footer small { line-height: 1.5; color: var(--muted-text-color); transition: col
 .favorite-card-title-container { overflow: hidden; min-height: 44px; }
 .favorite-card-title { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; margin-bottom: 0; } .favorite-card-title a { color: var(--heading-color); text-decoration: none; } .favorite-card-title a:hover { color: var(--link-hover-color); text-decoration: underline; }
 .favorite-toggle-button-card { display: inline-flex; align-items: center; justify-content: center; padding: .3rem .6rem; font-size: var(--small-font-size); opacity: 1; visibility: visible; line-height: 1; width: 32px; height: 32px; border-radius: 50%; }
+/* custom.css sonuna eklenecek */
+
+/* ==========================================================================
+   11. Özel Eklemeler (Placeholder vb.)
+   ========================================================================== */
+   .detail-image-placeholder {
+    /* width: 300px; */ /* Genişlik col-md-4 tarafından belirlenecek */
+    /* height: 400px; */ /* Yükseklik için aspect-ratio daha iyi olabilir */
+    aspect-ratio: 3 / 4; /* Genişlik/Yükseklik oranı (isteğe bağlı) */
+    max-width: 100%; /* Konteynerden taşmasın */
+    /* background-color, color, vs. Bootstrap sınıflarından (bg-light, text-secondary) geliyor */
+    /* display: flex, align-items, justify-content Bootstrap sınıflarından geliyor */
+    /* border-radius: var(--border-radius); */ /* Zaten Bootstrap rounded sınıfı ile var */
+    /* box-shadow: var(--box-shadow-sm); */ /* Zaten Bootstrap shadow-sm sınıfı ile var */
+  }

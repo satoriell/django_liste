@@ -1,7 +1,7 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
 {% comment %}
-    Ortak Detay Sayfası Şablonu
+    Ortak Detay Sayfası Şablonu (Güncellendi: Placeholder inline stili kaldırıldı)
     AOS animasyonları eklendi/çeşitlendirildi.
     Etiketler bölümü eklendi.
     Breadcrumb eklendi.
@@ -12,72 +12,59 @@
 {% block title %}{{ item.title }} - {{ model_name }} Detayları{% endblock title %}
 
 {% block content %}
-    {# Breadcrumb Navigasyonu (AOS ile) #}
     <nav aria-label="breadcrumb" class="mb-4" data-aos="fade-down">
-      <ol class="breadcrumb bg-light px-3 py-2 rounded-pill"> {# Arkaplan ve yuvarlaklık #}
+      <ol class="breadcrumb bg-light px-3 py-2 rounded-pill">
         <li class="breadcrumb-item"><a href="{% url 'tracker:dashboard' %}">Dashboard</a></li>
-        {# list_url_base varsa liste sayfasına link ver #}
         <li class="breadcrumb-item"><a href="{% if list_url_base %}{{ list_url_base }}{% else %}#{% endif %}">{{ model_name }}ler</a></li>
-        <li class="breadcrumb-item active" aria-current="page">{{ item.title|truncatechars:40 }}</li> {# Başlığı kısalt #}
+        <li class="breadcrumb-item active" aria-current="page">{{ item.title|truncatechars:40 }}</li>
       </ol>
     </nav>
 
-    {# --- Ana İçerik Alanı --- #}
-    <div class="detail-content-wrapper card card-body shadow-sm border-0" data-aos="fade-up" data-aos-delay="100"> {# Kart içine alındı #}
+    <div class="detail-content-wrapper card card-body shadow-sm border-0" data-aos="fade-up" data-aos-delay="100">
 
-        {# Başlık ve Eylem Butonları #}
         <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2" data-aos="fade-down" data-aos-delay="150">
-            <h1 class="mb-0 me-3 display-6">{{ item.title }}</h1> {# Daha küçük başlık #}
-            {# Buton Grubu #}
+            <h1 class="mb-0 me-3 display-6">{{ item.title }}</h1>
             <div class="btn-group flex-shrink-0 shadow-sm rounded" role="group" aria-label="Eylemler">
-                {# Favori Butonu #}
                 {% if user.is_authenticated %}
                 <button type="button"
                    class="btn btn-sm {% if is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %} js-toggle-favorite"
                    title="{% if is_favorite %}Favorilerden Çıkar{% else %}Favoriye Ekle{% endif %}"
+                   aria-label="{% if is_favorite %}Favorilerden Çıkar{% else %}Favoriye Ekle{% endif %}" {# aria-label eklendi #}
                    data-item-id="{{ item.pk }}"
                    data-item-type="{{ item_type }}">
                     <i class="fas fa-star" aria-hidden="true"></i>
                 </button>
                 {% endif %}
-                {# Düzenle/Sil Butonları (sadece sahibi görebilir) #}
                 {% if is_owner %}
-                    <a href="{% url 'tracker:'|add:item_type|add:'_edit' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit me-1"></i>Düzenle</a>
-                    <a href="{% url 'tracker:'|add:item_type|add:'_delete' item.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt me-1"></i>Sil</a>
+                    <a href="{% url 'tracker:'|add:item_type|add:'_edit' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit me-1" aria-hidden="true"></i>Düzenle</a>
+                    <a href="{% url 'tracker:'|add:item_type|add:'_delete' item.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt me-1" aria-hidden="true"></i>Sil</a>
                 {% endif %}
             </div>
         </div>
 
-        {# Ekleyen Kullanıcı Bilgisi #}
         <p class="text-muted mb-4" data-aos="fade-right" data-aos-delay="200"><small>Ekleyen: {{ item.user.username }}</small></p>
 
-        {# --- İki Sütunlu Yapı --- #}
         <div class="row g-4">
-             {# Sol Sütun: Resim, Durum, Puan, İlerleme #}
              <div class="col-md-4 text-center">
-                 {# Resim Alanı (AOS ile) #}
                 <div class="mb-4" data-aos="flip-left" data-aos-delay="250">
                      {% if item.cover_image_url %}
                         <a href="{{ item.cover_image_url }}" target="_blank" class="d-inline-block shadow rounded">
                             <img src="{{ item.cover_image_url }}"
-                                 class="img-fluid rounded detail-image" {# Kenarlık kaldırıldı, gölge eklendi #}
-                                 alt="{{ item.title }} Kapak"
+                                 class="img-fluid rounded detail-image"
+                                 alt="{{ item.title }} Kapak Resmi" {# Alt text iyileştirildi #}
                                  style="max-height: 450px; object-fit: contain;">
                          </a>
                     {% else %}
-                        {# Placeholder #}
-                        <div class="d-inline-block detail-image-placeholder d-flex align-items-center justify-content-center text-secondary rounded bg-light shadow-sm"
-                             style="width: 300px; height: 400px;">
-                            <i class="fas fa-image fa-5x" aria-hidden="true"></i>
+                        {# Placeholder - Inline stiller kaldırıldı, CSS sınıfı eklendi #}
+                        <div class="d-inline-block detail-image-placeholder d-flex align-items-center justify-content-center text-secondary rounded bg-light shadow-sm">
+                            <i class="fas fa-image fa-5x" aria-hidden="true"></i> {# aria-hidden eklendi #}
                         </div>
                     {% endif %}
                 </div>
-                 {# Durum ve Puan (AOS ile) #}
                 <div class="mb-4" data-aos="zoom-in" data-aos-delay="300">
-                   <span class="badge fs-6 rounded-pill badge-status {% if item.status == 'Watching' %}badge-status-watching{% elif item.status == 'Completed' %}badge-status-completed{% elif item.status == 'On Hold' %}badge-status-onhold{% elif item.status == 'Dropped' %}badge-status-dropped{% elif item.status == 'Plan to Watch' %}badge-status-plantowatch{% else %}badge-status-default{% endif %}"><i class="fas fa-info-circle me-1"></i>{{ item.get_status_display }}</span>
-                   {% if item.rating is not None %} <span class="badge fs-6 bg-dark ms-1"><i class="fas fa-star me-1"></i>Puan: {{ item.rating }}/10</span> {% endif %}
+                   <span class="badge fs-6 rounded-pill badge-status {% if item.status == 'Watching' %}badge-status-watching{% elif item.status == 'Completed' %}badge-status-completed{% elif item.status == 'On Hold' %}badge-status-onhold{% elif item.status == 'Dropped' %}badge-status-dropped{% elif item.status == 'Plan to Watch' %}badge-status-plantowatch{% else %}badge-status-default{% endif %}"><i class="fas fa-info-circle me-1" aria-hidden="true"></i>{{ item.get_status_display }}</span>
+                   {% if item.rating is not None %} <span class="badge fs-6 bg-dark ms-1"><i class="fas fa-star me-1" aria-hidden="true"></i>Puan: {{ item.rating }}/10</span> {% endif %}
                 </div>
-                 {# İlerleme Çubuğu (varsa) (AOS ile) #}
                 {% with progress=item.get_progress_percent %}
                     {% if progress is not None %}
                     <div class="mb-4 mx-auto" style="max-width: 300px;" data-aos="zoom-in-up" data-aos-delay="350">
@@ -90,19 +77,16 @@
                 {% endwith %}
              </div>
 
-             {# Sağ Sütun: Detaylar, Etiketler, Notlar #}
              <div class="col-md-8">
-                 {# Detay Listesi (Partial ile) (AOS ile) #}
                 <div class="item-details-list mb-4" data-aos="fade-left" data-aos-delay="400">
-                     <h4 class="mb-3"><i class="fas fa-list-ul me-2 text-muted"></i>Detaylar</h4>
+                     <h4 class="mb-3"><i class="fas fa-list-ul me-2 text-muted" aria-hidden="true"></i>Detaylar</h4>
                      {% include 'tracker/partials/_item_details_dl.html' with item=item %}
                 </div>
 
-                 {# Etiketler Bölümü (AOS ile) #}
                 {% if item.tags.all %}
                     <hr class="my-4" data-aos="fade" data-aos-delay="450">
                     <div class="item-tags-section mb-4" data-aos="fade-up" data-aos-delay="500">
-                         <h4 class="mb-3"><i class="fas fa-tags me-2 text-muted"></i>Etiketler</h4>
+                         <h4 class="mb-3"><i class="fas fa-tags me-2 text-muted" aria-hidden="true"></i>Etiketler</h4>
                          <p>
                             {% for tag in item.tags.all %}
                                 <a href="{% if list_url_base %}{{ list_url_base }}?tag={{ tag.slug }}{% else %}#{% endif %}"
@@ -114,20 +98,14 @@
                     </div>
                 {% endif %}
 
-                {# Notlar Alanı (varsa) (AOS ile) #}
                  {% if item.notes %}
                     <hr class="my-4" data-aos="fade" data-aos-delay="550">
                     <div class="item-notes-section" data-aos="fade-up" data-aos-delay="600">
-                        <h4 class="mb-3"><i class="fas fa-comment-alt me-2 text-muted"></i>Notlar</h4>
+                        <h4 class="mb-3"><i class="fas fa-comment-alt me-2 text-muted" aria-hidden="true"></i>Notlar</h4>
                         <div class="bg-light p-3 rounded shadow-sm" style="white-space: pre-wrap; max-height: 300px; overflow-y: auto;">{{ item.notes }}</div>
-                         {# Koyu tema stili CSS'te tanımlı #}
                     </div>
                 {% endif %}
              </div>
         </div>
-        {# --- İki Sütunlu Yapı Sonu --- #}
-
     </div>
-    {# --- Ana İçerik Alanı Sonu --- #}
-
 {% endblock content %}

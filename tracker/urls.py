@@ -16,7 +16,7 @@ urlpatterns = [
     # --- Kayıt (Signup) ---
     # Ana projenin urls.py'sinde 'accounts/' altında handle edilmiyor, burada kalabilir.
     # Veya accounts/ altına taşınabilir. Şimdilik burada.
-    # path("signup/", views.signup_view, name="signup"), # Eğer burada olacaksa
+      path("signup/", views.signup_view, name="signup"), # Eğer burada olacaksa
 
     # --- Favori URL'leri ---
     path("favorite/toggle/", views.toggle_favorite, name="toggle_favorite"), # AJAX endpoint

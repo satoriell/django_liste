@@ -1,34 +1,24 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
-{% comment %}
-Konum: tracker/templates/tracker/md_form_api.html
-MangaDex API'dan gelen Manga/Webtoon verisiyle formu gösterir.
-AOS animasyonları eklendi.
-{% endcomment %}
+{% comment %} Konum: tracker/templates/tracker/md_form_api.html (Güncellendi: _form_fields.html partial'ı kullanıldı) {% endcomment %}
 
 {# Dinamik Başlık #}
 {% block title %}API'dan {{ model_verbose_name }} Ekle: {{ mangadex_data.title|default:model_verbose_name }} - Kişisel Liste{% endblock title %}
 
 {% block content %}
-    {# Ana Satır (AOS) #}
     <div class="row justify-content-center mt-4 mb-5" data-aos="fade-up">
         <div class="col-md-10 col-lg-8">
-            {# Form Konteyneri (AOS) #}
             <div class="form-container shadow-sm" data-aos="zoom-in-up" data-aos-delay="100">
-
-                {# Dinamik Başlık (AOS) #}
                 <h2 class="mb-3 {% if model_verbose_name == 'Webtoon' %}text-success{% else %}text-danger{% endif %}" data-aos="fade-down">Listeye {{ model_verbose_name }} Ekle</h2>
 
                 {# API'dan Gelen Bilgiler (Teyit Kartı) #}
                 <div class="card mb-4 shadow-sm {% if not mangadex_data.cover_image_url %}border-0{% endif %}" data-aos="fade-up" data-aos-delay="150">
                     <div class="row g-0">
-                        {# Resim Sütunu #}
                         {% if mangadex_data.cover_image_url %}
                         <div class="col-md-4">
                             <img src="{{ mangadex_data.cover_image_url }}" class="img-fluid rounded-start" alt="{{ mangadex_data.title }} Kapak" style="max-height: 250px; object-fit: cover; width: 100%;">
                         </div>
                         {% endif %}
-                        {# Bilgi Sütunu #}
                         <div class="{% if mangadex_data.cover_image_url %}col-md-8{% else %}col-12{% endif %}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ mangadex_data.title|default:'Başlık Getirilemedi' }}</h5>
@@ -37,11 +27,9 @@ AOS animasyonları eklendi.
                                     {% if mangadex_data.artist and mangadex_data.artist != mangadex_data.author %}<br>Çizer: {{ mangadex_data.artist }}{% endif %}
                                 </p>
                                 <p class="card-text mb-2"><small class="text-muted">MangaDex ID: {{ mangadex_data.mangadex_id }}</small></p>
-                                {# Açıklama (Varsa) #}
                                 {% if mangadex_data.notes %}
                                 <p class="card-text small mt-2" style="max-height: 100px; overflow-y: auto;"><i>{{ mangadex_data.notes|safe|truncatewords:50 }}</i></p>
                                 {% endif %}
-                                {# Etiketler (Varsa) #}
                                 {% if mangadex_data.tags_list %}
                                  <p class="card-text mt-2"><small class="text-muted">Etiketler: {{ mangadex_data.tags_list|join:", " }}</small></p>
                                 {% endif %}
@@ -54,75 +42,17 @@ AOS animasyonları eklendi.
 
                 {# Önceden Doldurulmuş Form #}
                 <form method="post" action="">
-                    {% csrf_token %}
                     {% if form.non_field_errors %} <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div> {% endif %}
 
-                    {# ----- Form Alanları (Dinamik olarak gösterilecek) ----- #}
-
-                    {# Title (Ortak) #}
-                    <div class="mb-3"> <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}{% if form.title.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.title }} {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors|striptags }}</div>{% endif %} </div>
-
-                    {# Status ve Rating Yan Yana #}
-                     <div class="row">
-                        <div class="col-md-6 mb-3"> <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}{% if form.status.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.status }} {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors|striptags }}</div>{% endif %} </div>
-                        <div class="col-md-6 mb-3"> <label for="{{ form.rating.id_for_label }}" class="form-label">{{ form.rating.label }}</label> {{ form.rating }} {% if form.rating.errors %}<div class="invalid-feedback d-block">{{ form.rating.errors|striptags }}</div>{% endif %} </div>
-                    </div>
-
-                    {# Okuma İlerlemesi (Chapter/Volume) Yan Yana #}
-                    <div class="row">
-                        {# Chapters Read (Ortak) #}
-                        <div class="col-md-6 mb-3"> <label for="{{ form.chapters_read.id_for_label }}" class="form-label">{{ form.chapters_read.label }}</label> {{ form.chapters_read }} {% if form.chapters_read.errors %}<div class="invalid-feedback d-block">{{ form.chapters_read.errors|striptags }}</div>{% endif %} </div>
-                        {# Volumes Read (Sadece Manga'da) #}
-                        {% if form.volumes_read %}
-                        <div class="col-md-6 mb-3"> <label for="{{ form.volumes_read.id_for_label }}" class="form-label">{{ form.volumes_read.label }}</label> {{ form.volumes_read }} {% if form.volumes_read.errors %}<div class="invalid-feedback d-block">{{ form.volumes_read.errors|striptags }}</div>{% endif %} </div>
-                        {% endif %}
-                    </div>
-
-                    {# Toplam Sayılar (Chapter/Volume/Platform) Yan Yana #}
-                     <div class="row">
-                         {# Total Chapters (Ortak) #}
-                         <div class="col-md-{% if form.total_volumes or form.platform %}6{% else %}12{% endif %} mb-3"> <label for="{{ form.total_chapters.id_for_label }}" class="form-label">{{ form.total_chapters.label }}</label> {{ form.total_chapters }} {% if form.total_chapters.errors %}<div class="invalid-feedback d-block">{{ form.total_chapters.errors|striptags }}</div>{% endif %} </div>
-                         {# Total Volumes (Sadece Manga'da) #}
-                         {% if form.total_volumes %}
-                         <div class="col-md-6 mb-3"> <label for="{{ form.total_volumes.id_for_label }}" class="form-label">{{ form.total_volumes.label }}</label> {{ form.total_volumes }} {% if form.total_volumes.errors %}<div class="invalid-feedback d-block">{{ form.total_volumes.errors|striptags }}</div>{% endif %} </div>
-                         {% endif %}
-                         {# Platform (Sadece Webtoon'da) #}
-                         {% if form.platform %}
-                         <div class="col-md-6 mb-3"> <label for="{{ form.platform.id_for_label }}" class="form-label">{{ form.platform.label }}</label> {{ form.platform }} {% if form.platform.errors %}<div class="invalid-feedback d-block">{{ form.platform.errors|striptags }}</div>{% endif %} </div>
-                         {% endif %}
-                     </div>
-
-                     {# Author/Artist (Ortak - API'dan dolu) Yan Yana #}
-                     <div class="row">
-                         <div class="col-md-6 mb-3"> <label for="{{ form.author.id_for_label }}" class="form-label">{{ form.author.label }}</label> {{ form.author }} {% if form.author.errors %}<div class="invalid-feedback d-block">{{ form.author.errors|striptags }}</div>{% endif %} </div>
-                         {# Artist (Manga/Webtoon) #}
-                         {% if form.artist %}
-                         <div class="col-md-6 mb-3"> <label for="{{ form.artist.id_for_label }}" class="form-label">{{ form.artist.label }}</label> {{ form.artist }} {% if form.artist.errors %}<div class="invalid-feedback d-block">{{ form.artist.errors|striptags }}</div>{% endif %} </div>
-                         {% endif %}
-                     </div>
-
-                     {# Cover Image URL (Ortak - API'dan dolu) #}
-                     <div class="mb-3"> <label for="{{ form.cover_image_url.id_for_label }}" class="form-label">{{ form.cover_image_url.label }}</label> {{ form.cover_image_url }} {% if form.cover_image_url.errors %}<div class="invalid-feedback d-block">{{ form.cover_image_url.errors|striptags }}</div>{% endif %} </div>
-
-                      {# Start/End Date (Ortak - Kullanıcı Girecek) Yan Yana #}
-                     <div class="row">
-                         <div class="col-md-6 mb-3"> <label for="{{ form.start_date.id_for_label }}" class="form-label">{{ form.start_date.label }}</label> {{ form.start_date }} {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors|striptags }}</div>{% endif %} </div>
-                         <div class="col-md-6 mb-3"> <label for="{{ form.end_date.id_for_label }}" class="form-label">{{ form.end_date.label }}</label> {{ form.end_date }} {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors|striptags }}</div>{% endif %} </div>
-                     </div>
-
-                      {# Notes (Ortak - API'dan gelen + Kullanıcı) #}
-                      <div class="mb-3"> <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label> {{ form.notes }} {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors|striptags }}</div>{% endif %} </div>
-
-                       {# Tags (Ortak - API'dan gelen + Kullanıcı) #}
-                      <div class="mb-3"> <label for="{{ form.tags.id_for_label }}" class="form-label">{{ form.tags.label }}</label> {{ form.tags }} {% if form.tags.errors %}<div class="invalid-feedback d-block">{{ form.tags.errors|striptags }}</div>{% endif %} {% if form.tags.help_text %}<div class="form-text">{{ form.tags.help_text|safe }}</div>{% endif %} </div>
-
-                    {# ----- Form Alanları Sonu ----- #}
+                    {# --- Form Alanları (Partial ile) --- #}
+                    {# Not: Partial tüm alanları render edecek. API'dan gelen değerler formun initial'ında olmalı. #}
+                    {% include 'tracker/partials/_form_fields.html' with form=form %}
+                    {# --- Form Alanları Sonu ----- #}
 
                     <hr class="mt-4 mb-3">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        {# İptal butonu arama sayfasına döner #}
                         <a href="{% url 'tracker:manga_api_search' %}" class="btn btn-secondary">İptal</a>
-                        <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i>Listeye Kaydet</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save me-1" aria-hidden="true"></i>Listeye Kaydet</button>
                     </div>
                 </form>
             </div>

@@ -1,63 +1,47 @@
 {% comment %}
-tracker/templates/tracker/partials/_list_item.html
+tracker/templates/tracker/partials/_list_item.html (Güncellendi: aria-hidden, aria-label)
 Liste sayfalarındaki tek bir öğeyi render eder.
 AOS animasyonu eklendi (dönüşümlü fade-left/right).
 
-Gerekli Context:
-- item: Gösterilecek model nesnesi (Anime, Manga vb.)
-- item_type: Model adının küçük harfi (örn: 'anime', 'manga')
-- detail_url_name: Detay view'ının URL adı (örn: 'anime_detail')
-- edit_url_name: Düzenleme view'ının URL adı
-- delete_url_name: Silme view'ının URL adı
-- favorited_pks: Kullanıcının favori PK'larını içeren set
-- aos_delay (opsiyonel): Animasyon gecikmesi (ms)
+Gerekli Context: item, item_type, detail_url_name, edit_url_name, delete_url_name, favorited_pks, aos_delay (opsiyonel)
 {% endcomment %}
 {% load static %}
 
-{# Liste öğesine AOS animasyonu (cycle ile dönüşümlü) ve duration ayarı #}
 <li class="list-group-item p-3"
     data-aos="{% cycle 'fade-right' 'fade-left' %}"
     {% if aos_delay %}data-aos-delay="{{ aos_delay }}"{% endif %}
     data-aos-duration="400">
     <div class="row g-3 w-100 align-items-center">
 
-        {# Resim Alanı (Col-4 -> Col-md-3) #}
+        {# Resim Alanı #}
         <div class="col-4 col-md-3">
-            {# Detay sayfasına link #}
             <a href="{% url 'tracker:'|add:detail_url_name item.pk %}" class="text-decoration-none d-block list-item-image-link shadow-sm">
-                {# Resim oranı ve köşe yuvarlatma #}
                 <div class="ratio ratio-1x1 rounded overflow-hidden bg-light">
                     {% if item.cover_image_url %}
-                        <img src="{{ item.cover_image_url }}" alt="{{ item.title }} Kapak"
-                             class="img-fluid w-100 h-100 list-item-image" {# Hover efekti için sınıf #}
+                        <img src="{{ item.cover_image_url }}" alt="{{ item.title }} Kapak Resmi" {# Alt text iyileştirildi #}
+                             class="img-fluid w-100 h-100 list-item-image"
                              style="object-fit: cover;">
                     {% else %}
-                        {# Resim yoksa placeholder ikon #}
                         <div class="d-flex align-items-center justify-content-center h-100">
-                            <i class="fas fa-image fa-3x text-secondary" aria-hidden="true"></i>
+                            <i class="fas fa-image fa-3x text-secondary" aria-hidden="true"></i> {# aria-hidden eklendi #}
                          </div>
                     {% endif %}
                 </div>
             </a>
         </div>
-        {# Resim Alanı Sonu #}
 
-        {# İçerik Alanı (Col-8 -> Col-md-6) #}
+        {# İçerik Alanı #}
         <div class="col-8 col-md-6">
-            {# Başlık (Linkli) #}
             <h5 class="mb-1 list-item-title">
                 <a href="{% url 'tracker:'|add:detail_url_name item.pk %}" class="text-decoration-none link-dark">{{ item.title }}</a>
             </h5>
-             {# Durum ve Puan Rozetleri #}
-             <div class="mb-2"> {# Rozetler için alt boşluk #}
+             <div class="mb-2">
                 <span class="badge rounded-pill badge-status {% if item.status == 'Watching' %}badge-status-watching{% elif item.status == 'Completed' %}badge-status-completed{% elif item.status == 'On Hold' %}badge-status-onhold{% elif item.status == 'Dropped' %}badge-status-dropped{% elif item.status == 'Plan to Watch' %}badge-status-plantowatch{% else %}badge-status-default{% endif %}">{{ item.get_status_display }}</span>
                 {% if item.rating is not None %}
                     <span class="badge bg-dark ms-1"><i class="fas fa-star me-1" aria-hidden="true"></i>{{ item.rating }}/10</span>
                 {% endif %}
             </div>
-             {# Diğer Detaylar (İkonlarla) #}
              <small class="text-muted d-block mb-1">
-                {# Modele göre ilgili alanları göster #}
                 {% if item.studio %} <i class="fas fa-film fa-fw me-1" aria-hidden="true" title="Stüdyo"></i> {{ item.studio }} <br> {% endif %}
                  {% if item.author %} <i class="fas fa-user-edit fa-fw me-1" aria-hidden="true" title="Yazar/Çizer"></i>
                     {% if item.artist and item.artist != item.author %} {{ item.author }} | {{ item.artist }}
@@ -68,36 +52,33 @@ Gerekli Context:
                 {% if item.chapters_read is not None %} <i class="fas fa-book-reader fa-fw me-1" aria-hidden="true" title="Bölüm"></i> {{ item.chapters_read }}{% if item.total_chapters is not None %} / {{ item.total_chapters }}{% else %} / ?{% endif %} <br> {% endif %}
                  {% if item.volumes_read is not None %} <i class="fas fa-layer-group fa-fw me-1" aria-hidden="true" title="Cilt"></i> {{ item.volumes_read }}{% if item.total_volumes is not None %} / {{ item.total_volumes }}{% else %} / ?{% endif %} <br> {% endif %}
             </small>
-            {# Notlar (kısaltılmış) #}
             {% if item.notes %}<p class="mb-1 fst-italic text-muted" title="{{ item.notes }}"><small><i class="fas fa-comment-alt fa-fw me-1" aria-hidden="true"></i>{{ item.notes|truncatewords_html:15 }}</small></p>{% endif %}
-            {# Eklenme Tarihi #}
             <small class="text-muted"><i class="fas fa-calendar-plus fa-fw me-1" aria-hidden="true"></i>{{ item.added_date|date:"d M Y, H:i" }}</small>
         </div>
-        {# İçerik Alanı Sonu #}
 
-        {# Eylem Düğmeleri Alanı (Col-12 -> Col-md-3) #}
-        {# Mobil için alt alta, masaüstü için yan yana (d-md-flex) #}
+        {# Eylem Düğmeleri Alanı #}
         <div class="col-12 col-md-3 d-flex flex-column flex-md-row justify-content-md-end align-items-stretch align-items-md-center gap-2 mt-2 mt-md-0 action-buttons">
-             {# Favori Butonu #}
              <button type="button"
                class="btn btn-sm {% if item.pk in favorited_pks %}btn-warning{% else %}btn-outline-warning{% endif %} js-toggle-favorite flex-grow-1 flex-md-grow-0"
                title="{% if item.pk in favorited_pks %}Favorilerden Çıkar{% else %}Favoriye Ekle{% endif %}"
+               aria-label="{% if item.pk in favorited_pks %}{{ item.title }} favorilerden çıkar{% else %}{{ item.title }} favoriye ekle{% endif %}" {# aria-label eklendi #}
                data-item-id="{{ item.pk }}"
                data-item-type="{{ item_type }}">
                 <i class="fas fa-star" aria-hidden="true"></i>
-                <span class="d-md-none"> {% if item.pk in favorited_pks %}Favoriden Çıkar{% else %}Favoriye Ekle{% endif %}</span> {# Mobilde yazı göster #}
+                <span class="d-md-none"> {% if item.pk in favorited_pks %}Favoriden Çıkar{% else %}Favoriye Ekle{% endif %}</span>
             </button>
-            {# Düzenle Butonu #}
-            <a href="{% url 'tracker:'|add:edit_url_name item.pk %}" class="btn btn-sm btn-outline-primary flex-grow-1 flex-md-grow-0">
+            <a href="{% url 'tracker:'|add:edit_url_name item.pk %}"
+               class="btn btn-sm btn-outline-primary flex-grow-1 flex-md-grow-0"
+               aria-label="{{ item.title }} düzenle"> {# aria-label eklendi #}
                 <i class="fas fa-edit me-1" aria-hidden="true"></i>
-                <span class="d-md-none"> Düzenle</span> {# Mobilde yazı göster #}
+                <span class="d-md-none"> Düzenle</span>
             </a>
-            {# Sil Butonu #}
-            <a href="{% url 'tracker:'|add:delete_url_name item.pk %}" class="btn btn-sm btn-outline-danger flex-grow-1 flex-md-grow-0">
+            <a href="{% url 'tracker:'|add:delete_url_name item.pk %}"
+               class="btn btn-sm btn-outline-danger flex-grow-1 flex-md-grow-0"
+               aria-label="{{ item.title }} sil"> {# aria-label eklendi #}
                 <i class="fas fa-trash-alt me-1" aria-hidden="true"></i>
-                <span class="d-md-none"> Sil</span> {# Mobilde yazı göster #}
+                <span class="d-md-none"> Sil</span>
             </a>
         </div>
-        {# Eylem Düğmeleri Alanı Sonu #}
     </div>
 </li>

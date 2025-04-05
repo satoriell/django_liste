@@ -1,0 +1,97 @@
+{% comment %}
+tracker/templates/tracker/partials/_api_search_result_card.html
+API arama sonuçlarındaki tek bir öğeyi kart olarak render eder.
+
+Gerekli Context:
+- result: API'dan gelen tek bir sonuç öğesi (sözlük). Beklenen anahtarlar:
+    - id / mal_id: Öğenin API ID'si (MangaDex için 'id', Jikan için 'mal_id')
+    - title: Başlık
+    - image_url / cover_url: Kapak resmi URL'si
+    - year (opsiyonel): Yıl
+    - authors / author (opsiyonel): Yazar(lar)
+    - artists (opsiyonel): Çizer(ler)
+    - description_snippet / synopsis_snippet (opsiyonel): Kısa açıklama
+    - type (opsiyonel): Tür (örn: TV, Light Novel)
+    - episodes / chapters / volumes (opsiyonel): Bölüm/Cilt sayısı
+    - score (opsiyonel): Puan
+    - status (opsiyonel): Durum
+- add_item_url_name: API'dan ekleme view'ının URL adı (örn: 'md_add_item')
+- existing_ids_in_db: Kullanıcının listesinde zaten var olan ID'leri içeren set.
+- item_type_name: Öğenin tür adı (örn: 'Anime', 'Manga/Webtoon')
+{% endcomment %}
+{% load static %}
+
+{# ID'yi al (MangaDex için 'id', Jikan için 'mal_id') ve string'e çevir #}
+{% with item_api_id=result.id|default:result.mal_id %}
+{% with item_api_id_str=item_api_id|stringformat:"s" %}
+    {# Her kart için sütun (AOS) #}
+    <div class="col d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="{% cycle 0 50 100 150 %}">
+        <div class="card h-100 shadow-sm favorite-card">
+            {# Resim Alanı #}
+            <div class="fixed-height-image-container">
+                {% with image_src=result.image_url|default:result.cover_url %}
+                    {% if image_src %}
+                        <img src="{{ image_src }}" class="favorite-card-img" alt="{{ result.title }} Kapak">
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+                            <i class="fas fa-image fa-3x text-secondary" aria-hidden="true"></i> {# aria-hidden eklendi #}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+            {# Kart İçeriği #}
+            <div class="card-body d-flex flex-column p-3">
+                {# Başlık (Satır sınırlı) #}
+                <div class="favorite-card-title-container mb-2 flex-grow-1">
+                    <h6 class="card-title favorite-card-title" title="{{ result.title }}">
+                        {{ result.title }}
+                        {% if result.type and result.type != 'Manga' and result.type != 'Webtoon' %} {# MangaDex'ten gelmiyorsa türü göster #}
+                            <small class="text-muted fw-normal">({{ result.type }})</small>
+                        {% elif result.year %}
+                            <small class="text-muted fw-normal">({{ result.year }})</small>
+                        {% endif %}
+                    </h6>
+                </div>
+                {# Diğer Bilgiler #}
+                <small class="text-muted mb-2 d-block">
+                    {% with authors_str=result.authors|default:result.author %}
+                        {% if authors_str %}Yazar: {{ authors_str }}{% endif %}
+                    {% endwith %}
+                    {% if result.artists and result.artists != result.authors and result.artists != result.author %}<br>Çizer: {{ result.artists }}{% endif %}
+                    <br>
+                    {% if result.episodes %}Bölüm: {{ result.episodes }} | {% endif %}
+                    {% if result.chapters %}Bölüm (Ch): {{ result.chapters }} | {% endif %}
+                    {% if result.volumes %}Cilt: {{ result.volumes }} | {% endif %}
+                    {% if result.score %}Puan: {{ result.score }}/10 | {% endif %}
+                    {% if result.status %}Durum: {{ result.status|capfirst }}{% endif %}
+                </small>
+                {# Açıklama (Kısaltılmış) #}
+                {% with synopsis=result.description_snippet|default:result.synopsis_snippet %}
+                    {% if synopsis %}<p class="card-text small text-muted mb-2" style="line-height: 1.3;"><i>{{ synopsis }}</i></p>{% endif %}
+                {% endwith %}
+
+                {# Ekleme Butonu / Listede Rozeti (En altta) #}
+                <div class="mt-auto w-100 pt-2">
+                    {# ID'yi hem integer hem string olarak kontrol et (Jikan int, MangaDex str dönebilir) #}
+                     {% if item_api_id_str in existing_ids_in_db or item_api_id in existing_ids_in_db %}
+                        {# Listede var rozeti #}
+                        <span class="badge bg-success text-white w-100 py-2 rounded-pill" style="font-size: 0.85rem;">
+                            <i class="fas fa-check-circle me-1" aria-hidden="true"></i> Listede Mevcut
+                        </span>
+                    {% else %}
+                         {# Listeye ekle butonu #}
+                        {# URL'e API ID'sini gönderiyoruz #}
+                        <a href="{% url add_item_url_name item_api_id %}" class="btn btn-sm btn-success w-100">
+                            <i class="fas fa-plus me-1" aria-hidden="true"></i> Listeme Ekle
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {# Kart Footer (ID) #}
+            <div class="card-footer text-muted small py-1 px-3">
+                {% if result.id %}MangaDex{% else %}MAL{% endif %} ID: {{ item_api_id_str|truncatechars:15 }}...
+            </div>
+        </div>
+    </div>
+{% endwith %}
+{% endwith %}
