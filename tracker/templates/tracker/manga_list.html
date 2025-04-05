@@ -1,25 +1,28 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
-{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/manga_list.html {% endcomment %}
+{% comment %}
+Konum: /home/admin/App/django_liste/tracker/templates/tracker/manga_list.html
+Partial template'leri kullanacak şekilde refactor edildi.
+AOS animasyonları eklendi.
+{% endcomment %}
 
 {% block title %}Manga Listem - Kişisel Liste{% endblock title %}
 
 {% block content %}
 
-    {# Başlığa animasyon #}
-    <h1 class="mb-4 text-danger" data-aos="fade-down">Manga Listem</h1>
+    {# Sayfa Başlığı (AOS ile) #}
+    <h1 class="mb-4 text-danger" data-aos="fade-down">Manga Listem</h1> {# Renk temaya uygun #}
 
-    {% comment %} --- Kontrol Alanı --- {% endcomment %}
-    {# Kontrol alanına animasyon #}
+    {# Kontrol Alanı (Partial ile) (AOS ile) #}
     <div data-aos="slide-down" data-aos-duration="500">
-        {% include 'tracker/partials/_list_controls.html' with list_url_name='tracker:manga_list_view' export_url_name='tracker:export_manga_csv' status_choices=status_choices current_status_filter=current_status_filter search_query=search_query current_sort=current_sort %}
+        {% include 'tracker/partials/_list_controls.html' %}
+        {# Gerekli context view tarafından sağlanır #}
     </div>
 
-    {% comment %} --- Yeni Manga Ekleme Formu --- {% endcomment %}
-    {# Form konteynerine animasyon ve margin ayarı #}
+    {# Yeni Manga Ekleme Formu (AOS ile) #}
     <div class="form-container shadow-sm mb-4" data-aos="slide-up" data-aos-delay="100" data-aos-duration="500">
         <h4 class="mb-3">Yeni Manga Ekle</h4>
-        <form method="post" action="{% url 'tracker:manga_list_view' %}">
+        <form method="post" action="{% url list_url_name %}"> {# list_url_name context'ten gelir #}
             {% csrf_token %}
             {% for field in form %}
                 <div class="mb-3">
@@ -29,28 +32,39 @@
                     {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>{% endif %}
                 </div>
             {% endfor %}
-            <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save me-1"></i>Kaydet</button>
-             <a href="{% url 'admin:tracker_manga_add' %}" class="btn btn-outline-secondary mt-3 ms-2" target="_blank">Admin Panelinde Ekle</a>
+            <button type="submit" class="btn btn-success mt-2"><i class="fas fa-plus me-1"></i>Listeye Ekle</button>
+            <a href="{% url 'admin:tracker_manga_add' %}" class="btn btn-outline-secondary mt-2 ms-2" target="_blank" title="Admin Panelinde Ekle">
+                <i class="fas fa-user-shield"></i>
+            </a>
         </form>
     </div>
 
-    {% comment %} --- Manga Listesi --- {% endcomment %}
-    {# Liste başlığına animasyon #}
-    <h4 class="mb-3" data-aos="fade-up" data-aos-delay="150">Mevcut Liste {% if current_status_filter or search_query or current_sort != '-added_date' %}(Filtrelenmiş/Sıralanmış Sonuçlar){% endif %}</h4>
+    {# Mevcut Liste Başlığı (AOS ile) #}
+    <h4 class="mb-3" data-aos="fade-up" data-aos-delay="150">
+        Mevcut Liste {% if page_obj.paginator.count != total_items_count %}({{ page_obj.paginator.count }}/{{ total_items_count }}){% endif %}
+        {% if current_status_filter or search_query or current_tag_filter or current_sort != '-added_date' %}
+            <small class="text-muted fw-normal">(Filtrelenmiş/Sıralanmış)</small>
+        {% endif %}
+    </h4>
+
+    {# Manga Listesi (Partial ile) #}
     {% if page_obj %}
         <ul class="list-group mb-4">
             {% for manga in page_obj %}
-                 {# Sıralı gecikme için cycle etiketi #}
-                {% cycle '0' '50' '100' '150' '200' as current_delay silent %}
-                 {# Liste öğesi partial'ı (içinde fade-left/right animasyonu var) #}
-                {% include 'tracker/partials/_list_item.html' with item=manga detail_url_name='manga_detail' edit_url_name='manga_edit' delete_url_name='manga_delete' item_type='manga' favorited_pks=favorited_pks aos_delay=current_delay %}
+                {% cycle 0 50 100 150 200 as current_delay silent %}
+                {% include 'tracker/partials/_list_item.html' with item=manga item_type='manga' detail_url_name='manga_detail' edit_url_name='manga_edit' delete_url_name='manga_delete' favorited_pks=favorited_pks aos_delay=current_delay %}
+            {% empty %}
+                 <li class="list-group-item" data-aos="fade-in" data-aos-delay="200">
+                     <div class="alert alert-warning mb-0">Seçtiğiniz kriterlere uygun manga bulunamadı. <a href="{% url list_url_name %}" class="alert-link">Filtreleri Temizle</a></div>
+                 </li>
             {% endfor %}
         </ul>
-        {# Sayfalama partial'ı #}
-        {% include 'tracker/partials/_pagination.html' with page_obj=page_obj params_encoded=params_encoded %}
+        {# Sayfalama (Partial ile) #}
+        {% include 'tracker/partials/_pagination.html' %}
     {% else %}
-         {# Uyarı mesajına animasyon #}
-         <div class="alert alert-warning" role="alert" data-aos="fade-in" data-aos-delay="200"> {% if current_status_filter or search_query or current_sort != '-added_date' %}Seçtiğiniz kriterlere uygun manga bulunamadı. <a href="{% url 'tracker:manga_list_view' %}" class="alert-link">Filtreyi/Sıralamayı Temizle</a>{% else %}Listenizde henüz hiç manga bulunmuyor.{% endif %}</div>
+        <div class="alert alert-info" role="alert" data-aos="fade-in" data-aos-delay="200">
+             Listenizde henüz hiç manga bulunmuyor. Yukarıdaki formu kullanarak veya API aramasıyla ekleyebilirsiniz.
+        </div>
     {% endif %}
 
 {% endblock content %}

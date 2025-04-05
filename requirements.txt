@@ -1,7 +1,10 @@
+# django_liste/requirements.txt
+# Django 5.2 ve diğer bağımlılıklar
 asgiref==3.8.1
-certifi==2025.1.31
+certifi==2025.1.31 # Not: Bu sürüm gelecekteki bir tarih gibi görünüyor, test amaçlı olabilir.
 charset-normalizer==3.4.1
 Django==5.2
+django-debug-toolbar==4.4.1
 django-taggit==6.1.0
 idna==3.10
 requests==2.32.3

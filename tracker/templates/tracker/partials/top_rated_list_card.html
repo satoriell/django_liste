@@ -1,26 +1,37 @@
 {% comment %}
 tracker/templates/tracker/partials/top_rated_list_card.html
-En yüksek puanlıları listeleyen kart. AOS animasyonu kaldırıldı (üst elementte var).
-Context: items, url_name, title
+Dashboard'da en yüksek puanlıları listeleyen kart içeriği.
+AOS animasyonu üst elementte olduğu için burada yok.
+
+Context:
+- items: En yüksek puanlı öğelerin listesi
+- url_name: Detay sayfasının URL adı
+- title: Kart başlığı
 {% endcomment %}
 
-{# GÜNCELLENDİ: data-aos ve data-aos-delay kaldırıldı #}
-<div class="card dashboard-card shadow-sm">
-  <div class="card-header">
+<div class="card dashboard-card shadow-sm mb-3"> {# Alt boşluk eklendi #}
+  <div class="card-header fw-bold"> {# Kalın yazı #}
     {{ title }}
   </div>
   <ul class="list-group list-group-flush">
      {% if items %}
         {% for item in items %}
-             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <a href="{% url 'tracker:'|add:url_name item.pk %}">{{ item.title|truncatechars:40 }}</a>
+             {# Liste elemanı: Linkli başlık ve sağda puan rozeti #}
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2"> {# flex-wrap ve gap eklendi #}
+                {# Başlık (kısaltılmış) #}
+                <a href="{% url 'tracker:'|add:url_name item.pk %}" title="{{ item.title }}">{{ item.title|truncatechars:40 }}</a>
+                {# Puan (sağa yaslı) #}
                 {% if item.rating is not None %}
-                    <span class="badge bg-dark"><i class="fas fa-star me-1" aria-hidden="true"></i>{{ item.rating }}/10</span>
+                    <span class="badge bg-dark ms-auto"> {# ms-auto puanı sağa iter #}
+                        <i class="fas fa-star me-1" aria-hidden="true"></i>{{ item.rating }}/10
+                    </span>
                 {% endif %}
             </li>
+        {% empty %} {# items listesi boşsa #}
+            <li class="list-group-item text-muted small">Henüz puanlanmış kayıt yok.</li> {# Daha küçük yazı #}
         {% endfor %}
     {% else %}
-        <li class="list-group-item text-muted">Henüz puanlanmış kayıt yok.</li>
+        <li class="list-group-item text-muted small">Henüz puanlanmış kayıt yok.</li>
     {% endif %}
   </ul>
 </div>

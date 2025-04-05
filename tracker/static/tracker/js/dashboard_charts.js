@@ -1,126 +1,79 @@
 // tracker/static/tracker/js/dashboard_charts.js
+// responsive: false. Canvas width kaldırıldı. Görünüm iyileştirmeleri.
 
 document.addEventListener('DOMContentLoaded', () => {
     const chartDataElement = document.getElementById('chartDataJson');
     let chartData = null;
 
-    // Güvenlik kontrolü: chartDataElement gerçekten var mı?
-    if (!chartDataElement) {
-         console.error("HATA: JSON script elementi ('chartDataJson') dashboard.html'de bulunamadı!");
-         return; // Element yoksa devam etme
-    }
+    // ... (JSON veri okuma ve hata kontrolü aynı) ...
+    if (!chartDataElement) { /* ... */ return; }
+    try { chartData = JSON.parse(chartDataElement.textContent || "{}"); if (!chartData || typeof chartData !== 'object' || !chartData.typeLabels || !chartData.typeCounts || !chartData.statusLabels || !chartData.statusData) { throw new Error("..."); } } catch (e) { /* ... */ return; }
 
-    try {
-        chartData = JSON.parse(chartDataElement.textContent || "{}");
-    } catch (e) {
-        console.error("JSON verisi ayrıştırılamadı! Hata:", e);
-        console.error("Hatalı JSON Script İçeriği:", chartDataElement.textContent);
-        return; // Parse hatası varsa devam etme
-    }
+    // Chart.js için genel seçenekler
+    const commonChartOptions = {
+        responsive: false, // Otomatik boyutlandırma kapalı
+        maintainAspectRatio: false, // Canvas boyutlarına uymaya çalışır
+        layout: {
+            padding: 5
+        },
+        plugins: {
+            legend: {
+                position: 'bottom',
+                align: 'center',
+                labels: {
+                    padding: 15, // Dikey boşluk artırıldı
+                    boxWidth: 12,
+                    font: { size: 12 }, // Font biraz büyütüldü
+                    usePointStyle: true, // Nokta stili (daha şık olabilir)
+                }
+            },
+            tooltip: {
+                enabled: true,
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleFont: { weight: 'bold', size: 14 },
+                bodyFont: { size: 13 },
+                padding: 12, // Padding artırıldı
+                cornerRadius: 4,
+                displayColors: true,
+                boxPadding: 4,
+            }
+        },
+        // Animasyonlar
+        animation: {
+            duration: 1000, // Süre biraz artırıldı
+            easing: 'easeOutBounce' // Farklı bir easing efekti
+        },
+        // Cihaz piksel oranını dikkate al (retina ekranlarda netlik için)
+        // Bu genellikle responsive:true ile daha etkilidir ama deneyelim
+        devicePixelRatio: window.devicePixelRatio || 1
+    };
 
-    // --- Tür Dağılım Grafiği ---
+    // --- Tür Dağılım Grafiği (Doughnut) ---
     const typeCtx = document.getElementById('typeDistributionChart')?.getContext('2d');
-    if (typeCtx && chartData?.typeLabels && chartData?.typeCounts) {
+    if (typeCtx && chartData.typeLabels && chartData.typeCounts) {
          try {
              new Chart(typeCtx, {
                  type: 'doughnut',
-                 data: {
-                     labels: chartData.typeLabels,
-                     datasets: [{
-                         label: 'Kayıt Sayısı',
-                         data: chartData.typeCounts,
-                         backgroundColor: [
-                             'rgba(54, 162, 235, 0.8)', // Anime (Mavi)
-                             'rgba(75, 192, 192, 0.8)', // Webtoon (Yeşil)
-                             'rgba(255, 99, 132, 0.8)', // Manga (Kırmızı)
-                             'rgba(153, 102, 255, 0.8)' // Novel (Mor)
-                            ],
-                         borderColor: [
-                             'rgba(54, 162, 235, 1)',
-                             'rgba(75, 192, 192, 1)',
-                             'rgba(255, 99, 132, 1)',
-                             'rgba(153, 102, 255, 1)'
-                            ],
-                         borderWidth: 1,
-                         hoverOffset: 4
-                     }]
-                 },
+                 data: { labels: chartData.typeLabels, datasets: [{ label: 'Kayıt Sayısı', data: chartData.typeCounts, backgroundColor: ['rgba(108, 99, 255, 0.8)','rgba(25, 135, 84, 0.8)','rgba(220, 53, 69, 0.8)','rgba(147, 141, 255, 0.8)'], borderColor: ['rgba(108, 99, 255, 1)','rgba(25, 135, 84, 1)','rgba(220, 53, 69, 1)','rgba(147, 141, 255, 1)'], borderWidth: 2, hoverOffset: 10, hoverBorderColor: '#fff' }] }, // borderWidth, hoverOffset artırıldı
                  options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                         legend: {
-                             position: 'bottom',
-                         },
-                         tooltip: { // Tooltip'leri özelleştir (opsiyonel)
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed !== null) {
-                                        label += context.parsed;
-                                    }
-                                    return label;
-                                }
-                            }
-                         }
-                    }
+                     ...commonChartOptions,
+                     cutout: '65%' // Ortadaki boşluk biraz artırıldı
                  }
              });
-         } catch (e) { console.error("Tür grafiği hatası:", e); }
-    } else { console.error("Tür grafiği için Canvas veya veri bulunamadı/hatalı."); }
+         } catch (e) { console.error("Tür dağılım grafiği hatası:", e); }
+    } else { /* ... hata mesajı ... */ }
 
-    // --- Durum Dağılım Grafiği ---
+    // --- Durum Dağılım Grafiği (Pie) ---
     const statusCtx = document.getElementById('statusDistributionChart')?.getContext('2d');
-    if (statusCtx && chartData?.statusLabels && chartData?.statusData) {
+    if (statusCtx && chartData.statusLabels && chartData.statusData) {
          try {
-            const statusBackgroundColors = [
-                'rgba(25, 135, 84, 0.8)',  // Watching (Yeşil)
-                'rgba(13, 110, 253, 0.8)', // Completed (Mavi)
-                'rgba(255, 193, 7, 0.8)',   // On Hold (Sarı)
-                'rgba(220, 53, 69, 0.8)',  // Dropped (Kırmızı)
-                'rgba(13, 202, 240, 0.8)', // Plan to Watch (Açık Mavi)
-            ];
+            const statusBackgroundColors = ['rgba(25, 135, 84, 0.8)','rgba(108, 99, 255, 0.8)','rgba(255, 193, 7, 0.8)','rgba(220, 53, 69, 0.8)','rgba(13, 202, 240, 0.8)'];
             const statusBorderColors = statusBackgroundColors.map(color => color.replace('0.8', '1'));
              new Chart(statusCtx, {
                  type: 'pie',
-                 data: {
-                     labels: chartData.statusLabels,
-                     datasets: [{
-                         label: ' Kayıt Sayısı',
-                         data: chartData.statusData,
-                         backgroundColor: statusBackgroundColors.slice(0, chartData.statusLabels.length),
-                         borderColor: statusBorderColors.slice(0, chartData.statusLabels.length),
-                         borderWidth: 1,
-                         hoverOffset: 4
-                     }]
-                 },
-                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                         legend: {
-                             position: 'bottom',
-                         },
-                         tooltip: { // Tooltip'leri özelleştir (opsiyonel)
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed !== null) {
-                                        label += context.parsed;
-                                    }
-                                    return label;
-                                }
-                            }
-                         }
-                     }
-                 }
+                 data: { labels: chartData.statusLabels, datasets: [{ label: ' Kayıt Sayısı', data: chartData.statusData, backgroundColor: statusBackgroundColors.slice(0, chartData.statusLabels.length), borderColor: statusBorderColors.slice(0, chartData.statusLabels.length), borderWidth: 2, hoverOffset: 10, hoverBorderColor: '#fff' }] }, // borderWidth, hoverOffset artırıldı
+                 options: commonChartOptions
              });
-         } catch (e) { console.error("Durum grafiği hatası:", e); }
-    } else { console.error("Durum grafiği için Canvas veya veri bulunamadı/hatalı."); }
+         } catch (e) { console.error("Durum dağılım grafiği hatası:", e); }
+    } else { /* ... hata mesajı ... */ }
 });

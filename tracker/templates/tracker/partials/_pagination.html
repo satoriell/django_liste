@@ -1,56 +1,63 @@
 {% comment %}
 tracker/templates/tracker/partials/_pagination.html
-
-Sayfalama linklerini gösterir.
+Sayfalama linklerini gösterir. Bootstrap 5 uyumlu.
+Çok fazla sayfa varsa aradaki sayfaları "..." ile kısaltır.
 
 Gerekli Context Değişkenleri:
 - page_obj: Paginator'dan gelen mevcut sayfa nesnesi
-- paginator: Paginator nesnesi (opsiyonel, page_obj.paginator kullanılabilir)
 - params_encoded: Mevcut GET parametreleri (sayfa numarası hariç), URL'e eklenecek.
 {% endcomment %}
 
 {% if page_obj.paginator.num_pages > 1 %} {# Sadece birden fazla sayfa varsa göster #}
 <nav aria-label="Sayfalar" class="mt-4 d-flex justify-content-center">
-  {# Bootstrap 5 Pagination #}
-  <ul class="pagination flex-wrap"> {# flex-wrap küçük ekranlar için #}
+  {# Bootstrap 5 Pagination - flex-wrap küçük ekranlarda sığmazsa alt satıra geçmesini sağlar #}
+  <ul class="pagination flex-wrap">
+
+    {# İlk Sayfa ve Önceki Sayfa Linkleri #}
     {% if page_obj.has_previous %}
       <li class="page-item">
-        <a class="page-link" href="?page=1&amp;{{ params_encoded }}" aria-label="İlk Sayfa">&laquo;&laquo;</a>
+        {# İlk sayfaya git #}
+        <a class="page-link" href="?page=1&amp;{{ params_encoded }}" aria-label="İlk Sayfa" title="İlk Sayfa">&laquo;&laquo;</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&amp;{{ params_encoded }}" aria-label="Önceki">&laquo;</a>
+        {# Önceki sayfaya git #}
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&amp;{{ params_encoded }}" aria-label="Önceki" title="Önceki Sayfa">&laquo;</a>
       </li>
     {% else %}
+      {# Eğer ilk sayfadaysa butonları devre dışı bırak #}
       <li class="page-item disabled"><span class="page-link">&laquo;&laquo;</span></li>
       <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
     {% endif %}
 
-    {# Sayfa Numaraları - Çok fazla sayfa varsa sadece etraftakileri göster #}
+    {# Sayfa Numaraları - Çok fazla sayfa varsa sadece etraftakileri ve başı/sonu göster #}
     {% for page_num in page_obj.paginator.page_range %}
       {% if page_obj.number == page_num %}
-        {# Aktif sayfa #}
+        {# Aktif (mevcut) sayfa #}
         <li class="page-item active" aria-current="page"><span class="page-link">{{ page_num }}</span></li>
       {% elif page_num > page_obj.number|add:'-3' and page_num < page_obj.number|add:'3' %}
-        {# Aktif sayfanın etrafındaki sayfalar #}
+        {# Aktif sayfanın +/- 2 etrafındaki sayfalar #}
         <li class="page-item"><a class="page-link" href="?page={{ page_num }}&amp;{{ params_encoded }}">{{ page_num }}</a></li>
       {% elif page_num == page_obj.number|add:'-3' or page_num == page_obj.number|add:'3' %}
-         {# Üç nokta (...) göster #}
-         <li class="page-item disabled"><span class="page-link">...</span></li>
+         {# Aktif sayfadan 3 uzaklıktaki sayfa numarası yerine "..." göster #}
+         <li class="page-item disabled d-none d-sm-block"><span class="page-link">...</span></li> {# Küçük ekranda gizle #}
       {% endif %}
     {% endfor %}
 
+    {# Sonraki Sayfa ve Son Sayfa Linkleri #}
     {% if page_obj.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}&amp;{{ params_encoded }}" aria-label="Sonraki">&raquo;</a>
+        {# Sonraki sayfaya git #}
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}&amp;{{ params_encoded }}" aria-label="Sonraki" title="Sonraki Sayfa">&raquo;</a>
       </li>
       <li class="page-item">
-         <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&amp;{{ params_encoded }}" aria-label="Son Sayfa">&raquo;&raquo;</a>
+         {# Son sayfaya git #}
+         <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&amp;{{ params_encoded }}" aria-label="Son Sayfa" title="Son Sayfa">&raquo;&raquo;</a>
       </li>
     {% else %}
+      {# Eğer son sayfadaysa butonları devre dışı bırak #}
       <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
       <li class="page-item disabled"><span class="page-link">&raquo;&raquo;</span></li>
     {% endif %}
   </ul>
 </nav>
-{% endif %}
-{% comment %} --- Pagination Kontrolleri Sonu --- {% endcomment %}
+{% endif %} {# if page_obj.paginator.num_pages > 1 #}

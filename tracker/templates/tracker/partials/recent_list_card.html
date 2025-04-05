@@ -1,31 +1,40 @@
 {% comment %}
 tracker/templates/tracker/partials/recent_list_card.html
-Son eklenenleri listeleyen kart. AOS animasyonu kaldırıldı (üst elementte var).
-Context: items, url_name, title
+Dashboard'da son eklenenleri listeleyen kart içeriği.
+AOS animasyonu üst elementte olduğu için burada yok.
+
+Context:
+- items: Son eklenen öğelerin listesi
+- url_name: Detay sayfasının URL adı (örn: 'anime_detail')
+- title: Kart başlığı (örn: 'Animeler')
 {% endcomment %}
 
-{# GÜNCELLENDİ: data-aos ve data-aos-delay kaldırıldı #}
-<div class="card dashboard-card shadow-sm">
-  <div class="card-header">
+<div class="card dashboard-card shadow-sm mb-3"> {# Alt boşluk eklendi #}
+  <div class="card-header fw-bold"> {# Kalın yazı #}
     {{ title }}
   </div>
   <ul class="list-group list-group-flush">
     {% if items %}
         {% for item in items %}
-            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                <a href="{% url 'tracker:'|add:url_name item.pk %}">{{ item.title|truncatechars:40 }}</a>
-                <span class="ms-auto text-nowrap">
-                    <small class="text-muted">{{ item.added_date|date:"d M, H:i" }}</small>
+             {# Liste elemanı: Linkli başlık ve sağda tarih/puan rozeti #}
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2"> {# flex-wrap ve gap eklendi #}
+                {# Başlık (kısaltılmış) #}
+                <a href="{% url 'tracker:'|add:url_name item.pk %}" title="{{ item.title }}">{{ item.title|truncatechars:35 }}</a>
+                {# Tarih ve Puan (sağa yaslı) #}
+                <span class="ms-auto text-nowrap d-flex align-items-center"> {# d-flex eklendi #}
+                    <small class="text-muted me-2">{{ item.added_date|date:"d M, H:i" }}</small> {# Tarih rozetten önce #}
                     {% if item.rating is not None %}
-                        <span class="badge bg-dark ms-2">
+                        <span class="badge bg-dark">
                             <i class="fas fa-star me-1" aria-hidden="true"></i>{{ item.rating }}/10
                         </span>
                     {% endif %}
                 </span>
             </li>
+        {% empty %} {# items listesi boşsa #}
+            <li class="list-group-item text-muted small">Bu kategoride henüz kayıt yok.</li> {# Daha küçük yazı #}
         {% endfor %}
     {% else %}
-        <li class="list-group-item text-muted">Henüz kayıt yok.</li>
+         <li class="list-group-item text-muted small">Bu kategoride henüz kayıt yok.</li>
     {% endif %}
   </ul>
 </div>

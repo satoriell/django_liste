@@ -1,19 +1,30 @@
 {% comment %}
 tracker/templates/tracker/partials/_list_controls.html
-
 Liste sayfalarındaki filtreleme, arama, sıralama ve export kontrollerini içerir.
 Etiket filtresi eklendi.
 API Arama butonu, view'dan gelen 'api_search_url' context değişkenine göre gösterilir.
-Gerekli Context: list_url_name, export_url_name, status_choices, current_status_filter,
-                 search_query, current_sort, all_tags, current_tag_filter, api_search_url (opsiyonel)
+
+Gerekli Context:
+- list_url_name: Liste view'ının URL adı (form action'ı ve sıralama linkleri için)
+- export_url_name: CSV export view'ının URL adı
+- status_choices: Durum filtreleme seçenekleri (modelden gelir)
+- current_status_filter: Seçili durum filtresi
+- search_query: Mevcut arama sorgusu
+- current_sort: Mevcut sıralama parametresi
+- all_tags: Kullanıcının tüm etiketleri (Tag nesneleri listesi)
+- current_tag_filter: Seçili etiket slug'ı
+- api_search_url (opsiyonel): İlgili API arama view'ının URL'i
+- item_type_str (opsiyonel): API butonu metni için (örn: 'anime')
 {% endcomment %}
 
+{# Kontrol paneli konteyneri #}
 <div class="controls-container p-3 mb-4 border rounded shadow-sm">
+
     {# Filtreleme ve Arama Formu #}
     <form method="get" action="{% url list_url_name %}" class="row g-3 align-items-end mb-3 border-bottom pb-3">
 
-        {# Durum Filtresi #}
-        <div class="col-md-3">
+        {# Durum Filtresi (col-md-3) #}
+        <div class="col-md col-sm-6"> {# Orta boyutta 3, küçükte 6 sütun #}
             <label for="statusFilter" class="form-label small mb-1">Durum</label>
             <select class="form-select form-select-sm" id="statusFilter" name="status">
                 <option value="" {% if not current_status_filter %}selected{% endif %}>-- Tümü --</option>
@@ -23,8 +34,8 @@ Gerekli Context: list_url_name, export_url_name, status_choices, current_status_
             </select>
         </div>
 
-        {# Etiket Filtresi #}
-        <div class="col-md-3">
+        {# Etiket Filtresi (col-md-3) #}
+        <div class="col-md col-sm-6"> {# Orta boyutta 3, küçükte 6 sütun #}
             <label for="tagFilter" class="form-label small mb-1">Etiket</label>
             <select class="form-select form-select-sm" id="tagFilter" name="tag">
                 <option value="" {% if not current_tag_filter %}selected{% endif %}>-- Tüm Etiketler --</option>
@@ -36,47 +47,51 @@ Gerekli Context: list_url_name, export_url_name, status_choices, current_status_
             </select>
         </div>
 
-        {# Arama Alanı #}
-        <div class="col-md-4">
+        {# Arama Alanı (col-md-4) #}
+        <div class="col-md col-sm-8"> {# Orta boyutta 4, küçükte 8 sütun #}
             <label for="searchInput" class="form-label small mb-1">Başlıkta Ara</label>
-            <input type="text" class="form-control form-control-sm" id="searchInput" name="q" placeholder="Ara..." value="{{ search_query|default:'' }}">
+            <input type="search" class="form-control form-control-sm" id="searchInput" name="q" placeholder="Ara..." value="{{ search_query|default:'' }}">
         </div>
 
-        {# Buton Alanı #}
-        <div class="col-md-2 text-end">
-            <button type="submit" class="btn btn-secondary btn-sm w-100">Uygula</button>
+        {# Buton Alanı (col-md-2) #}
+        <div class="col-md-auto col-sm-4"> {# Orta boyutta otomatik genişlik, küçükte 4 sütun #}
+            {# URL'deki mevcut sort parametresini koru #}
+            <input type="hidden" name="sort" value="{{ current_sort|default:'-added_date' }}">
+            <button type="submit" class="btn btn-secondary btn-sm w-100">Filtrele</button>
         </div>
     </form>
 
     {# Sıralama Linkleri #}
-    <div class="sorting-links d-flex flex-wrap gap-2">
-        <small class="me-2 align-self-center">Sırala:</small>
-        {% url list_url_name as list_url %}
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&tag={{ current_tag_filter|urlencode }}&q={{ search_query|urlencode }}&sort=title_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_asc' %}active{% endif %}"><i class="fas fa-sort-alpha-down me-1"></i>Başlık (A-Z)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&tag={{ current_tag_filter|urlencode }}&q={{ search_query|urlencode }}&sort=title_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_desc' %}active{% endif %}"><i class="fas fa-sort-alpha-up me-1"></i>Başlık (Z-A)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&tag={{ current_tag_filter|urlencode }}&q={{ search_query|urlencode }}&sort=rating_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_desc' %}active{% endif %}"><i class="fas fa-arrow-down-9-1 me-1"></i>Puan (Yüksek)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&tag={{ current_tag_filter|urlencode }}&q={{ search_query|urlencode }}&sort=rating_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_asc' %}active{% endif %}"><i class="fas fa-arrow-up-1-9 me-1"></i>Puan (Düşük)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&tag={{ current_tag_filter|urlencode }}&q={{ search_query|urlencode }}&sort=date_desc" class="btn btn-outline-dark btn-sm {% if current_sort == '-added_date' or current_sort == 'date_desc' %}active{% endif %}"><i class="fas fa-calendar-day me-1"></i>Tarih (Yeni)</a>
-        <a href="{{ list_url }}?status={{ current_status_filter|urlencode }}&tag={{ current_tag_filter|urlencode }}&q={{ search_query|urlencode }}&sort=date_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'date_asc' %}active{% endif %}"><i class="fas fa-calendar-alt me-1"></i>Tarih (Eski)</a>
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <small class="me-2 text-muted">Sırala:</small>
+        {# Mevcut filtreleri (status, tag, q) koruyarak sıralama linkleri oluştur #}
+        {% with base_params=params_encoded|default:request.GET.urlencode %} {# Views'dan gelmiyorsa request'ten al #}
+        {% url list_url_name as list_url_base %}
+            <a href="{{ list_url_base }}?{{ base_params }}&sort=title_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_asc' %}active{% endif %}" title="Başlığa Göre Artan"><i class="fas fa-sort-alpha-down"></i></a>
+            <a href="{{ list_url_base }}?{{ base_params }}&sort=title_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'title_desc' %}active{% endif %}" title="Başlığa Göre Azalan"><i class="fas fa-sort-alpha-up"></i></a>
+            <a href="{{ list_url_base }}?{{ base_params }}&sort=rating_desc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_desc' %}active{% endif %}" title="Puana Göre Azalan"><i class="fas fa-arrow-down-9-1"></i></a>
+            <a href="{{ list_url_base }}?{{ base_params }}&sort=rating_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'rating_asc' %}active{% endif %}" title="Puana Göre Artan"><i class="fas fa-arrow-up-1-9"></i></a>
+            <a href="{{ list_url_base }}?{{ base_params }}&sort=date_desc" class="btn btn-outline-dark btn-sm {% if current_sort == '-added_date' or current_sort == 'date_desc' %}active{% endif %}" title="Tarihe Göre Azalan (En Yeni)"><i class="fas fa-calendar-day"></i></a>
+            <a href="{{ list_url_base }}?{{ base_params }}&sort=date_asc" class="btn btn-outline-dark btn-sm {% if current_sort == 'date_asc' %}active{% endif %}" title="Tarihe Göre Artan (En Eski)"><i class="fas fa-calendar-alt"></i></a>
+        {% endwith %}
     </div>
 
     {# Export ve API Arama Düğmeleri #}
-     <div class="mt-3 d-flex justify-content-end gap-2 flex-wrap">
+     <div class="d-flex justify-content-end gap-2 flex-wrap">
          {# API Arama Butonu (Sadece view'dan URL geldiyse görünür) #}
          {% if api_search_url %}
-         {# Buton metnini biraz daha açıklayıcı yapabiliriz #}
-         {% with button_text="API ile Ara/Ekle" %}
-             {# Örnek: Eğer anime sayfasıysa metni değiştir (opsiyonel) #}
-             {# {% if item_type_str == 'anime' %}{% with button_text="Jikan API ile Ara/Ekle" %}{% endwith %}{% endif %} #}
+             {# Buton metnini türe göre dinamik yapalım #}
+             {% with api_button_text=item_type_str|default:"Öğe"|capfirst|add:" Ara/Ekle" %}
              <a href="{{ api_search_url }}" class="btn btn-info btn-sm">
-                 <i class="fas fa-search-plus me-1" aria-hidden="true"></i> {{ button_text }}
+                 <i class="fas fa-search-plus me-1" aria-hidden="true"></i> API ile {{ api_button_text }}
              </a>
-         {% endwith %}
+             {% endwith %}
          {% endif %}
 
-         {# Export Düğmesi #}
+         {# Export Düğmesi (Mevcut filtreleri URL'e ekle) #}
+         {# Not: Sıralama parametresini export URL'ine eklemek genellikle gereksizdir. #}
          <a href="{% url export_url_name %}?status={{ current_status_filter|urlencode }}&tag={{ current_tag_filter|urlencode }}&q={{ search_query|urlencode }}" class="btn btn-outline-success btn-sm">
-             <i class="fas fa-file-csv me-1" aria-hidden="true"></i>CSV Olarak Dışa Aktar
+             <i class="fas fa-file-csv me-1" aria-hidden="true"></i> CSV Olarak Dışa Aktar
          </a>
     </div>
 

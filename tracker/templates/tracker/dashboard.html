@@ -1,103 +1,68 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
-{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/dashboard.html {% endcomment %}
+{% comment %}
+Konum: /home/admin/App/django_liste/tracker/templates/tracker/dashboard.html
+Görünüm İyileştirme: Canvas'lardan width kaldırıldı, sadece height kaldı.
+AOS animasyonları grafikler için hala kapalı. responsive:false varsayılıyor.
+{% endcomment %}
 
 {% block title %}Dashboard - Kişisel Liste{% endblock title %}
 
 {% block content %}
-    {# Animasyon Güncellendi #}
-    <h1 class="mb-4" data-aos="fade-down" data-aos-delay="100">
-        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    {# Başlık #}
+    <h1 class="mb-4" data-aos="fade-down">
+        <i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard
     </h1>
 
-    {% comment %} ----- Toplam Sayılar ----- {% endcomment %}
+    {# ----- Toplam Sayılar (Özet Kartları) ----- #}
     <div class="row mb-4">
-        {# GÜNCELLENDİ: data-aos="fade-up" (staggered) #}
-        <div class="col-md-3 col-sm-6 mb-3 summary-card summary-card-anime" data-aos="fade-up" data-aos-delay="200">
-            <div class="card text-center h-100 shadow-sm">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title"><i class="fas fa-tv me-1 text-primary"></i>Toplam Anime</h5>
-                    <p class="card-text fs-2 fw-bold my-auto">{{ anime_count }}</p>
-                    <a href="{% url 'tracker:anime_list_view' %}" class="btn btn-primary btn-sm mt-auto">Listeye Git</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3 summary-card summary-card-webtoon" data-aos="fade-up" data-aos-delay="300">
-            <div class="card text-center h-100 shadow-sm">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title"><i class="fas fa-scroll me-1 text-success"></i>Toplam Webtoon</h5>
-                    <p class="card-text fs-2 fw-bold my-auto">{{ webtoon_count }}</p>
-                    <a href="{% url 'tracker:webtoon_list_view' %}" class="btn btn-success btn-sm mt-auto">Listeye Git</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3 summary-card summary-card-manga" data-aos="fade-up" data-aos-delay="400">
-             <div class="card text-center h-100 shadow-sm">
-                 <div class="card-body d-flex flex-column">
-                    <h5 class="card-title"><i class="fas fa-book-open me-1 text-danger"></i>Toplam Manga</h5>
-                    <p class="card-text fs-2 fw-bold my-auto">{{ manga_count }}</p>
-                    <a href="{% url 'tracker:manga_list_view' %}" class="btn btn-danger btn-sm mt-auto">Listeye Git</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3 summary-card summary-card-novel" data-aos="fade-up" data-aos-delay="500">
-            <div class="card text-center h-100 shadow-sm">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title"><i class="fas fa-book me-1" style="color: var(--primary-color);"></i>Toplam Novel</h5>
-                    <p class="card-text fs-2 fw-bold my-auto">{{ novel_count }}</p>
-                    <a href="{% url 'tracker:novel_list_view' %}" class="btn btn-primary btn-sm mt-auto">Listeye Git</a>
-                </div>
-            </div>
-        </div>
+        {# Kartlar (AOS ile) ... (Bu kısım aynı) ... #}
+        <div class="col-lg-3 col-md-6 mb-4 summary-card summary-card-anime" data-aos="fade-up" data-aos-delay="100"> <div class="card text-center h-100 shadow-sm"> <div class="card-body d-flex flex-column"> <h5 class="card-title"><i class="fas fa-tv me-1 text-primary"></i>Toplam Anime</h5> <p class="card-text fs-2 fw-bold my-auto">{{ anime_count|default:0 }}</p> <a href="{% url 'tracker:anime_list_view' %}" class="btn btn-primary btn-sm mt-3">Listeye Git</a> </div> </div> </div>
+        <div class="col-lg-3 col-md-6 mb-4 summary-card summary-card-webtoon" data-aos="fade-up" data-aos-delay="200"> <div class="card text-center h-100 shadow-sm"> <div class="card-body d-flex flex-column"> <h5 class="card-title"><i class="fas fa-scroll me-1 text-success"></i>Toplam Webtoon</h5> <p class="card-text fs-2 fw-bold my-auto">{{ webtoon_count|default:0 }}</p> <a href="{% url 'tracker:webtoon_list_view' %}" class="btn btn-success btn-sm mt-3">Listeye Git</a> </div> </div> </div>
+        <div class="col-lg-3 col-md-6 mb-4 summary-card summary-card-manga" data-aos="fade-up" data-aos-delay="300"> <div class="card text-center h-100 shadow-sm"> <div class="card-body d-flex flex-column"> <h5 class="card-title"><i class="fas fa-book-open me-1 text-danger"></i>Toplam Manga</h5> <p class="card-text fs-2 fw-bold my-auto">{{ manga_count|default:0 }}</p> <a href="{% url 'tracker:manga_list_view' %}" class="btn btn-danger btn-sm mt-3">Listeye Git</a> </div> </div> </div>
+        <div class="col-lg-3 col-md-6 mb-4 summary-card summary-card-novel" data-aos="fade-up" data-aos-delay="400"> <div class="card text-center h-100 shadow-sm"> <div class="card-body d-flex flex-column"> <h5 class="card-title"><i class="fas fa-book me-1" style="color: var(--primary-color);"></i>Toplam Novel</h5> <p class="card-text fs-2 fw-bold my-auto">{{ novel_count|default:0 }}</p> <a href="{% url 'tracker:novel_list_view' %}" class="btn btn-primary btn-sm mt-3">Listeye Git</a> </div> </div> </div>
     </div>
 
-    {% comment %} ----- Grafikler Bölümü ----- {% endcomment %}
+    {# ----- Grafikler Bölümü (AOS KALDIRILDI, CANVAS WIDTH KALDIRILDI) ----- #}
      <div class="row mb-4">
-         {# GÜNCELLENDİ: data-aos="zoom-out" #}
-        <div class="col-md-6 mb-4 mb-md-0" data-aos="zoom-out" data-aos-delay="300">
-            <h5 class="text-center mb-3 chart-title"><i class="fas fa-chart-pie me-1"></i>Türlere Göre Dağılım</h5>
-            <div id="typeDistributionChartContainer" style="position: relative; min-height: 300px;">
-                 <canvas id="typeDistributionChart"></canvas>
+         {# Tür Dağılımı Grafiği #}
+        <div class="col-md-6 mb-4 mb-md-0"> {# data-aos ve ortalama stilleri kaldırıldı #}
+            <div id="typeDistributionChartContainer" class="shadow-sm"> {# w-100'e gerek yok, col-md-6 zaten doldurur #}
+                 <h5 class="text-center mb-3 chart-title"><i class="fas fa-chart-pie me-1"></i>Türlere Göre Dağılım</h5>
+                 {# ---- DEĞİŞİKLİK BURADA: width kaldırıldı ---- #}
+                 <canvas id="typeDistributionChart" height="300"></canvas>
+                 {# -------------------------------------- #}
             </div>
         </div>
-         {# GÜNCELLENDİ: data-aos="zoom-out" #}
-        <div class="col-md-6" data-aos="zoom-out" data-aos-delay="450">
-            <h5 class="text-center mb-3 chart-title"><i class="fas fa-chart-bar me-1"></i>Durumlara Göre Dağılım</h5>
-            <div id="statusDistributionChartContainer" style="position: relative; min-height: 300px;">
-                 <canvas id="statusDistributionChart"></canvas>
+         {# Durum Dağılımı Grafiği #}
+        <div class="col-md-6"> {# data-aos ve ortalama stilleri kaldırıldı #}
+            <div id="statusDistributionChartContainer" class="shadow-sm"> {# w-100'e gerek yok #}
+                <h5 class="text-center mb-3 chart-title"><i class="fas fa-tasks me-1"></i>Durumlara Göre Dağılım</h5>
+                 {# ---- DEĞİŞİKLİK BURADA: width kaldırıldı ---- #}
+                 <canvas id="statusDistributionChart" height="300"></canvas>
+                 {# -------------------------------------- #}
             </div>
         </div>
     </div>
+    {# ----- Grafik Bölümü Sonu ----- #}
 
-    <hr class="my-4" data-aos="fade">
+    <hr class="my-4" data-aos="fade" data-aos-delay="400">
 
-    {% comment %} ----- Son Eklenenler ve En Yüksek Puanlılar ----- {% endcomment %}
+    {# ----- Son Eklenenler ve En Yüksek Puanlılar ----- #}
     <div class="row">
-         {# GÜNCELLENDİ: data-aos="slide-right" #}
-         <div class="col-md-6" data-aos="slide-right" data-aos-duration="700"> {# Daha uzun süre #}
-             <h3 class="mb-3"><i class="fas fa-clock text-info me-2"></i>Son Eklenenler</h3>
-             {% with items=recent_anime url_name="anime_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Animeler" %}{% endwith %}
-             {% with items=recent_webtoons url_name="webtoon_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Webtoonlar" %}{% endwith %}
-             {% with items=recent_mangas url_name="manga_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Mangalar" %}{% endwith %}
-             {% with items=recent_novels url_name="novel_detail" %}{% include 'tracker/partials/recent_list_card.html' with title="Noveller" %}{% endwith %}
-         </div>
-          {# GÜNCELLENDİ: data-aos="slide-left" #}
-         <div class="col-md-6" data-aos="slide-left" data-aos-duration="700" data-aos-delay="150">
-             <h3 class="mb-3"><i class="fas fa-trophy text-warning me-2"></i>En Yüksek Puanlılar</h3>
-             {% with items=top_anime url_name="anime_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Animeler" %}{% endwith %}
-             {% with items=top_webtoons url_name="webtoon_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Webtoonlar" %}{% endwith %}
-             {% with items=top_mangas url_name="manga_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Mangalar" %}{% endwith %}
-             {% with items=top_novels url_name="novel_detail" %}{% include 'tracker/partials/top_rated_list_card.html' with title="Noveller" %}{% endwith %}
-         </div>
+         {# Kolonlar (AOS ile) ... (Bu kısım aynı) ... #}
+         <div class="col-md-6 mb-4 mb-md-0" data-aos="slide-right" data-aos-duration="600" data-aos-delay="200"> <h3 class="mb-3"><i class="fas fa-history text-info me-2"></i>Son Eklenenler</h3> {% include 'tracker/partials/recent_list_card.html' with items=recent_anime url_name="anime_detail" title="Animeler" %} {% include 'tracker/partials/recent_list_card.html' with items=recent_webtoons url_name="webtoon_detail" title="Webtoonlar" %} {% include 'tracker/partials/recent_list_card.html' with items=recent_mangas url_name="manga_detail" title="Mangalar" %} {% include 'tracker/partials/recent_list_card.html' with items=recent_novels url_name="novel_detail" title="Noveller" %} </div>
+         <div class="col-md-6" data-aos="slide-left" data-aos-duration="600" data-aos-delay="350"> <h3 class="mb-3"><i class="fas fa-trophy text-warning me-2"></i>En Yüksek Puanlılar</h3> {% include 'tracker/partials/top_rated_list_card.html' with items=top_anime url_name="anime_detail" title="Animeler" %} {% include 'tracker/partials/top_rated_list_card.html' with items=top_webtoons url_name="webtoon_detail" title="Webtoonlar" %} {% include 'tracker/partials/top_rated_list_card.html' with items=top_mangas url_name="manga_detail" title="Mangalar" %} {% include 'tracker/partials/top_rated_list_card.html' with items=top_novels url_name="novel_detail" title="Noveller" %} </div>
     </div>
 
+    {# Grafik verilerini JSON olarak göm #}
     <script id="chartDataJson" type="application/json">
         {{ chart_data_json|safe }}
     </script>
 
 {% endblock content %}
 
-
+{# Sayfaya özel scriptleri yükle #}
 {% block extra_scripts %}
-    <script src="{% static 'tracker/js/dashboard_charts.js' %}"></script>
+    <script src="{% static 'tracker/js/dashboard_charts.js' %}?v=1.4"></script> {# Versiyonu artır #}
 {% endblock extra_scripts %}

@@ -1,53 +1,77 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
-{% comment %} Konum: /home/admin/App/django_liste/tracker/templates/tracker/anime_list.html {% endcomment %}
+{% comment %}
+Konum: /home/admin/App/django_liste/tracker/templates/tracker/anime_list.html
+Partial template'leri kullanacak şekilde refactor edildi.
+AOS animasyonları eklendi.
+{% endcomment %}
 
 {% block title %}Anime Listem - Kişisel Liste{% endblock title %}
 
 {% block content %}
 
+    {# Sayfa Başlığı (AOS ile) #}
     <h1 class="mb-4 text-primary" data-aos="fade-down">Anime Listem</h1>
 
-    {% comment %} --- Kontrol Alanı --- {% endcomment %}
-    {# GÜNCELLENDİ: data-aos="slide-down" #}
+    {# Kontrol Alanı (Partial ile) (AOS ile) #}
     <div data-aos="slide-down" data-aos-duration="500">
-        {% include 'tracker/partials/_list_controls.html' with list_url_name='tracker:anime_list_view' export_url_name='tracker:export_anime_csv' status_choices=status_choices current_status_filter=current_status_filter search_query=search_query current_sort=current_sort %}
+        {% include 'tracker/partials/_list_controls.html' %}
+        {# Gerekli context view tarafından sağlanır: list_url_name, export_url_name, status_choices, current_status_filter, search_query, current_sort, all_tags, current_tag_filter, api_search_url, item_type_str #}
     </div>
 
-    {% comment %} --- Yeni Anime Ekleme Formu --- {% endcomment %}
-    {# GÜNCELLENDİ: data-aos="slide-up" #}
+    {# Yeni Anime Ekleme Formu (AOS ile) #}
     <div class="form-container shadow-sm mb-4" data-aos="slide-up" data-aos-delay="100" data-aos-duration="500">
         <h4 class="mb-3">Yeni Anime Ekle</h4>
-        <form method="post" action="{% url 'tracker:anime_list_view' %}">
+        {# Formun action'ı view'dan gelen list_url_name'e göre ayarlanabilir veya sabit bırakılabilir #}
+        <form method="post" action="{% url list_url_name %}">
             {% csrf_token %}
+            {# Form alanlarını manuel render etmek yerine döngüyle render edelim #}
             {% for field in form %}
                 <div class="mb-3">
                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                    {{ field }}
+                    {{ field }} {# Widget stilleri forms.py içinde tanımlı #}
                     {% if field.help_text %}<div id="{{ field.id_for_label }}_help" class="form-text">{{ field.help_text|safe }}</div>{% endif %}
                     {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>{% endif %}
                 </div>
             {% endfor %}
-            <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save me-1"></i>Kaydet</button>
-            <a href="{% url 'admin:tracker_anime_add' %}" class="btn btn-outline-secondary mt-3 ms-2" target="_blank">Admin Panelinde Ekle</a>
+            <button type="submit" class="btn btn-success mt-2"><i class="fas fa-plus me-1"></i>Listeye Ekle</button> {# Buton metni ve ikonu güncellendi #}
+            {# Admin paneline link (opsiyonel) #}
+            <a href="{% url 'admin:tracker_anime_add' %}" class="btn btn-outline-secondary mt-2 ms-2" target="_blank" title="Admin Panelinde Ekle">
+                <i class="fas fa-user-shield"></i>
+            </a>
         </form>
     </div>
 
-    {% comment %} --- Anime Listesi --- {% endcomment %}
-    {# GÜNCELLENDİ: data-aos="fade-up" #}
-    <h4 class="mb-3" data-aos="fade-up" data-aos-delay="150">Mevcut Liste {% if current_status_filter or search_query or current_sort != '-added_date' %}(Filtrelenmiş/Sıralanmış Sonuçlar){% endif %}</h4>
+    {# Mevcut Liste Başlığı (AOS ile) #}
+    <h4 class="mb-3" data-aos="fade-up" data-aos-delay="150">
+        Mevcut Liste {% if page_obj.paginator.count != total_items_count %}({{ page_obj.paginator.count }}/{{ total_items_count }}){% endif %} {# Filtrelenmişse sayıyı göster #}
+        {% if current_status_filter or search_query or current_tag_filter or current_sort != '-added_date' %}
+            <small class="text-muted fw-normal">(Filtrelenmiş/Sıralanmış)</small>
+        {% endif %}
+    </h4>
+
+    {# Anime Listesi (Partial ile) #}
     {% if page_obj %}
         <ul class="list-group mb-4">
             {% for anime in page_obj %}
-                 {# Liste öğeleri fade-left/right ile geliyor (_list_item.html) #}
-                {% cycle '0' '50' '100' '150' '200' as current_delay silent %}
-                {% include 'tracker/partials/_list_item.html' with item=anime detail_url_name='anime_detail' edit_url_name='anime_edit' delete_url_name='anime_delete' item_type='anime' favorited_pks=favorited_pks aos_delay=current_delay %}
+                 {# Sıralı gecikme için cycle etiketi #}
+                {% cycle 0 50 100 150 200 as current_delay silent %}
+                {# Liste öğesi partial'ını dahil et, gerekli context'i geçir #}
+                {% include 'tracker/partials/_list_item.html' with item=anime item_type='anime' detail_url_name='anime_detail' edit_url_name='anime_edit' delete_url_name='anime_delete' favorited_pks=favorited_pks aos_delay=current_delay %}
+            {% empty %} {# page_obj var ama içi boşsa (filtreden dolayı) #}
+                 <li class="list-group-item" data-aos="fade-in" data-aos-delay="200">
+                     <div class="alert alert-warning mb-0">Seçtiğiniz kriterlere uygun anime bulunamadı. <a href="{% url list_url_name %}" class="alert-link">Filtreleri Temizle</a></div>
+                 </li>
             {% endfor %}
         </ul>
-        {% include 'tracker/partials/_pagination.html' with page_obj=page_obj params_encoded=params_encoded %}
+        {# Sayfalama (Partial ile) #}
+        {% include 'tracker/partials/_pagination.html' %}
+        {# Gerekli context view tarafından sağlanır: page_obj, params_encoded #}
     {% else %}
-         {# GÜNCELLENDİ: data-aos="fade-in" (aynı kaldı) #}
-        <div class="alert alert-warning" role="alert" data-aos="fade-in" data-aos-delay="200"> {% if current_status_filter or search_query or current_sort != '-added_date' %}Seçtiğiniz kriterlere uygun anime bulunamadı. <a href="{% url 'tracker:anime_list_view' %}" class="alert-link">Filtreyi/Sıralamayı Temizle</a>{% else %}Listenizde henüz hiç anime bulunmuyor.{% endif %}</div>
+         {# Hiç öğe yoksa (filtresiz durumda) #}
+        <div class="alert alert-info" role="alert" data-aos="fade-in" data-aos-delay="200">
+             Listenizde henüz hiç anime bulunmuyor. Yukarıdaki formu kullanarak veya API aramasıyla ekleyebilirsiniz.
+        </div>
     {% endif %}
 
 {% endblock content %}

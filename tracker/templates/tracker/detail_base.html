@@ -2,39 +2,45 @@
 {% load static %}
 {% comment %}
     Ortak Detay Sayfası Şablonu
-    AOS animasyonları çeşitlendirildi.
-    YENİ: Etiketler bölümü eklendi.
+    AOS animasyonları eklendi/çeşitlendirildi.
+    Etiketler bölümü eklendi.
+    Breadcrumb eklendi.
+
+    Gerekli Context: item, model_name, item_type, is_favorite, is_owner, list_url_base
 {% endcomment %}
 
 {% block title %}{{ item.title }} - {{ model_name }} Detayları{% endblock title %}
 
 {% block content %}
-    {# Breadcrumb Navigasyonu #}
+    {# Breadcrumb Navigasyonu (AOS ile) #}
     <nav aria-label="breadcrumb" class="mb-4" data-aos="fade-down">
-      <ol class="breadcrumb">
+      <ol class="breadcrumb bg-light px-3 py-2 rounded-pill"> {# Arkaplan ve yuvarlaklık #}
         <li class="breadcrumb-item"><a href="{% url 'tracker:dashboard' %}">Dashboard</a></li>
-        {# YENİ: Etiket linkleri için list_url_base context'i kullanılıyor #}
+        {# list_url_base varsa liste sayfasına link ver #}
         <li class="breadcrumb-item"><a href="{% if list_url_base %}{{ list_url_base }}{% else %}#{% endif %}">{{ model_name }}ler</a></li>
-        <li class="breadcrumb-item active" aria-current="page">{{ item.title|truncatechars:50 }}</li>
+        <li class="breadcrumb-item active" aria-current="page">{{ item.title|truncatechars:40 }}</li> {# Başlığı kısalt #}
       </ol>
     </nav>
 
     {# --- Ana İçerik Alanı --- #}
-    <div class="detail-content-wrapper">
+    <div class="detail-content-wrapper card card-body shadow-sm border-0" data-aos="fade-up" data-aos-delay="100"> {# Kart içine alındı #}
 
         {# Başlık ve Eylem Butonları #}
-        <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2" data-aos="fade-down">
-            <h1 class="mb-0 me-3">{{ item.title }}</h1>
-            <div class="btn-group flex-shrink-0" role="group" aria-label="Eylemler">
+        <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2" data-aos="fade-down" data-aos-delay="150">
+            <h1 class="mb-0 me-3 display-6">{{ item.title }}</h1> {# Daha küçük başlık #}
+            {# Buton Grubu #}
+            <div class="btn-group flex-shrink-0 shadow-sm rounded" role="group" aria-label="Eylemler">
+                {# Favori Butonu #}
                 {% if user.is_authenticated %}
                 <button type="button"
                    class="btn btn-sm {% if is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %} js-toggle-favorite"
-                   title="Favoriye Ekle/Çıkar"
+                   title="{% if is_favorite %}Favorilerden Çıkar{% else %}Favoriye Ekle{% endif %}"
                    data-item-id="{{ item.pk }}"
                    data-item-type="{{ item_type }}">
                     <i class="fas fa-star" aria-hidden="true"></i>
                 </button>
                 {% endif %}
+                {# Düzenle/Sil Butonları (sadece sahibi görebilir) #}
                 {% if is_owner %}
                     <a href="{% url 'tracker:'|add:item_type|add:'_edit' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit me-1"></i>Düzenle</a>
                     <a href="{% url 'tracker:'|add:item_type|add:'_delete' item.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt me-1"></i>Sil</a>
@@ -43,79 +49,83 @@
         </div>
 
         {# Ekleyen Kullanıcı Bilgisi #}
-        <p class="text-muted mb-4" data-aos="fade-right" data-aos-delay="100"><small>Ekleyen: {{ item.user.username }}</small></p>
+        <p class="text-muted mb-4" data-aos="fade-right" data-aos-delay="200"><small>Ekleyen: {{ item.user.username }}</small></p>
 
-        {# Resim Alanı - Ortalanmış #}
-        <div class="text-center mb-4" data-aos="flip-left" data-aos-delay="150">
-             {% if item.cover_image_url %}
-                <a href="{{ item.cover_image_url }}" target="_blank" class="d-inline-block">
-                    <img src="{{ item.cover_image_url }}"
-                         class="img-fluid rounded shadow-sm detail-image"
-                         alt="{{ item.title }} Kapak"
-                         style="max-width: 350px; max-height: 500px; object-fit: contain;">
-                 </a>
-            {% else %}
-                <div class="d-inline-block detail-image-placeholder d-flex align-items-center justify-content-center text-secondary rounded bg-light"
-                     style="width: 300px; height: 400px;">
-                    <i class="fas fa-image fa-5x" aria-hidden="true"></i>
+        {# --- İki Sütunlu Yapı --- #}
+        <div class="row g-4">
+             {# Sol Sütun: Resim, Durum, Puan, İlerleme #}
+             <div class="col-md-4 text-center">
+                 {# Resim Alanı (AOS ile) #}
+                <div class="mb-4" data-aos="flip-left" data-aos-delay="250">
+                     {% if item.cover_image_url %}
+                        <a href="{{ item.cover_image_url }}" target="_blank" class="d-inline-block shadow rounded">
+                            <img src="{{ item.cover_image_url }}"
+                                 class="img-fluid rounded detail-image" {# Kenarlık kaldırıldı, gölge eklendi #}
+                                 alt="{{ item.title }} Kapak"
+                                 style="max-height: 450px; object-fit: contain;">
+                         </a>
+                    {% else %}
+                        {# Placeholder #}
+                        <div class="d-inline-block detail-image-placeholder d-flex align-items-center justify-content-center text-secondary rounded bg-light shadow-sm"
+                             style="width: 300px; height: 400px;">
+                            <i class="fas fa-image fa-5x" aria-hidden="true"></i>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
-        </div>
-
-        {# Durum ve Puan - Ortalanmış #}
-        <div class="text-center mb-4" data-aos="zoom-in-up" data-aos-delay="200">
-           <span class="badge fs-6 rounded-pill badge-status {% if item.status == 'Watching' %}badge-status-watching{% elif item.status == 'Completed' %}badge-status-completed{% elif item.status == 'On Hold' %}badge-status-onhold{% elif item.status == 'Dropped' %}badge-status-dropped{% elif item.status == 'Plan to Watch' %}badge-status-plantowatch{% else %}badge-status-default{% endif %}"><i class="fas fa-check-circle me-1"></i>{{ item.get_status_display }}</span>
-           {% if item.rating is not None %} <span class="badge fs-6 bg-dark ms-1"><i class="fas fa-star me-1"></i>Puan: {{ item.rating }}/10</span> {% endif %}
-        </div>
-
-        {# İlerleme Çubuğu (varsa) #}
-        {% with progress=item.get_progress_percent %}
-            {% if progress is not None %}
-            <div class="mb-4 mx-auto" style="max-width: 500px;" data-aos="zoom-in" data-aos-delay="250">
-                <small class="text-muted d-block text-center mb-1">İlerleme:</small>
-                <div class="progress" role="progressbar" aria-label="İlerleme" aria-valuenow="{{ progress|floatformat:0 }}" aria-valuemin="0" aria-valuemax="100" style="height: 10px;">
-                  <div class="progress-bar {% if progress == 100 %}bg-primary{% else %}bg-success{% endif %}" style="width: {{ progress }}%"></div>
+                 {# Durum ve Puan (AOS ile) #}
+                <div class="mb-4" data-aos="zoom-in" data-aos-delay="300">
+                   <span class="badge fs-6 rounded-pill badge-status {% if item.status == 'Watching' %}badge-status-watching{% elif item.status == 'Completed' %}badge-status-completed{% elif item.status == 'On Hold' %}badge-status-onhold{% elif item.status == 'Dropped' %}badge-status-dropped{% elif item.status == 'Plan to Watch' %}badge-status-plantowatch{% else %}badge-status-default{% endif %}"><i class="fas fa-info-circle me-1"></i>{{ item.get_status_display }}</span>
+                   {% if item.rating is not None %} <span class="badge fs-6 bg-dark ms-1"><i class="fas fa-star me-1"></i>Puan: {{ item.rating }}/10</span> {% endif %}
                 </div>
+                 {# İlerleme Çubuğu (varsa) (AOS ile) #}
+                {% with progress=item.get_progress_percent %}
+                    {% if progress is not None %}
+                    <div class="mb-4 mx-auto" style="max-width: 300px;" data-aos="zoom-in-up" data-aos-delay="350">
+                        <small class="text-muted d-block text-center mb-1">İlerleme (%{{ progress|floatformat:0 }})</small>
+                        <div class="progress" role="progressbar" aria-label="İlerleme" aria-valuenow="{{ progress|floatformat:0 }}" aria-valuemin="0" aria-valuemax="100" style="height: 8px;">
+                          <div class="progress-bar {% if progress == 100 %}bg-primary{% else %}bg-success{% endif %}" style="width: {{ progress }}%"></div>
+                        </div>
+                     </div>
+                    {% endif %}
+                {% endwith %}
              </div>
-            {% endif %}
-        {% endwith %}
 
-        <hr class="my-4" data-aos="fade" data-aos-delay="300">
+             {# Sağ Sütun: Detaylar, Etiketler, Notlar #}
+             <div class="col-md-8">
+                 {# Detay Listesi (Partial ile) (AOS ile) #}
+                <div class="item-details-list mb-4" data-aos="fade-left" data-aos-delay="400">
+                     <h4 class="mb-3"><i class="fas fa-list-ul me-2 text-muted"></i>Detaylar</h4>
+                     {% include 'tracker/partials/_item_details_dl.html' with item=item %}
+                </div>
 
-        {# Detay Listesi #}
-        <div class="item-details-list mx-auto" style="max-width: 600px;" data-aos="fade-up" data-aos-delay="350">
-             <h4 class="text-center mb-3">Detaylar</h4>
-             {% include 'tracker/partials/_item_details_dl.html' with item=item %}
+                 {# Etiketler Bölümü (AOS ile) #}
+                {% if item.tags.all %}
+                    <hr class="my-4" data-aos="fade" data-aos-delay="450">
+                    <div class="item-tags-section mb-4" data-aos="fade-up" data-aos-delay="500">
+                         <h4 class="mb-3"><i class="fas fa-tags me-2 text-muted"></i>Etiketler</h4>
+                         <p>
+                            {% for tag in item.tags.all %}
+                                <a href="{% if list_url_base %}{{ list_url_base }}?tag={{ tag.slug }}{% else %}#{% endif %}"
+                                   class="badge rounded-pill bg-secondary text-decoration-none me-1 mb-1">
+                                    {{ tag.name }}
+                                </a>
+                            {% endfor %}
+                         </p>
+                    </div>
+                {% endif %}
+
+                {# Notlar Alanı (varsa) (AOS ile) #}
+                 {% if item.notes %}
+                    <hr class="my-4" data-aos="fade" data-aos-delay="550">
+                    <div class="item-notes-section" data-aos="fade-up" data-aos-delay="600">
+                        <h4 class="mb-3"><i class="fas fa-comment-alt me-2 text-muted"></i>Notlar</h4>
+                        <div class="bg-light p-3 rounded shadow-sm" style="white-space: pre-wrap; max-height: 300px; overflow-y: auto;">{{ item.notes }}</div>
+                         {# Koyu tema stili CSS'te tanımlı #}
+                    </div>
+                {% endif %}
+             </div>
         </div>
-
-        {# --- YENİ: Etiketler Bölümü --- #}
-        {% if item.tags.all %}
-            <hr class="my-4" data-aos="fade" data-aos-delay="400">
-            <div class="item-tags-section mx-auto text-center" style="max-width: 700px;" data-aos="fade-up" data-aos-delay="450">
-                 <h4 class="mb-3"><i class="fas fa-tags me-1 text-muted"></i>Etiketler</h4>
-                 <p>
-                    {% for tag in item.tags.all %}
-                        {# list_url_base context değişkeni views.py'de _render_detail_view içinde tanımlandı #}
-                        <a href="{% if list_url_base %}{{ list_url_base }}?tag={{ tag.slug }}{% else %}#{% endif %}"
-                           class="badge rounded-pill bg-secondary text-decoration-none me-1 mb-1">
-                            {{ tag.name }}
-                        </a>
-                    {% endfor %}
-                 </p>
-            </div>
-        {% endif %}
-        {# --- Etiketler Bölümü Sonu --- #}
-
-        {# Notlar Alanı (varsa) #}
-         {% if item.notes %}
-            <hr class="my-4" data-aos="fade" data-aos-delay="500"> {# Delay artırıldı #}
-            <div class="item-notes-section mx-auto" style="max-width: 700px;" data-aos="fade-up" data-aos-delay="550"> {# Delay artırıldı #}
-                <h4 class="mb-3 text-center"><i class="fas fa-comment-alt me-1 text-muted"></i>Notlar</h4>
-                <div class="bg-light p-3 rounded" style="white-space: pre-wrap;">{{ item.notes }}</div>
-                 {# Koyu tema için not arkaplanı #}
-                 <style> html[data-theme="dark"] .item-notes-section .bg-light { background-color: var(--gray-300) !important; } </style>
-            </div>
-        {% endif %}
+        {# --- İki Sütunlu Yapı Sonu --- #}
 
     </div>
     {# --- Ana İçerik Alanı Sonu --- #}

@@ -1,23 +1,25 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
 {% comment %}
-    Konum: tracker/templates/tracker/jikan_novel_form_api.html
-    Jikan API'dan gelen Novel verisiyle önceden doldurulmuş formu gösterir.
-    Context: form (NovelForm), api_data (Jikan'dan gelen maplenmiş veri), model_verbose_name ("Novel")
+Konum: tracker/templates/tracker/jikan_novel_form_api.html
+Jikan API'dan gelen Novel verisiyle formu gösterir.
+AOS animasyonları eklendi.
 {% endcomment %}
 
 {% block title %}API'dan {{ model_verbose_name }} Ekle: {{ api_data.title|default:model_verbose_name }} - Kişisel Liste{% endblock title %}
 
 {% block content %}
+     {# Ana Satır (AOS) #}
     <div class="row justify-content-center mt-4 mb-5" data-aos="fade-up">
         <div class="col-md-10 col-lg-8">
+             {# Form Konteyneri (AOS) #}
             <div class="form-container shadow-sm" data-aos="zoom-in-up" data-aos-delay="100">
 
-                {# Başlık rengi primary kaldı #}
+                {# Başlık (AOS) - Renk primary #}
                 <h2 class="mb-3" style="color: var(--primary-color);" data-aos="fade-down">Listeye {{ model_verbose_name }} Ekle</h2>
 
-                {# API'dan Gelen Bilgiler (Teyit Amaçlı) #}
-                <div class="card mb-4 shadow-sm {% if not api_data.cover_image_url %}border-0{% endif %}">
+                 {# API'dan Gelen Bilgiler (Teyit Kartı) (AOS) #}
+                <div class="card mb-4 shadow-sm {% if not api_data.cover_image_url %}border-0{% endif %}" data-aos="fade-up" data-aos-delay="150">
                     <div class="row g-0">
                         {% if api_data.cover_image_url %}
                         <div class="col-md-4">
@@ -27,13 +29,13 @@
                         <div class="{% if api_data.cover_image_url %}col-md-8{% else %}col-12{% endif %}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ api_data.title|default:'Başlık Getirilemedi' }}</h5>
-                                <p class="card-text small text-muted">
+                                <p class="card-text small text-muted mb-1">
                                     {% if api_data.author %}Yazar: {{ api_data.author }}{% endif %}
                                     {% if api_data.total_chapters is not None %}<br>Toplam Bölüm (API): {{ api_data.total_chapters }} {% endif %}
                                     {% if api_data.total_volumes is not None %}<br>Toplam Cilt (API): {{ api_data.total_volumes }} {% endif %}
                                 </p>
-                                <p class="card-text"><small class="text-muted">MAL ID: {{ api_data.mal_id }}</small></p>
-                                {% if api_data.notes %} {# Synopsis -> notes #}
+                                <p class="card-text mb-2"><small class="text-muted">MAL ID: {{ api_data.mal_id }}</small></p>
+                                {% if api_data.notes %}
                                 <p class="card-text small mt-2" style="max-height: 100px; overflow-y: auto;"><i>{{ api_data.notes|safe|truncatewords:50 }}</i></p>
                                 {% endif %}
                              </div>
@@ -44,56 +46,41 @@
                 <hr>
 
                 {# Önceden Doldurulmuş Form #}
-                {# Action boş, jikan_add_novel_view'a POST yapacak #}
                 <form method="post" action="">
                     {% csrf_token %}
                     {% if form.non_field_errors %} <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div> {% endif %}
 
                     {# ----- NovelForm Alanları ----- #}
-
-                    {# Title (Ortak - API'dan dolu) #}
+                    {# Title #}
                     <div class="mb-3"> <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}{% if form.title.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.title }} {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors|striptags }}</div>{% endif %} </div>
-
+                    {# Status & Rating #}
                     <div class="row">
-                         {# Status (Ortak - API'dan önerilenle dolu) #}
                          <div class="col-md-6 mb-3"> <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}{% if form.status.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.status }} {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors|striptags }}</div>{% endif %} </div>
-                         {# Rating (Ortak - API'dan önerilenle dolu) #}
-                         <div class="col-md-6 mb-3"> <label for="{{ form.rating.id_for_label }}" class="form-label">{{ form.rating.label }}{% if form.rating.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.rating }} {% if form.rating.errors %}<div class="invalid-feedback d-block">{{ form.rating.errors|striptags }}</div>{% endif %} </div>
+                         <div class="col-md-6 mb-3"> <label for="{{ form.rating.id_for_label }}" class="form-label">{{ form.rating.label }}</label> {{ form.rating }} {% if form.rating.errors %}<div class="invalid-feedback d-block">{{ form.rating.errors|striptags }}</div>{% endif %} </div>
                     </div>
-
-                    {# Author (Novel Özel - API'dan dolu) #}
-                    <div class="mb-3"> <label for="{{ form.author.id_for_label }}" class="form-label">{{ form.author.label }}{% if form.author.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.author }} {% if form.author.errors %}<div class="invalid-feedback d-block">{{ form.author.errors|striptags }}</div>{% endif %} </div>
-
+                    {# Author #}
+                    <div class="mb-3"> <label for="{{ form.author.id_for_label }}" class="form-label">{{ form.author.label }}</label> {{ form.author }} {% if form.author.errors %}<div class="invalid-feedback d-block">{{ form.author.errors|striptags }}</div>{% endif %} </div>
+                    {# Chapters Read & Total Chapters #}
                     <div class="row">
-                         {# Chapters Read (Novel Özel - Kullanıcı girmeli) #}
-                         <div class="col-md-6 mb-3"> <label for="{{ form.chapters_read.id_for_label }}" class="form-label">{{ form.chapters_read.label }}{% if form.chapters_read.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.chapters_read }} {% if form.chapters_read.errors %}<div class="invalid-feedback d-block">{{ form.chapters_read.errors|striptags }}</div>{% endif %} </div>
-                         {# Total Chapters (Novel Özel - API'dan dolu, kullanıcı değiştirebilir) #}
-                         <div class="col-md-6 mb-3"> <label for="{{ form.total_chapters.id_for_label }}" class="form-label">{{ form.total_chapters.label }}{% if form.total_chapters.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.total_chapters }} {% if form.total_chapters.errors %}<div class="invalid-feedback d-block">{{ form.total_chapters.errors|striptags }}</div>{% endif %} </div>
+                         <div class="col-md-6 mb-3"> <label for="{{ form.chapters_read.id_for_label }}" class="form-label">{{ form.chapters_read.label }}</label> {{ form.chapters_read }} {% if form.chapters_read.errors %}<div class="invalid-feedback d-block">{{ form.chapters_read.errors|striptags }}</div>{% endif %} </div>
+                         <div class="col-md-6 mb-3"> <label for="{{ form.total_chapters.id_for_label }}" class="form-label">{{ form.total_chapters.label }}</label> {{ form.total_chapters }} {% if form.total_chapters.errors %}<div class="invalid-feedback d-block">{{ form.total_chapters.errors|striptags }}</div>{% endif %} </div>
                     </div>
-
+                    {# Volumes Read & Total Volumes #}
                     <div class="row">
-                         {# Volumes Read (Novel Özel - Kullanıcı girmeli) #}
-                         <div class="col-md-6 mb-3"> <label for="{{ form.volumes_read.id_for_label }}" class="form-label">{{ form.volumes_read.label }}{% if form.volumes_read.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.volumes_read }} {% if form.volumes_read.errors %}<div class="invalid-feedback d-block">{{ form.volumes_read.errors|striptags }}</div>{% endif %} </div>
-                         {# Total Volumes (Novel Özel - API'dan dolu, kullanıcı değiştirebilir) #}
-                         <div class="col-md-6 mb-3"> <label for="{{ form.total_volumes.id_for_label }}" class="form-label">{{ form.total_volumes.label }}{% if form.total_volumes.field.required %}<span class="text-danger">*</span>{% endif %}</label> {{ form.total_volumes }} {% if form.total_volumes.errors %}<div class="invalid-feedback d-block">{{ form.total_volumes.errors|striptags }}</div>{% endif %} </div>
+                         <div class="col-md-6 mb-3"> <label for="{{ form.volumes_read.id_for_label }}" class="form-label">{{ form.volumes_read.label }}</label> {{ form.volumes_read }} {% if form.volumes_read.errors %}<div class="invalid-feedback d-block">{{ form.volumes_read.errors|striptags }}</div>{% endif %} </div>
+                         <div class="col-md-6 mb-3"> <label for="{{ form.total_volumes.id_for_label }}" class="form-label">{{ form.total_volumes.label }}</label> {{ form.total_volumes }} {% if form.total_volumes.errors %}<div class="invalid-feedback d-block">{{ form.total_volumes.errors|striptags }}</div>{% endif %} </div>
                     </div>
-
-                    {# Cover Image URL (Ortak - API'dan dolu) #}
+                     {# Cover Image URL #}
                     <div class="mb-3"> <label for="{{ form.cover_image_url.id_for_label }}" class="form-label">{{ form.cover_image_url.label }}</label> {{ form.cover_image_url }} {% if form.cover_image_url.errors %}<div class="invalid-feedback d-block">{{ form.cover_image_url.errors|striptags }}</div>{% endif %} </div>
-
+                     {# Start & End Date #}
                     <div class="row">
-                         {# Start Date (Ortak - Kullanıcı girmeli) #}
                          <div class="col-md-6 mb-3"> <label for="{{ form.start_date.id_for_label }}" class="form-label">{{ form.start_date.label }}</label> {{ form.start_date }} {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors|striptags }}</div>{% endif %} </div>
-                          {# End Date (Ortak - Kullanıcı girmeli) #}
                          <div class="col-md-6 mb-3"> <label for="{{ form.end_date.id_for_label }}" class="form-label">{{ form.end_date.label }}</label> {{ form.end_date }} {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors|striptags }}</div>{% endif %} </div>
                      </div>
-
-                    {# Notes (Ortak - API'dan synopsis ile dolu) #}
+                    {# Notes #}
                     <div class="mb-3"> <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label> {{ form.notes }} {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors|striptags }}</div>{% endif %} </div>
-
-                   {# Tags (Ortak - Kullanıcı girmeli) #}
+                    {# Tags #}
                    <div class="mb-3"> <label for="{{ form.tags.id_for_label }}" class="form-label">{{ form.tags.label }}</label> {{ form.tags }} {% if form.tags.errors %}<div class="invalid-feedback d-block">{{ form.tags.errors|striptags }}</div>{% endif %} {% if form.tags.help_text %}<div class="form-text">{{ form.tags.help_text|safe }}</div>{% endif %} </div>
-
                     {# ----- Form Alanları Sonu ----- #}
 
                     <hr class="mt-4 mb-3">

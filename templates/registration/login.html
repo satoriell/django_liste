@@ -4,44 +4,53 @@
 {% block title %}Giriş Yap - Kişisel Liste{% endblock title %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
+{# AOS animasyonu eklendi #}
+<div class="row justify-content-center mt-5" data-aos="fade-up">
     <div class="col-md-6">
+        {# form-container sınıfı kaldırıldı, card kullanılıyor #}
         <div class="card shadow-sm">
-            {# GÜNCELLENDİ: text-center eklendi ve h2 içine ikon eklendi #}
-            <div class="card-header text-center">
+            <div class="card-header text-center bg-primary text-white"> {# Renk eklendi #}
                 <h2 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Giriş Yap</h2>
             </div>
             <div class="card-body p-4">
+                {# Hata Mesajı #}
                 {% if form.errors %}
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-danger small p-2" role="alert"> {# Daha küçük alert #}
                         Kullanıcı adı veya şifre hatalı. Lütfen tekrar deneyin.
                     </div>
                 {% endif %}
 
+                {# 'Next' Parametresi için Mesaj #}
                 {% if next %}
                     {% if user.is_authenticated %}
-                    <p class="text-warning">Hesabınızın bu sayfaya erişim izni yok. Devam etmek için lütfen yetkili bir hesapla giriş yapın.</p>
+                    <p class="alert alert-warning small p-2">Hesabınızın bu sayfaya erişim izni yok. Devam etmek için lütfen yetkili bir hesapla giriş yapın.</p>
                     {% else %}
-                    <p class="text-info">Lütfen bu sayfayı görmek için giriş yapın.</p>
+                    <p class="alert alert-info small p-2">Lütfen bu sayfayı görmek için giriş yapın.</p>
                     {% endif %}
                 {% endif %}
 
+                {# Login Formu #}
                 <form method="post" action="{% url 'login' %}">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="id_username" class="form-label">Kullanıcı Adı</label>
-                        <input type="text" name="username" id="id_username" class="form-control" required>
+                        {# forms.py'daki widget stilleri geçerli olacak #}
+                        {{ form.username }}
+                        {# <input type="text" name="username" id="id_username" class="form-control" required> #}
                     </div>
                     <div class="mb-3">
                         <label for="id_password" class="form-label">Şifre</label>
-                        <input type="password" name="password" id="id_password" class="form-control" required>
+                        {{ form.password }}
+                        {# <input type="password" name="password" id="id_password" class="form-control" required> #}
                     </div>
                     <div class="d-grid gap-2 mt-4">
                         <button type="submit" class="btn btn-primary">Giriş Yap</button>
                     </div>
-                    <input type="hidden" name="next" value="{{ next | default:'/' }}"> {# next yoksa anasayfaya git #}
+                    {# 'next' parametresini gizli alan olarak gönder #}
+                    <input type="hidden" name="next" value="{{ next | default:'/' }}">
                 </form>
                 <hr>
+                {# Ek Linkler #}
                 <div class="text-center small">
                     <a href="{% url 'password_reset' %}">Şifreni mi unuttun?</a>
                     <br>
