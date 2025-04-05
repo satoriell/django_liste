@@ -2,16 +2,18 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     const chartDataElement = document.getElementById('chartDataJson');
+    const typeChartCanvas = document.getElementById('typeDistributionChart');
+    const statusChartCanvas = document.getElementById('statusDistributionChart');
+
+    // Grafik instance'larını saklamak için değişkenler
+    let typeChartInstance = null;
+    let statusChartInstance = null;
 
     // Gerekli HTML elementleri veya veri yoksa fonksiyondan çık
-    if (!chartDataElement || typeof Chart === 'undefined') {
-        if (typeof Chart === 'undefined') {
-            console.warn("Chart.js kütüphanesi yüklenemedi.");
-        }
-        if (!chartDataElement) {
-            console.warn("Grafik veri elementi (#chartDataJson) bulunamadı.");
-        }
-        // Grafiğe ihtiyaç duymayan sayfalarda hata vermemesi için sessizce çık
+    if (!chartDataElement || typeof Chart === 'undefined' || (!typeChartCanvas && !statusChartCanvas)) {
+        if (typeof Chart === 'undefined') console.warn("Chart.js kütüphanesi yüklenemedi.");
+        if (!chartDataElement) console.warn("Grafik veri elementi (#chartDataJson) bulunamadı.");
+        if (!typeChartCanvas && !statusChartCanvas) console.warn("Grafik canvas elementleri bulunamadı.");
         return;
     }
 
@@ -20,96 +22,123 @@ document.addEventListener('DOMContentLoaded', function() {
         chartData = JSON.parse(chartDataElement.textContent);
     } catch (e) {
         console.error("Grafik verisi JSON formatında ayrıştırılamadı:", e);
-        return; // Veri yoksa devam etme
+        return;
     }
 
-    // --- Grafik Renklerini Tanımla (Açık/Koyu Tema Uyumlu olabilir) ---
-    // Bu renkleri CSS değişkenlerinden almak daha dinamik olurdu ama şimdilik sabit tanımlayalım
-    // CSS değişkenlerini JS ile okumak: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
-    const primaryColor = '#6C63FF'; // Anime, Novel
-    const successColor = '#198754'; // Webtoon
-    const dangerColor = '#dc3545';  // Manga
-    const infoColor = '#0dcaf0';   // Plan to Watch
-    const warningColor = '#ffc107'; // On Hold
-    const secondaryColor = '#6c757d'; // Dropped vb.
-    const darkColor = '#212529'; // Completed (açık tema)
+    // --- Yardımcı Fonksiyon: CSS Değişkeninden Renk Alma ---
+    function getCssVariableValue(variableName) {
+        // Değişken adının başında '--' olduğundan emin ol
+        const formattedVarName = variableName.startsWith('--') ? variableName : `--${variableName}`;
+        // Değeri al ve boşlukları temizle
+        return getComputedStyle(document.documentElement).getPropertyValue(formattedVarName).trim();
+    }
 
-    const statusColors = [
-        successColor, // Watching ('İzliyorum/Okuyorum') -> Yeşil
-        primaryColor, // Completed ('Tamamladım') -> Mor (veya Mavi?)
-        warningColor, // On Hold ('Beklemede') -> Sarı
-        dangerColor,  // Dropped ('Bıraktım') -> Kırmızı
-        infoColor,    // Plan to Watch ('İzleyeceğim/Okuyacağım') -> Açık Mavi
-    ];
+    // --- Grafik Renklerini CSS Değişkenlerinden Alma Fonksiyonu ---
+    function getChartColors() {
+        // CSS'deki renk değişkenlerini oku (base.css ve dark_mode.css ile uyumlu olmalı)
+        // Not: color-mix gibi karmaşık CSS fonksiyonları burada doğrudan okunamaz,
+        // bu yüzden ana renkleri kullanıyoruz. Gerekirse renkleri JS içinde üretebiliriz.
+        const primaryColor = getCssVariableValue('--primary-color') || '#6C63FF';
+        const successColor = getCssVariableValue('--success-color') || '#198754';
+        const dangerColor = getCssVariableValue('--danger-color') || '#dc3545';
+        const infoColor = getCssVariableValue('--info-color') || '#0dcaf0';
+        const warningColor = getCssVariableValue('--warning-color') || '#ffc107';
+        // const secondaryColor = getCssVariableValue('--secondary-color') || '#6c757d';
+        // const darkColor = getCssVariableValue('--dark-color') || '#212529'; // Açık temadaki --dark-color
+        const bodyBg = getCssVariableValue('--body-bg-start') || '#f8f9fa'; // Arkaplan rengi (örn: border için)
+        const headingColor = getCssVariableValue('--heading-color') || '#212529'; // Eksen/legend rengi
+        const textColor = getCssVariableValue('--text-color') || '#495057'; // Eksen/legend rengi
+        const borderColor = getCssVariableValue('--border-color') || '#dee2e6'; // Grid çizgileri
 
-    const typeColors = [
-        primaryColor,   // Anime
-        successColor,   // Webtoon
-        dangerColor,    // Manga
-        primaryColor    // Novel (Anime ile aynı renk veya farklı bir renk seçilebilir, örn: secondaryColor)
-    ];
+        return {
+            typeColors: [
+                primaryColor,   // Anime
+                successColor,   // Webtoon
+                dangerColor,    // Manga
+                primaryColor    // Novel (Anime ile aynı veya farklı seçilebilir)
+            ],
+            statusColors: [
+                successColor,   // Watching
+                primaryColor,   // Completed
+                warningColor,   // On Hold
+                dangerColor,    // Dropped
+                infoColor       // Plan to Watch
+            ],
+            commonBorderColor: bodyBg, // Dilimler arası veya çubuk kenarlığı için
+            gridColor: borderColor, // Eksen çizgileri
+            fontColor: textColor, // Eksen yazı renkleri
+            legendFontColor: headingColor // Legend yazı rengi
+        };
+    }
 
-    // --- Ortak Grafik Ayarları ---
-    const commonChartOptions = {
-        responsive: true, // Konteynere göre boyutlan
-        maintainAspectRatio: false, // Yüksekliği konteyner belirlesin
-        plugins: {
-            legend: {
-                position: 'bottom', // Göstergeyi alta al
-                labels: {
-                    // padding: 15,
-                    boxWidth: 12,
-                    font: {
-                        size: 11 // Daha küçük font
+    // --- Ortak Grafik Ayarları Fonksiyonu ---
+    function getCommonChartOptions() {
+        const colors = getChartColors(); // Mevcut tema renklerini al
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: colors.legendFontColor, // Tema uyumlu renk
+                        padding: 15,
+                        boxWidth: 12,
+                        font: { size: 11 }
                     }
+                },
+                tooltip: {
+                    // Tooltip stilini CSS sınıfı ile yönetmek daha iyi olabilir,
+                    // ancak şimdilik temel renkleri ayarlayalım
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Genellikle koyu kalır
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    titleFont: { weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    cornerRadius: 4,
                 }
             },
-            tooltip: {
-                backgroundColor: 'rgba(0, 0, 0, 0.8)', // Tooltip arkaplanı (tema ile değişebilir)
-                titleFont: { weight: 'bold' },
-                bodyFont: { size: 12 },
-                padding: 10,
-                cornerRadius: 4,
-                // callbacks: { // İsteğe bağlı: Tooltip içeriğini özelleştir
-                //     label: function(context) {
-                //         let label = context.label || '';
-                //         if (label) {
-                //             label += ': ';
-                //         }
-                //         if (context.parsed !== null) {
-                //             label += context.parsed;
-                //         }
-                //         return label;
-                //     }
-                // }
+            // Eksen renkleri
+            scales: {
+                 x: { // Sadece bar grafikte kullanılır
+                    ticks: { color: colors.fontColor },
+                    grid: { color: colors.gridColor }
+                 },
+                 y: { // Sadece bar grafikte kullanılır
+                    ticks: { color: colors.fontColor },
+                    grid: { color: colors.gridColor }
+                 }
             }
-        }
-    };
+        };
+    }
 
-    // --- Tür Dağılımı Grafiği (Doughnut) ---
-    const typeCtx = document.getElementById('typeDistributionChart')?.getContext('2d');
-    if (typeCtx && chartData.typeLabels && chartData.typeCounts) {
+    // --- Tür Dağılımı Grafiği (Doughnut) Oluşturma ---
+    if (typeChartCanvas && chartData.typeLabels && chartData.typeCounts) {
+        const ctx = typeChartCanvas.getContext('2d');
+        const initialColors = getChartColors(); // Başlangıç renkleri
+        const commonOptions = getCommonChartOptions(); // Başlangıç seçenekleri
         try {
-            new Chart(typeCtx, {
+            typeChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: chartData.typeLabels,
                     datasets: [{
                         label: 'Tür Dağılımı',
                         data: chartData.typeCounts,
-                        backgroundColor: typeColors,
-                        borderColor: '#ffffff', // Dilimler arası beyaz çizgi (tema ile değişebilir)
+                        backgroundColor: initialColors.typeColors,
+                        borderColor: initialColors.commonBorderColor, // Temaya uygun kenarlık
                         borderWidth: 2,
-                        hoverOffset: 8 // Üzerine gelince dilimi büyüt
+                        hoverOffset: 8
                     }]
                 },
                 options: {
-                    ...commonChartOptions, // Ortak ayarları devral
-                     cutout: '60%', // Ortadaki boşluk oranı
+                    ...commonOptions, // Ortak ayarları devral
+                     cutout: '60%',
                     plugins: { // Legend ve tooltip'i override et/ekle
-                         ...commonChartOptions.plugins, // Ortak plugin ayarlarını devral
+                         ...commonOptions.plugins, // Ortak plugin ayarlarını devral
                         tooltip: {
-                            ...commonChartOptions.plugins.tooltip,
+                            ...commonOptions.plugins.tooltip,
                             callbacks: { // Yüzdeyi göster
                                 label: function(context) {
                                     let label = context.label || '';
@@ -123,91 +152,111 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             });
-        } catch (e) {
-            console.error("Tür dağılımı grafiği oluşturulurken hata:", e);
-        }
-    } else if (document.getElementById('typeDistributionChart')) {
-        console.warn("Tür dağılımı grafiği için canvas veya veri bulunamadı.");
+        } catch (e) { console.error("Tür dağılımı grafiği oluşturulurken hata:", e); }
     }
 
-
-    // --- Durum Dağılımı Grafiği (Bar) ---
-    const statusCtx = document.getElementById('statusDistributionChart')?.getContext('2d');
-    if (statusCtx && chartData.statusLabels && chartData.statusData) {
-       try {
-            new Chart(statusCtx, {
+    // --- Durum Dağılımı Grafiği (Bar) Oluşturma ---
+    if (statusChartCanvas && chartData.statusLabels && chartData.statusData) {
+        const ctx = statusChartCanvas.getContext('2d');
+        const initialColors = getChartColors(); // Başlangıç renkleri
+        const commonOptions = getCommonChartOptions(); // Başlangıç seçenekleri
+        try {
+            statusChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: chartData.statusLabels,
                     datasets: [{
                         label: 'Sayı',
                         data: chartData.statusData,
-                        backgroundColor: statusColors, // Her çubuk için farklı renk
-                        borderColor: statusColors, // Kenarlık rengi aynı olsun
+                        backgroundColor: initialColors.statusColors,
+                        borderColor: initialColors.statusColors, // Kenarlık aynı renk
                         borderWidth: 1,
-                        borderRadius: 4, // Köşeleri hafif yuvarlat
-                        barPercentage: 0.7, // Çubuk genişliği
-                        categoryPercentage: 0.8 // Kategori alanı genişliği
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
                     }]
                 },
                 options: {
-                    ...commonChartOptions,
-                    indexAxis: 'y', // Yatay çubuk grafik için 'y'
-                    scales: {
-                        x: { // Sayısal eksen (alt)
-                            beginAtZero: true, // 0'dan başla
+                    ...commonOptions,
+                    indexAxis: 'y', // Yatay çubuk grafik
+                    scales: { // Eksen ayarlarını override et/ekle
+                        x: {
+                            ...commonOptions.scales.x, // Ortak renkleri al
+                            beginAtZero: true,
                             ticks: {
-                                precision: 0 // Tam sayıları göster
-                            },
+                                ...commonOptions.scales.x.ticks, // Ortak rengi al
+                                precision: 0
+                             },
                             grid: {
-                                // display: false // Arka plan çizgilerini gizle (isteğe bağlı)
-                                color: 'rgba(0, 0, 0, 0.05)' // Çizgi rengini soluklaştır (tema ile değişebilir)
+                                ...commonOptions.scales.x.grid, // Ortak rengi al
+                                // display: false // İsteğe bağlı: çizgileri gizle
                             }
                         },
-                        y: { // Kategori ekseni (sol)
+                        y: {
+                            ...commonOptions.scales.y, // Ortak renkleri al
                              grid: {
-                                display: false // Kategori çizgilerini gizle
+                                 ...commonOptions.scales.y.grid, // Ortak rengi al
+                                display: false
                             }
                         }
                     },
                     plugins: {
-                        ...commonChartOptions.plugins,
-                         legend: {
-                            display: false // Tek dataset olduğu için gösterge gereksiz
-                        }
-                        // Tooltip ayarları ortak ayarlardan gelir
+                        ...commonOptions.plugins,
+                         legend: { display: false } // Legend gereksiz
+                        // Tooltip ortak ayarlardan gelir
                     }
                 }
             });
-       } catch (e) {
-            console.error("Durum dağılımı grafiği oluşturulurken hata:", e);
-       }
-    } else if (document.getElementById('statusDistributionChart')) {
-        console.warn("Durum dağılımı grafiği için canvas veya veri bulunamadı.");
+        } catch (e) { console.error("Durum dağılımı grafiği oluşturulurken hata:", e); }
     }
 
-    // --- Koyu Tema Değişikliğini Dinleme (Opsiyonel - Grafik Renklerini Güncelleme) ---
-    // Eğer tema değişiminde grafik renklerinin de değişmesini isterseniz:
-    // const htmlElement = document.documentElement;
-    // const observer = new MutationObserver(mutations => {
-    //     mutations.forEach(mutation => {
-    //         if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
-    //             // Tema değişti, grafik renklerini güncelle ve yeniden çiz
-    //             // updateChartColorsAndRedraw(typeChartInstance, statusChartInstance);
-    //             console.log("Tema değişti, grafikler güncellenmeli (fonksiyon implemente edilmedi).");
-    //         }
-    //     });
-    // });
-    // observer.observe(htmlElement, { attributes: true });
-    // function updateChartColorsAndRedraw(typeChart, statusChart) {
-         // CSS değişkenlerinden yeni renkleri al
-         // const newPrimaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
-         // ... diğer renkler ...
-         // Chart instance'larının data.datasets[...].backgroundColor vb. güncelle
-         // typeChart.data.datasets[0].backgroundColor = [...];
-         // statusChart.data.datasets[0].backgroundColor = [...];
-         // typeChart.update();
-         // statusChart.update();
-    // }
+    // --- Grafik Renklerini Güncelleme Fonksiyonu ---
+    function updateChartColors() {
+        if (!typeChartInstance && !statusChartInstance) return; // Güncellenecek grafik yoksa çık
+
+        const newColors = getChartColors();
+        const newOptions = getCommonChartOptions(); // Seçenekleri de güncelle (eksen renkleri vb.)
+
+        // Tür Grafiğini Güncelle
+        if (typeChartInstance) {
+            const typeDataset = typeChartInstance.data.datasets[0];
+            typeDataset.backgroundColor = newColors.typeColors;
+            typeDataset.borderColor = newColors.commonBorderColor;
+            // Legend ve eksen renkleri options ile güncellenir
+            typeChartInstance.options.plugins.legend.labels.color = newOptions.plugins.legend.labels.color;
+            // Doughnut'ta eksen yok
+            typeChartInstance.update();
+            // console.log("Tür grafiği renkleri güncellendi.");
+        }
+
+        // Durum Grafiğini Güncelle
+        if (statusChartInstance) {
+            const statusDataset = statusChartInstance.data.datasets[0];
+            statusDataset.backgroundColor = newColors.statusColors;
+            statusDataset.borderColor = newColors.statusColors;
+            // Legend, eksen ve grid renkleri options ile güncellenir
+            statusChartInstance.options.plugins.legend.labels.color = newOptions.plugins.legend.labels.color;
+            statusChartInstance.options.scales.x.ticks.color = newOptions.scales.x.ticks.color;
+            statusChartInstance.options.scales.x.grid.color = newOptions.scales.x.grid.color;
+            statusChartInstance.options.scales.y.ticks.color = newOptions.scales.y.ticks.color;
+            statusChartInstance.options.scales.y.grid.color = newOptions.scales.y.grid.color;
+            statusChartInstance.update();
+            // console.log("Durum grafiği renkleri güncellendi.");
+        }
+    }
+
+    // --- Koyu Tema Değişikliğini Dinleme ---
+    const htmlElement = document.documentElement;
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                // Tema değişti, grafik renklerini güncelle
+                 console.log("Tema değişti, grafikler güncelleniyor...");
+                 // Kısa bir gecikme vermek CSS değişkenlerinin güncellenmesini garantileyebilir
+                 setTimeout(updateChartColors, 50);
+            }
+        });
+    });
+    observer.observe(htmlElement, { attributes: true }); // data-theme değişikliğini izle
 
 }); // DOMContentLoaded sonu

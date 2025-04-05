@@ -1,5 +1,5 @@
 # tracker/mangadex_service.py
-# İyileştirmeler: Logging detayları, None dönüşü, quote kullanımı, tag/type tespiti.
+# İyileştirmeler: Logging detayları, None dönüşü, quote kullanımı, tag/type tespiti, time.sleep aktif edildi, .get() kullanımı iyileştirildi.
 
 import requests
 import time
@@ -39,8 +39,9 @@ def _make_request(endpoint, params=None):
     full_url = url # Loglama için
     response_text_snippet = "" # Hata durumunda loglamak için
     try:
-        # MangaDex rate limit'i daha esnek, şimdilik bekleme yok. Gerekirse aktif et:
-        # time.sleep(0.2) # Örnek: saniyede 5 istek
+        # ----- YORUMU KALDIRILDI -----
+        time.sleep(0.2) # MangaDex rate limit için küçük bir bekleme (saniyede 5 istek)
+        # -------------------------
 
         if params:
             # Query parametrelerini URL'e güvenli bir şekilde ekle
@@ -109,91 +110,87 @@ def search_manga(title: str, limit: int = 15):
     params = {
         'title': title,
         'limit': limit,
-        # İlişkili verileri dahil et (tek istekte daha fazla bilgi)
         'includes[]': ['cover_art', 'author', 'artist'],
-        # İçerik derecelendirmesi (isteğe bağlı olarak 'pornographic', 'erotica' eklenebilir)
         'contentRating[]': ['safe', 'suggestive'],
-        # Sipariş (en alakalı olanlar önce gelsin - opsiyonel)
         'order[relevance]': 'desc'
     }
-    # API isteğini yap
     data = _make_request("manga", params=params)
 
-    # Hata kontrolü
-    if data is None: # API hatası oluştu
-        return None # Hata olduğunu belirtmek için None dön
-    if not data or data.get('result') != 'ok' or not data.get('data'):
+    if data is None: return None
+    if not data or data.get('result') != 'ok' or not isinstance(data.get('data'), list): # data'nın list olduğunu kontrol et
         logger.info(f"MangaDex araması '{title}' için sonuç döndürmedi veya hatalı formatta.")
-        return [] # Sonuç yoksa veya format hatalıysa boş liste
+        return []
 
-    # Sonuçları işle
     results = []
     for manga_data in data['data']:
-        attributes = manga_data.get('attributes', {})
-        relationships = manga_data.get('relationships', [])
+        # .get() kullanımı daha güvenli hale getirildi (varsayılan değerlerle)
+        attributes = manga_data.get('attributes', {}) or {} # attributes yoksa boş dict
+        relationships = manga_data.get('relationships', []) or [] # relationships yoksa boş liste
         manga_id = manga_data.get('id')
-        if not manga_id: continue # ID yoksa atla
+        if not manga_id: continue
 
-        # Lokalize başlığı al (TR > EN > İlk Bulunan)
-        manga_title = get_localized_text(attributes.get('title', {}), preferred_lang='tr')
-        if not manga_title: manga_title = f"ID: {manga_id}" # Başlık yoksa ID göster
+        manga_title = get_localized_text(attributes.get('title', {}), preferred_lang='tr') or f"ID: {manga_id}"
 
-        # Kapak resmini bul ve URL'ini oluştur
         cover_filename = None
         cover_url = None
-        # 'cover_art' tipindeki ilişkiyi bul
+        # cover_relation için .get() kullanmak daha güvenli
         cover_relation = next((rel for rel in relationships if rel.get('type') == 'cover_art'), None)
-        if cover_relation and isinstance(cover_relation.get('attributes'), dict):
-             cover_filename = cover_relation['attributes'].get('fileName')
-             if cover_filename:
-                 # Güvenli URL oluşturma (ID ve dosya adını quote et)
-                 # .512.jpg gibi uzantılarla belirli boyutları almak mümkün
+        # cover_relation['attributes'] yerine .get('attributes') kullan
+        cover_attributes = cover_relation.get('attributes', {}) if cover_relation else {}
+        if isinstance(cover_attributes, dict):
+            cover_filename = cover_attributes.get('fileName')
+            if cover_filename:
                  cover_url = f"https://uploads.mangadex.org/covers/{quote(manga_id)}/{quote(cover_filename)}.512.jpg"
 
-        # Yazar ve çizer isimlerini al
-        authors = [rel['attributes']['name'] for rel in relationships if rel.get('type') == 'author' and isinstance(rel.get('attributes'), dict) and rel['attributes'].get('name')]
-        artists = [rel['attributes']['name'] for rel in relationships if rel.get('type') == 'artist' and isinstance(rel.get('attributes'), dict) and rel['attributes'].get('name')]
+        # Yazar/Çizer alırken daha dikkatli ol
+        authors = [
+            rel.get('attributes', {}).get('name')
+            for rel in relationships
+            if rel.get('type') == 'author' and rel.get('attributes', {}).get('name') # Hem attributes hem name var mı?
+        ]
+        artists = [
+            rel.get('attributes', {}).get('name')
+            for rel in relationships
+            if rel.get('type') == 'artist' and rel.get('attributes', {}).get('name')
+        ]
 
-        # Açıklama (kısa versiyon)
-        description = get_localized_text(attributes.get('description', {}), preferred_lang='tr')
+        description_dict = attributes.get('description', {})
+        description = get_localized_text(description_dict, preferred_lang='tr') if isinstance(description_dict, dict) else ""
         description_snippet = (description[:200] + '...' if description and len(description) > 200 else description) if description else ""
 
         results.append({
             'id': manga_id,
             'title': manga_title,
             'description_snippet': description_snippet,
-            'year': attributes.get('year'), # Yayın yılı
-            'status': attributes.get('status'), # Yayın durumu (ongoing, completed vb.)
+            'year': attributes.get('year'),
+            'status': attributes.get('status'),
             'cover_url': cover_url,
-            'authors': ", ".join(authors), # Virgülle ayrılmış string
-            'artists': ", ".join(artists), # Virgülle ayrılmış string
+            'authors': ", ".join(filter(None, authors)), # None değerleri filtrele
+            'artists': ", ".join(filter(None, artists)), # None değerleri filtrele
         })
     return results
 
 def get_manga_details(mangadex_id: str):
     """Verilen MangaDex UUID'sine sahip öğenin detaylarını getirir."""
-    # UUID format kontrolü (opsiyonel ama iyi pratik)
     try:
-        uuid_obj = uuid.UUID(mangadex_id)
+        uuid_obj = uuid.UUID(str(mangadex_id))
     except ValueError:
         logger.error(f"Geçersiz MangaDex ID formatı: {mangadex_id}")
         return None
 
     params = {
-        'includes[]': ['cover_art', 'author', 'artist', 'tag'] # Etiketleri de dahil et
+        'includes[]': ['cover_art', 'author', 'artist', 'tag']
     }
-    # ID'yi URL'e güvenli bir şekilde ekle (quote ile)
     endpoint = f"manga/{quote(str(uuid_obj))}"
     data = _make_request(endpoint, params=params)
 
-    if data is None: # API hatası veya bulunamadı (404)
+    if data is None:
         logger.warning(f"MangaDex detayları alınamadı veya bulunamadı: ID={mangadex_id}")
         return None
     if not data or data.get('result') != 'ok' or not data.get('data'):
         logger.warning(f"MangaDex detayları alınamadı (hatalı format): ID={mangadex_id}")
         return None
 
-    # Başarılı yanıttan veriyi haritala
     return map_mangadex_data_to_dict(data['data'])
 
 def map_mangadex_data_to_dict(manga_data):
@@ -202,117 +199,85 @@ def map_mangadex_data_to_dict(manga_data):
         logger.error("map_mangadex_data_to_dict: Geçersiz veya boş manga_data.")
         return {}
 
-    attributes = manga_data.get('attributes', {})
-    relationships = manga_data.get('relationships', [])
+    attributes = manga_data.get('attributes', {}) or {}
+    relationships = manga_data.get('relationships', []) or []
     manga_id = manga_data.get('id')
     if not manga_id:
         logger.error("map_mangadex_data_to_dict: Manga ID bulunamadı.")
-        return {} # ID yoksa boş dön
+        return {}
 
-    # Başlık
     title = get_localized_text(attributes.get('title', {}), preferred_lang='tr') or f"ID: {manga_id}"
 
-    # Kapak
     cover_filename = None
     cover_url = None
     cover_relation = next((rel for rel in relationships if rel.get('type') == 'cover_art'), None)
-    if cover_relation and isinstance(cover_relation.get('attributes'), dict):
-        cover_filename = cover_relation['attributes'].get('fileName')
+    cover_attributes = cover_relation.get('attributes', {}) if cover_relation else {}
+    if isinstance(cover_attributes, dict):
+        cover_filename = cover_attributes.get('fileName')
         if cover_filename:
-             cover_url = f"https://uploads.mangadex.org/covers/{quote(manga_id)}/{quote(cover_filename)}.512.jpg"
+            cover_url = f"https://uploads.mangadex.org/covers/{quote(manga_id)}/{quote(cover_filename)}.512.jpg"
 
-    # Yazar/Çizer
-    authors = [rel['attributes']['name'] for rel in relationships if rel.get('type') == 'author' and isinstance(rel.get('attributes'), dict) and rel['attributes'].get('name')]
-    artists = [rel['attributes']['name'] for rel in relationships if rel.get('type') == 'artist' and isinstance(rel.get('attributes'), dict) and rel['attributes'].get('name')]
-    author_str = ", ".join(authors)
-    artist_str = ", ".join(artists)
+    authors = [
+        rel.get('attributes', {}).get('name')
+        for rel in relationships
+        if rel.get('type') == 'author' and rel.get('attributes', {}).get('name')
+    ]
+    artists = [
+        rel.get('attributes', {}).get('name')
+        for rel in relationships
+        if rel.get('type') == 'artist' and rel.get('attributes', {}).get('name')
+    ]
+    author_str = ", ".join(filter(None, authors))
+    artist_str = ", ".join(filter(None, artists))
 
-    # Açıklama/Notlar
-    description = get_localized_text(attributes.get('description', {}), preferred_lang='tr') or ""
+    description_dict = attributes.get('description', {})
+    description = get_localized_text(description_dict, preferred_lang='tr') if isinstance(description_dict, dict) else ""
 
-    # Tip Tespiti ve Etiketler
-    detected_type = 'MANGA' # Varsayılan
-    tags_from_api = attributes.get('tags', [])
-    tag_names_en = set() # Tutarlılık için İngilizce isimleri topla
+    detected_type = 'MANGA'
+    tags_from_api = attributes.get('tags', []) or [] # tags yoksa boş liste
+    tag_names_en = set()
     if isinstance(tags_from_api, list):
         for tag_data in tags_from_api:
-             # Gelen verinin beklenen yapıda olduğunu kontrol et
-             if isinstance(tag_data, dict) and isinstance(tag_data.get('attributes'), dict):
-                 tag_name_dict = tag_data['attributes'].get('name', {})
-                 if isinstance(tag_name_dict, dict):
-                     tag_name = tag_name_dict.get('en') # İngilizce isim
-                     if tag_name:
-                         tag_names_en.add(tag_name.lower()) # Küçük harfe çevir
+             tag_attributes = tag_data.get('attributes', {}) if isinstance(tag_data, dict) else {}
+             tag_name_dict = tag_attributes.get('name', {}) if isinstance(tag_attributes, dict) else {}
+             if isinstance(tag_name_dict, dict):
+                 tag_name = tag_name_dict.get('en')
+                 if tag_name and isinstance(tag_name, str): # tag_name string mi?
+                     tag_names_en.add(tag_name.lower())
 
-        # Webtoon tespiti (etiketlere göre)
         if 'webtoon' in tag_names_en or 'long strip' in tag_names_en:
             detected_type = 'WEBTOON'
             logger.debug(f"Webtoon tipi tespit edildi (etiketlerden): ID={manga_id}")
-        elif 'manhwa' in tag_names_en: # Opsiyonel: Manhwa'yı da Webtoon sayabiliriz
+        elif 'manhwa' in tag_names_en:
              detected_type = 'WEBTOON'
              logger.debug(f"Webtoon tipi tespit edildi (manhwa etiketinden): ID={manga_id}")
 
-
-    # Formda ve view'da kullanılacak etiket listesi (alfabetik sıralı)
     tags_list_for_view = sorted(list(tag_names_en))
 
-    # Formu doldurmak için haritalanmış veri
     mapped_data = {
         'mangadex_id': manga_id,
         'title': title,
         'cover_image_url': cover_url,
         'author': author_str,
         'artist': artist_str,
-        'notes': description, # Notlar alanını API açıklaması ile doldur
-        # API genellikle bu bilgileri direkt vermez, kullanıcı doldurmalı
+        'notes': description,
         'total_chapters': None,
-        'chapters_read': 0, # Varsayılan
+        'chapters_read': 0,
         'total_volumes': None,
-        'volumes_read': 0, # Varsayılan
-        'platform': '', # Webtoon ise kullanıcı girebilir
-        'status': 'Plan to Watch', # Varsayılan durum
-        'rating': None, # Kullanıcı girecek
+        'volumes_read': 0,
+        'platform': '',
+        'status': 'Plan to Watch',
+        'rating': None,
         'start_date': None,
         'end_date': None,
-        # Tespit edilen tip ve etiketler view tarafından kullanılacak
         'detected_type': detected_type,
-        'tags_list': tags_list_for_view, # View'da tags.add() için kullanılacak
-        'tags': ", ".join(tags_list_for_view), # Formdaki tags alanı için string
+        'tags_list': tags_list_for_view,
+        'tags': ", ".join(tags_list_for_view),
     }
     return mapped_data
 
 # ----- Test Kodları (Opsiyonel, kaldırılabilir) -----
 # if __name__ == '__main__':
-#     # Basit logging ayarı
 #     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 #     logger.info("MangaDex Servis Testi Başlatıldı")
-#     test_manga_id = "a96676e5-8ae2-425e-b549-7f15dd34a6d8" # One Piece
-#     test_webtoon_id = "3f65e893-63ff-4a50-9450-c63860917b33" # Tower of God (ToG)
-#     test_invalid_id = "invalid-uuid-format"
-#     test_notfound_id = "00000000-0000-0000-0000-000000000000"
-
-#     # logger.info(f"--- Arama Testi ('solo leveling') ---")
-#     # search_results = search_manga("solo leveling", limit=5)
-#     # if search_results:
-#     #     logger.info(f"{len(search_results)} sonuç bulundu.")
-#     #     # print(json.dumps(search_results, indent=2, ensure_ascii=False))
-#     # elif search_results == []:
-#     #     logger.warning("Arama sonucu bulunamadı.")
-#     # else:
-#     #     logger.error("Arama sırasında API hatası oluştu.")
-
-#     logger.info(f"--- Manga Detayları ({test_manga_id}) ---")
-#     details_manga = get_manga_details(test_manga_id)
-#     if details_manga: print(json.dumps(details_manga, indent=2, ensure_ascii=False))
-
-#     logger.info(f"--- Webtoon Detayları ({test_webtoon_id}) ---")
-#     details_webtoon = get_manga_details(test_webtoon_id)
-#     if details_webtoon: print(json.dumps(details_webtoon, indent=2, ensure_ascii=False))
-
-#     logger.info(f"--- Geçersiz ID Testi ({test_invalid_id}) ---")
-#     details_invalid = get_manga_details(test_invalid_id)
-#     if details_invalid is None: logger.info("Geçersiz ID testi başarılı (None döndü).")
-
-#     logger.info(f"--- Bulunamayan ID Testi ({test_notfound_id}) ---")
-#     details_notfound = get_manga_details(test_notfound_id)
-#     if details_notfound is None: logger.info("Bulunamayan ID testi başarılı (None döndü).")
+#     # ... (test kodları) ...
