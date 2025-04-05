@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "tracker",  # Bizim app'imiz
+    'taggit'
 ]
 
 MIDDLEWARE = [

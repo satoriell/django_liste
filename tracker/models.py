@@ -1,13 +1,14 @@
 # tracker/models.py
 # Konum: /home/admin/App/django_liste/tracker/models.py
 
-import uuid # <- YENİ: UUIDField için eklendi
+import uuid
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from taggit.managers import TaggableManager # <- YENİ: django-taggit import edildi
 
 # Ortak alanları burada tanımlayıp diğer modellerde tekrar yazmaktan kurtulabiliriz.
 class MediaItem(models.Model):
@@ -59,16 +60,23 @@ class MediaItem(models.Model):
         default=timezone.now, verbose_name="Eklenme Tarihi"
     )
 
-    # --- YENİ: API ID Alanları ---
-    # anilist_id = models.PositiveIntegerField(...) # Önceki adımdan (varsa)
+    # --- API ID Alanları ---
     mangadex_id = models.UUIDField(
         null=True,
         blank=True,
-        unique=True, # Bir mangadex_id sadece bir öğeye ait olmalı
-        db_index=True, # Aramayı hızlandırmak için index ekleyelim
+        unique=True,
+        db_index=True,
         verbose_name="MangaDex ID"
     )
     # --------------------------
+
+    # --- YENİ: Etiket Alanı (django-taggit) ---
+    tags = TaggableManager(
+        blank=True, # Etiket eklemek zorunlu değil
+        verbose_name="Etiketler",
+        help_text="Etiketleri virgülle ayırarak giriniz." # Admin panelinde yardımcı metin
+    )
+    # ---------------------------------------
 
     # Meta
     class Meta:
@@ -79,7 +87,6 @@ class MediaItem(models.Model):
     def __str__(self):
         return self.title
 
-    # GÜNCELLENDİ: Manga/Novel için cilt ilerlemesini de hesaba katar.
     def get_progress_percent(self):
         """Öğenin ilerleme yüzdesini hesaplar (ondalıklı).
            Bölüm/Chapter bilgisi varsa onu, yoksa Cilt/Volume bilgisini kullanır."""
@@ -102,22 +109,20 @@ class MediaItem(models.Model):
 
         # Hesaplama
         if (
-            total is not None and total > 0 and # total > 0 kontrolü zaten var ama netlik için tekrar
-            current is not None and isinstance(current, int) and isinstance(total, int)
+            total is not None and total > 0 and
+            current is not None and isinstance(current, (int, float)) and isinstance(total, (int, float)) # int/float olabilir
            ):
             try:
                 current = max(0, current) # Negatif değer olmasın
                 percentage = (current / total) * 100
                 return min(percentage, 100) # %100'ü geçmesin
             except ZeroDivisionError:
-                # Bu aslında total > 0 kontrolü ile engellenmeli, ama garanti olsun
                 return None
             except (TypeError, ValueError):
-                # Beklenmedik veri tipi veya değer hatası
                 return None
-        return None # Toplam veya mevcut değer yoksa/geçersizse None döner
+        return None
 
-# --- Medya Modelleri (Değişiklik yok) ---
+# --- Medya Modelleri (Değişiklik yok, 'tags' alanı MediaItem'dan miras alınacak) ---
 class Anime(MediaItem):
     studio = models.CharField(max_length=100, blank=True, verbose_name="Stüdyo")
     episodes_watched = models.PositiveIntegerField(default=0, verbose_name="İzlenen Bölüm")

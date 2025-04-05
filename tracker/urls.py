@@ -1,10 +1,11 @@
 # tracker/urls.py
 # Konum: /home/admin/App/django_liste/tracker/urls.py
+# --- DEĞİŞİKLİK GEREKMEZ ---
 
 from django.urls import path
-# UUID tipini import et (Zaten vardı)
+# UUID tipini import et
 import uuid
-# View fonksiyonlarını import et (md_add_item_view dahil)
+# View fonksiyonlarını import et
 from . import views
 
 # Uygulama ad alanı (namespace)
@@ -15,20 +16,18 @@ urlpatterns = [
     path("", views.dashboard_view, name="dashboard"),
 
     # --- Kayıt (Signup) ---
-    path("accounts/signup/", views.signup_view, name="signup"), # accounts/ öneki olmadan urls.py'de
+    # Ana projenin urls.py dosyasında 'accounts/' handle edilmeli (genellikle django.contrib.auth.urls ile)
+    # Eğer burada tanımlamak istersen: path("signup/", views.signup_view, name="signup"),
+    # Ama genellikle projenin ana urls.py'sinde olur.
 
-    # --- Favori URL'leri (Veritabanı Tabanlı) ---
+    # --- Favori URL'leri ---
     path("favorite/toggle/", views.toggle_favorite, name="toggle_favorite"),
     path("favorites/", views.favorites_view, name="favorites_view"),
 
-    # --- MangaDex API Arama ve Ekleme URL'leri (GÜNCELLENDİ) ---
+    # --- MangaDex API Arama ve Ekleme URL'leri ---
     path("manga/search-api/", views.manga_api_search_view, name="manga_api_search"),
-    # Webtoon için API arama URL'si (aynı view'ı kullanıyor)
     path("webtoon/search-api/", views.manga_api_search_view, name="webtoon_api_search"),
-    # Genel API'dan Ekleme URL'si (view adı ve path değişti)
     path("add-from-mangadex/<uuid:mangadex_id>/", views.md_add_item_view, name="md_add_item"),
-    # Eski URL'leri kaldırdık
-    # ----------------------------------------------------------
 
     # --- Anime URL'leri ---
     path("anime/", views.anime_list_and_create, name="anime_list_view"),
@@ -57,4 +56,8 @@ urlpatterns = [
     path("novel/<int:pk>/edit/", views.novel_edit, name="novel_edit"),
     path("novel/<int:pk>/delete/", views.novel_delete, name="novel_delete"),
     path("novel/export/csv/", views.export_novel_csv, name="export_novel_csv"),
+
+    # Opsiyonel: İleride tüm tipleri tek bir etikete göre listeleyen bir sayfa istersen
+    # buraya yeni bir path ekleyebilirsin, örneğin:
+    # path("tags/<slug:tag_slug>/", views.items_by_tag_view, name="items_by_tag"),
 ]

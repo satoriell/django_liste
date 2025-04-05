@@ -3,6 +3,8 @@
 
 from django import forms
 from django.core.exceptions import ValidationError
+# taggit form alanı gerekirse import edilir, ama ModelForm genelde halleder.
+# from taggit.forms import TagField
 
 from .models import Anime, Manga, Novel, Webtoon
 
@@ -13,7 +15,6 @@ class MediaItemBaseForm(forms.ModelForm):
     start_date = forms.DateField(
         required=False,
         widget=forms.DateInput(
-            # type="date" input'unun beklediği YYYY-MM-DD formatını belirtiyoruz
             format="%Y-%m-%d",
             attrs={"type": "date", "class": "form-control mb-2"},
         ),
@@ -22,12 +23,16 @@ class MediaItemBaseForm(forms.ModelForm):
     end_date = forms.DateField(
         required=False,
         widget=forms.DateInput(
-            # type="date" input'unun beklediği YYYY-MM-DD formatını belirtiyoruz
             format="%Y-%m-%d",
             attrs={"type": "date", "class": "form-control mb-2"},
         ),
         label="Bitirme Tarihi",
     )
+
+    # DİKKAT: Eğer TaggableManager için özel widget istersen (örn: TagWidget)
+    # from taggit.forms import TagField, TagWidget
+    # tags = TagField(required=False, widget=TagWidget(attrs={'class': 'form-control mb-2', 'placeholder': 'Etiketler (virgülle ayırın)'}))
+    # Ama şimdilik ModelForm'un varsayılanını kullanıyoruz.
 
     class Meta:
         # Bu alanlar tüm alt formlar tarafından kullanılacak
@@ -39,9 +44,8 @@ class MediaItemBaseForm(forms.ModelForm):
             "end_date",
             "cover_image_url",
             "notes",
+            "tags",  # <- YENİ: tags alanı eklendi
         ]
-        # Not: DateInput widget'ları yukarıda format ile tanımlandığı için
-        # Meta.widgets içinde tekrar belirtmeye gerek yok.
         widgets = {
             "title": forms.TextInput(
                 attrs={"class": "form-control mb-2", "placeholder": "Başlık"}
@@ -51,6 +55,8 @@ class MediaItemBaseForm(forms.ModelForm):
                 attrs={
                     "class": "form-control mb-2",
                     "placeholder": "Puan (0-10)",
+                    "min": "0", # Min/Max HTML tarafında da eklenebilir
+                    "max": "10",
                 }
             ),
             "cover_image_url": forms.URLInput(
@@ -66,6 +72,13 @@ class MediaItemBaseForm(forms.ModelForm):
                     "placeholder": "Notlar...",
                 }
             ),
+            # YENİ: tags alanı için widget (ModelForm varsayılan olarak TextInput kullanır)
+            "tags": forms.TextInput(
+                attrs={
+                    "class": "form-control mb-2",
+                    "placeholder": "Etiketleri virgülle ayırarak girin (örn: Aksiyon, Komedi)",
+                }
+            ),
         }
 
     # Form seviyesinde genel doğrulama (Tarih kontrolü)
@@ -79,18 +92,30 @@ class MediaItemBaseForm(forms.ModelForm):
                 "Bitirme tarihi, başlama tarihinden önce olamaz."
             )
 
+        # Puan için ek kontrol (opsiyonel, modelde validator var ama burada da yapılabilir)
+        rating = cleaned_data.get("rating")
+        if rating is not None and (rating < 0 or rating > 10):
+             self.add_error('rating', "Puan 0 ile 10 arasında olmalıdır.")
+             # raise ValidationError({'rating': "Puan 0 ile 10 arasında olmalıdır."}) # Alternatif
+
         return cleaned_data
 
+# --- Diğer Formlar (AnimeForm, WebtoonForm, MangaForm, NovelForm) ---
+# Bu formlarda Meta.fields'ı MediaItemBaseForm.Meta.fields'dan miras aldıkları
+# ve TaggableManager alanını MediaItem'dan aldıkları için ek bir değişiklik
+# yapmaya gerek YOKTUR. 'tags' alanı otomatik olarak bu formlara dahil olacaktır.
 
-# --- Anime Formu ---
+# Örnek AnimeForm (Değişiklik GEREKMEZ, sadece gösterim amaçlı)
 class AnimeForm(MediaItemBaseForm):
     class Meta(MediaItemBaseForm.Meta):
         model = Anime
+        # 'tags' zaten MediaItemBaseForm.Meta.fields içinde
         fields = MediaItemBaseForm.Meta.fields + [
             "episodes_watched",
             "total_episodes",
             "studio",
         ]
+        # 'tags' widget'ı zaten MediaItemBaseForm.Meta.widgets içinde
         widgets = {
             **MediaItemBaseForm.Meta.widgets,
             "episodes_watched": forms.NumberInput(
@@ -112,6 +137,7 @@ class AnimeForm(MediaItemBaseForm):
             ),
         }
 
+    # Clean metodu aynı kalır
     def clean(self):
         cleaned_data = super().clean()
         episodes_watched = cleaned_data.get("episodes_watched")
@@ -127,8 +153,7 @@ class AnimeForm(MediaItemBaseForm):
             )
         return cleaned_data
 
-
-# --- Webtoon Formu ---
+# --- WebtoonForm, MangaForm, NovelForm aynı kalır ---
 class WebtoonForm(MediaItemBaseForm):
     class Meta(MediaItemBaseForm.Meta):
         model = Webtoon
@@ -168,7 +193,6 @@ class WebtoonForm(MediaItemBaseForm):
                 }
             ),
         }
-
     def clean(self):
         cleaned_data = super().clean()
         chapters_read = cleaned_data.get("chapters_read")
@@ -184,8 +208,6 @@ class WebtoonForm(MediaItemBaseForm):
             )
         return cleaned_data
 
-
-# --- Manga Formu ---
 class MangaForm(MediaItemBaseForm):
     class Meta(MediaItemBaseForm.Meta):
         model = Manga
@@ -237,7 +259,6 @@ class MangaForm(MediaItemBaseForm):
                 }
             ),
         }
-
     def clean(self):
         cleaned_data = super().clean()
         chapters_read = cleaned_data.get("chapters_read")
@@ -265,8 +286,6 @@ class MangaForm(MediaItemBaseForm):
             raise ValidationError(errors)
         return cleaned_data
 
-
-# --- Novel Formu ---
 class NovelForm(MediaItemBaseForm):
     class Meta(MediaItemBaseForm.Meta):
         model = Novel
@@ -311,7 +330,6 @@ class NovelForm(MediaItemBaseForm):
                 }
             ),
         }
-
     def clean(self):
         cleaned_data = super().clean()
         chapters_read = cleaned_data.get("chapters_read")
