@@ -1,25 +1,32 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
-{% comment %} Konum: tracker/templates/tracker/manga_api_search.html {% endcomment %}
+{% comment %} 
+    Konum: tracker/templates/tracker/manga_api_search.html 
+    Manga ve Webtoon arama sonuçlarını gösterir.
+{% endcomment %}
 
-{% block title %}MangaDex API ile Manga Ara - Kişisel Liste{% endblock title %}
+{# Başlık güncellendi #}
+{% block title %}MangaDex API ile Manga/Webtoon Ara - Kişisel Liste{% endblock title %}
 
 {% block content %}
-    <h1 class="mb-4 text-danger" data-aos="fade-down"><i class="fas fa-search me-2"></i>MangaDex API ile Manga Ara</h1>
+    {# Başlık ve ikon güncellendi #}
+    <h1 class="mb-4 text-primary" data-aos="fade-down"><i class="fas fa-search me-2"></i>MangaDex API ile Ara</h1>
 
     {# --- Arama Formu --- #}
     <div class="controls-container p-3 mb-4 border rounded shadow-sm" data-aos="fade-up">
-        <form method="post" action="{% url 'tracker:manga_api_search' %}">
+        {# Action URL doğru ('manga_api_search' veya 'webtoon_api_search' olabilir, view aynı olduğu için fark etmez) #}
+        <form method="post" action="{% url 'tracker:manga_api_search' %}"> 
             {% csrf_token %}
             <div class="input-group">
-                <input type="text" class="form-control" name="query" placeholder="Manga başlığı girin..." value="{{ query|default:'' }}" aria-label="Manga başlığı" required>
-                <button class="btn btn-danger" type="submit">Ara</button> {# Buton rengi Manga temasına uygun #}
+                <input type="text" class="form-control" name="query" placeholder="Manga veya Webtoon başlığı girin..." value="{{ query|default:'' }}" aria-label="Manga/Webtoon başlığı" required>
+                {# Buton rengi daha genel yapıldı #}
+                <button class="btn btn-primary" type="submit">Ara</button> 
             </div>
         </form>
     </div>
 
     {# --- Arama Sonuçları --- #}
-    {% if search_results is not None %} {# Arama yapıldıysa (API hatası olsa bile None olmaz, boş liste olur) #}
+    {% if search_results is not None %} 
         <hr data-aos="fade">
         <h4 class="mb-3" data-aos="fade-up">Arama Sonuçları {% if query %}({{ query }}){% endif %}</h4>
 
@@ -47,8 +54,9 @@
                                 {% if result.description_snippet %}
                                     <p class="card-text small text-muted mb-2"><i>{{ result.description_snippet }}</i></p>
                                 {% endif %}
-                                {# API'dan gelen UUID ile add_from_api URL'ine link ver #}
-                                <a href="{% url 'tracker:manga_add_from_api' result.id %}" class="btn btn-sm btn-success mt-auto w-100">
+                                
+                                {# DİKKAT: URL adı 'md_add_item' olarak güncellendi #}
+                                <a href="{% url 'tracker:md_add_item' result.id %}" class="btn btn-sm btn-success mt-auto w-100">
                                     <i class="fas fa-plus me-1"></i> Listeme Ekle
                                 </a>
                             </div>
@@ -60,7 +68,6 @@
                 {% endfor %}
             </div>
         {% else %}
-             {# Arama yapıldı ama sonuç bulunamadıysa (views.py'de mesaj veriliyor ama burada da belirtebiliriz) #}
             <div class="alert alert-warning" role="alert" data-aos="fade-in">
                 Arama kriterlerinize uygun sonuç bulunamadı.
             </div>

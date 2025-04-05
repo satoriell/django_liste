@@ -2,11 +2,12 @@
 # Konum: /home/admin/App/django_liste/tracker/urls.py
 
 from django.urls import path
-# YENİ: UUID tipini import et
+# UUID tipini import et (Zaten vardı)
 import uuid
-from . import views # signup_view ve yeni view'ları import edilmiş olmalı
+# View fonksiyonlarını import et (md_add_item_view dahil)
+from . import views
 
-# Uygulama ad alanı (namespace) - URL'leri tersine çevirirken kullanılır
+# Uygulama ad alanı (namespace)
 app_name = "tracker"
 
 urlpatterns = [
@@ -14,22 +15,20 @@ urlpatterns = [
     path("", views.dashboard_view, name="dashboard"),
 
     # --- Kayıt (Signup) ---
-    path("accounts/signup/", views.signup_view, name="signup"),
+    path("accounts/signup/", views.signup_view, name="signup"), # accounts/ öneki olmadan urls.py'de
 
     # --- Favori URL'leri (Veritabanı Tabanlı) ---
     path("favorite/toggle/", views.toggle_favorite, name="toggle_favorite"),
     path("favorites/", views.favorites_view, name="favorites_view"),
 
-    # --- YENİ: MangaDex API Arama ve Ekleme URL'leri ---
+    # --- MangaDex API Arama ve Ekleme URL'leri (GÜNCELLENDİ) ---
     path("manga/search-api/", views.manga_api_search_view, name="manga_api_search"),
-    # Arama sonuçları GET ile aynı view'da gösterilebilir veya ayrı bir URL olabilir.
-    # Şimdilik aynı view'da (manga_api_search_view) hem GET (form) hem POST (arama) yapısını kuralım.
-    path("manga/add-from-api/<uuid:mangadex_id>/", views.manga_add_from_api_view, name="manga_add_from_api"),
-    # ----------------------------------------------------
-    # --- YENİ: Webtoon için de benzerleri eklenebilir ---
-    # path("webtoon/search-api/", views.webtoon_api_search_view, name="webtoon_api_search"),
-    # path("webtoon/add-from-api/<uuid:mangadex_id>/", views.webtoon_add_from_api_view, name="webtoon_add_from_api"),
-    # ----------------------------------------------------
+    # Webtoon için API arama URL'si (aynı view'ı kullanıyor)
+    path("webtoon/search-api/", views.manga_api_search_view, name="webtoon_api_search"),
+    # Genel API'dan Ekleme URL'si (view adı ve path değişti)
+    path("add-from-mangadex/<uuid:mangadex_id>/", views.md_add_item_view, name="md_add_item"),
+    # Eski URL'leri kaldırdık
+    # ----------------------------------------------------------
 
     # --- Anime URL'leri ---
     path("anime/", views.anime_list_and_create, name="anime_list_view"),
