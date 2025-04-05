@@ -13,10 +13,9 @@ BASE_URL = settings.MANGADEX_API_URL
 def _make_request(endpoint, params=None):
     """MangaDex API'na güvenli GET isteği yapar."""
     url = f"{BASE_URL}/{endpoint}"
-    # Türkçe ve İngilizce dil tercihini başlıkta belirtelim
     headers = {
-        'User-Agent': 'DjangoListeApp/0.1 (Contact: YourEmail@example.com)', # Kendi iletişim bilginizi ekleyin
-        'Accept-Language': 'tr, en;q=0.9' # Önce Türkçe, sonra İngilizce tercih et
+        'User-Agent': 'DjangoListeApp/0.1 (Contact: YourEmail@example.com)',
+        'Accept-Language': 'tr, en;q=0.9'
     }
     try:
         # time.sleep(0.25) # Rate limit için gerekirse
@@ -50,31 +49,21 @@ def get_localized_text(data_dict, default_lang='en', preferred_lang='tr'):
        sonra da ilk bulduğunu döndürür."""
     if not isinstance(data_dict, dict):
         return None
-    # 1. Tercih edilen dil (örn: 'tr')
     text = data_dict.get(preferred_lang)
     if text: return text
-    # 2. Varsayılan dil (örn: 'en')
     text = data_dict.get(default_lang)
     if text: return text
-    # 3. Diğer diller (örn: 'ja-ro' gibi Romaji)
-    #    Basitlik adına ilk bulduğu değeri döndürebilir veya belirli bir sıra izleyebilir.
     for lang_code, value in data_dict.items():
-        # Belki Romaji ('ja-ro') gibi alternatifleri İngilizce'den sonra arayabiliriz
-        # if 'ja-ro' in lang_code: return value
-        if value: # İlk bulunan değeri al
-             return value
-    return None # Hiçbir şey bulunamadıysa
+        if value: return value
+    return None
 
-def search_manga(title: str, limit: int = 15): # Limiti biraz artırdık
-    """Verilen başlığa göre MangaDex'te manga/manhwa/manhua arar.
-       Türkçe detayları almaya öncelik verir.
-    """
+def search_manga(title: str, limit: int = 15):
+    """Verilen başlığa göre MangaDex'te manga/manhwa/manhua arar."""
     params = {
         'title': title,
         'limit': limit,
         'includes[]': ['cover_art', 'author', 'artist'],
-        'contentRating[]': ['safe', 'suggestive', 'erotica'] # Erotica'yı da ekleyelim mi? (Opsiyonel)
-        # 'availableTranslatedLanguage[]': ['tr'] # Bu sadece bölüm çevirisi olanları filtreler, metadata için gereksiz.
+        'contentRating[]': ['safe', 'suggestive', 'erotica']
     }
     data = _make_request("manga", params=params)
 
@@ -86,12 +75,9 @@ def search_manga(title: str, limit: int = 15): # Limiti biraz artırdık
         attributes = manga_data.get('attributes', {})
         relationships = manga_data.get('relationships', [])
 
-        # Başlık (Türkçe > İngilizce > İlk dil)
         manga_title = get_localized_text(attributes.get('title', {}), default_lang='en', preferred_lang='tr')
-        if not manga_title:
-             manga_title = f"ID: {manga_data['id']}" # Başlık hiç yoksa
+        if not manga_title: manga_title = f"ID: {manga_data['id']}"
 
-        # Kapak Resmi URL'si (Daha Güvenli Kontrol)
         cover_url = None
         cover_relation = next((rel for rel in relationships if rel.get('type') == 'cover_art'), None)
         if cover_relation and isinstance(cover_relation.get('attributes'), dict):
@@ -99,22 +85,19 @@ def search_manga(title: str, limit: int = 15): # Limiti biraz artırdık
              if filename:
                  cover_url = f"https://uploads.mangadex.org/covers/{manga_data['id']}/{filename}.512.jpg"
 
-        # Yazar/Çizer isimleri
         authors = [rel['attributes']['name'] for rel in relationships if rel.get('type') == 'author' and isinstance(rel.get('attributes'), dict) and rel['attributes'].get('name')]
         artists = [rel['attributes']['name'] for rel in relationships if rel.get('type') == 'artist' and isinstance(rel.get('attributes'), dict) and rel['attributes'].get('name')]
 
-        # Açıklama (Türkçe > İngilizce > İlk dil) - Kısa Snippet
         description = get_localized_text(attributes.get('description', {}), default_lang='en', preferred_lang='tr')
         description_snippet = (description[:200] + '...' if description and len(description) > 200 else description) if description else ""
 
-
         results.append({
-            'id': manga_data['id'], # UUID
+            'id': manga_data['id'],
             'title': manga_title,
             'description_snippet': description_snippet,
             'year': attributes.get('year'),
             'status': attributes.get('status'),
-            'cover_url': cover_url, # None olabilir
+            'cover_url': cover_url,
             'authors': ", ".join(authors),
             'artists': ", ".join(artists),
         })
@@ -123,13 +106,14 @@ def search_manga(title: str, limit: int = 15): # Limiti biraz artırdık
 def get_manga_details(mangadex_id: str):
     """Verilen MangaDex UUID'sine sahip öğenin detaylarını getirir."""
     params = {
-        'includes[]': ['cover_art', 'author', 'artist'] # Gerekirse başka ilişkiler de eklenebilir ('manga_relation', 'tag' vb.)
+        # DİKKAT: 'tag' BURAYA EKLENDİ!
+        'includes[]': ['cover_art', 'author', 'artist', 'tag']
     }
     data = _make_request(f"manga/{mangadex_id}", params=params)
 
     # --- DEBUG İÇİN PRINT (İsteğe Bağlı) ---
     # print("----- MangaDex API Ham Yanıtı (Detay) -----")
-    # print(json.dumps(data, indent=2, ensure_ascii=False)) # Türkçe karakterler için ensure_ascii=False
+    # print(json.dumps(data, indent=2, ensure_ascii=False))
     # print("-----------------------------------------")
     # --- DEBUG SONU ---
 
@@ -141,18 +125,18 @@ def get_manga_details(mangadex_id: str):
 
 def map_mangadex_data_to_dict(manga_data):
     """MangaDex'ten gelen detaylı veriyi Django formunu
-       doldurmak için bir sözlüğe dönüştürür (Türkçe öncelikli)."""
+       doldurmak için bir sözlüğe dönüştürür (Türkçe öncelikli ve tip tespiti ile)."""
     if not manga_data:
         return {}
 
     attributes = manga_data.get('attributes', {})
     relationships = manga_data.get('relationships', [])
 
-    # Başlık (Türkçe > İngilizce > İlk dil)
+    # Başlık
     title = get_localized_text(attributes.get('title', {}), default_lang='en', preferred_lang='tr')
     if not title: title = f"ID: {manga_data['id']}"
 
-    # Kapak (Daha Güvenli Kontrol)
+    # Kapak
     cover_url = None
     cover_relation = next((rel for rel in relationships if rel.get('type') == 'cover_art'), None)
     if cover_relation and isinstance(cover_relation.get('attributes'), dict):
@@ -165,35 +149,48 @@ def map_mangadex_data_to_dict(manga_data):
     artists = [rel['attributes']['name'] for rel in relationships if rel.get('type') == 'artist' and isinstance(rel.get('attributes'), dict) and rel['attributes'].get('name')]
     author_str = ", ".join(authors) if authors else ""
     artist_str = ", ".join(artists) if artists else ""
-    # Yazar ve çizer aynıysa ve çizer boş değilse, yine de gösterelim. Boşaltma mantığını kaldırdık.
-    # Kullanıcı formda kendisi düzenleyebilir.
 
-    # Açıklama (Türkçe > İngilizce > İlk dil)
+    # Açıklama
     description = get_localized_text(attributes.get('description', {}), default_lang='en', preferred_lang='tr') or ""
 
-    # Diğer potansiyel alanlar (şimdilik eklenmedi, isteğe göre eklenebilir)
-    # status = attributes.get('status')
-    # year = attributes.get('year')
-    # tags = [get_localized_text(t.get('attributes',{}).get('name',{}),'en','tr') for t in attributes.get('tags',[])]
-
-    # Toplam Bölüm/Cilt - API'dan güvenilir şekilde alınamıyor.
+    # Toplam Bölüm/Cilt
     total_chapters = None
     total_volumes = None
+
+    # --- DİKKAT: Tip Tespiti (Etiketlere Göre) BURADA ---
+    detected_type = 'MANGA' # Varsayılan
+    tags = attributes.get('tags', []) # API yanıtından etiketleri al
+    if isinstance(tags, list):
+        # Etiket isimlerini al (İngilizce isimlerine bakmak daha güvenilir)
+        tag_names_en = set() # Tekrarları önlemek için set kullanalım
+        for tag in tags:
+             if isinstance(tag.get('attributes'), dict):
+                 tag_name = tag['attributes'].get('name', {}).get('en')
+                 if tag_name:
+                      tag_names_en.add(tag_name.lower()) # Küçük harfe çevir
+
+        # "Webtoon" veya "Long Strip" etiketleri var mı kontrol et
+        if 'webtoon' in tag_names_en or 'long strip' in tag_names_en:
+            detected_type = 'WEBTOON'
+            # print(f"Webtoon tespit edildi: {manga_data['id']}") # DEBUG
+        # Alternatif: Format etiket grubu kontrolü (daha az güvenilir olabilir)
+        # elif any(t.get('attributes',{}).get('group') == 'format' and t.get('attributes',{}).get('name',{}).get('en','').lower() in ['webtoon', 'long strip'] for t in tags):
+        #     detected_type = 'WEBTOON'
+    # ----------------------------------------------------
 
     mapped_data = {
         'mangadex_id': manga_data['id'],
         'title': title,
-        'cover_image_url': cover_url, # None olabilir
+        'cover_image_url': cover_url,
         'author': author_str,
-        'artist': artist_str,       # Artık yazarla aynı olsa bile boşaltılmıyor
-        'notes': description,      # Açıklamayı notlara ekliyoruz
-        'total_chapters': total_chapters, # None
-        'total_volumes': total_volumes,   # None
-        # Eklenebilecek diğer alanlar...
-        # 'status': map_md_status(status), # Durum eşleştirme fonksiyonu yazılırsa
+        'artist': artist_str,
+        'notes': description,
+        'total_chapters': total_chapters,
+        'total_volumes': total_volumes,
+        'detected_type': detected_type, # <- TESPİT EDİLEN TİP EKLENDİ
     }
-
     return mapped_data
 
 # ----- Örnek Kullanım (Test Amaçlı) -----
-# (Aynı kalabilir)
+# if __name__ == '__main__':
+#     # ... (test kodları aynı kalabilir) ...
