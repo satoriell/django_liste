@@ -1,37 +1,36 @@
-{% extends 'tracker/base.html' %}
-{% load static %}
-{% comment %} Konum: tracker/templates/tracker/novel_api_search.html (Güncellendi: _api_search_result_card.html partial'ı kullanıldı) {% endcomment %}
+    {% extends 'tracker/base.html' %}
+    {% load static %}
+    {% comment %} Konum: tracker/templates/tracker/novel_api_search.html (Güncellendi: CSRF token eklendi) {% endcomment %}
 
-{% block title %}{{ search_title|default:"API ile Novel Ara" }} - Kişisel Liste{% endblock title %}
+    {% block title %}{{ search_title|default:"API ile Novel Ara" }} - Kişisel Liste{% endblock title %}
 
-{% block content %}
-     <h1 class="mb-4" style="color: var(--primary-color);" data-aos="fade-down"><i class="fas fa-search me-2"></i>{{ search_title|default:"Jikan API ile Novel Ara" }}</h1>
+    {% block content %}
+        <h1 class="mb-4" style="color: var(--primary-color);" data-aos="fade-down"><i class="fas fa-search me-2"></i>{{ search_title|default:"Jikan API ile Novel Ara" }}</h1>
 
-    {# Arama Formu #}
-    <div class="controls-container p-3 mb-4 border rounded shadow-sm" data-aos="fade-up">
-        <form method="post" action="{% url 'tracker:novel_api_search' %}">
-            {% csrf_token %}
-            <div class="input-group">
-                <input type="search" class="form-control" name="query" placeholder="{{ item_type_name|default:'Novel' }} başlığı girin..." value="{{ query|default:'' }}" aria-label="{{ item_type_name|default:'Novel' }} başlığı" required>
-                <button class="btn btn-primary" type="submit"><i class="fas fa-search me-1"></i>Ara</button>
-            </div>
-        </form>
-    </div>
+        {# Arama Formu #}
+        <div class="controls-container p-3 mb-4 border rounded shadow-sm" data-aos="fade-up">
+            <form method="post" action="{% url 'tracker:novel_api_search' %}">
+                {% csrf_token %} {# <-- EKLENDİ #}
+                <div class="input-group">
+                    <input type="search" class="form-control" name="query" placeholder="{{ item_type_name|default:'Novel' }} başlığı girin..." value="{{ query|default:'' }}" aria-label="{{ item_type_name|default:'Novel' }} başlığı" required>
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-search me-1"></i>Ara</button>
+                </div>
+            </form>
+        </div>
 
-    {# Arama Sonuçları #}
-    {% if search_results is not None %}
-        <hr data-aos="fade">
-        <h4 class="mb-3" data-aos="fade-up">Arama Sonuçları {% if query %}({{ query|truncatechars:30 }}){% endif %}</h4>
+        {# Arama Sonuçları #}
+        {% if search_results is not None %}
+            <hr data-aos="fade">
+            <h4 class="mb-3" data-aos="fade-up">Arama Sonuçları {% if query %}({{ query|truncatechars:30 }}){% endif %}</h4>
 
-        {% if search_results %}
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-                {% for result in search_results %}
-                    {# --- Partial Kullanımı --- #}
-                    {% include 'tracker/partials/_api_search_result_card.html' with result=result add_item_url_name=add_item_url_name existing_ids_in_db=existing_ids_in_db item_type_name=item_type_name %}
-                {% endfor %}
-            </div>
-         {% elif query %}
-            <div class="alert alert-warning" role="alert" data-aos="fade-in">"{{ query }}" için Jikan (MAL) üzerinde Light Novel sonucu bulunamadı.</div>
+            {% if search_results %}
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                    {% for result in search_results %}
+                        {% include 'tracker/partials/_api_search_result_card.html' with result=result add_item_url_name=add_item_url_name existing_ids_in_db=existing_ids_in_db item_type_name=item_type_name %}
+                    {% endfor %}
+                </div>
+            {% elif query %}
+                <div class="alert alert-warning" role="alert" data-aos="fade-in">"{{ query }}" için Jikan (MAL) üzerinde Light Novel sonucu bulunamadı.</div>
+            {% endif %}
         {% endif %}
-    {% endif %}
-{% endblock content %}
+    {% endblock content %}

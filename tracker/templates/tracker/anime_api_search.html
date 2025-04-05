@@ -1,6 +1,6 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
-{% comment %} Konum: tracker/templates/tracker/anime_api_search.html (Güncellendi: _api_search_result_card.html partial'ı kullanıldı) {% endcomment %}
+{% comment %} Konum: tracker/templates/tracker/anime_api_search.html (Güncellendi: CSRF token eklendi) {% endcomment %}
 
 {% block title %}{{ search_title|default:"API ile Anime Ara" }} - Kişisel Liste{% endblock title %}
 
@@ -10,7 +10,7 @@
     {# Arama Formu #}
     <div class="controls-container p-3 mb-4 border rounded shadow-sm" data-aos="fade-up">
         <form method="post" action="{% url 'tracker:anime_api_search' %}">
-            {% csrf_token %}
+            {% csrf_token %} {# <-- EKLENDİ #}
             <div class="input-group">
                 <input type="search" class="form-control" name="query" placeholder="{{ item_type_name|default:'Anime' }} başlığı girin..." value="{{ query|default:'' }}" aria-label="{{ item_type_name|default:'Anime' }} başlığı" required>
                 <button class="btn btn-primary" type="submit"><i class="fas fa-search me-1"></i>Ara</button>
@@ -26,7 +26,6 @@
         {% if search_results %}
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
                 {% for result in search_results %}
-                    {# --- Partial Kullanımı --- #}
                     {% include 'tracker/partials/_api_search_result_card.html' with result=result add_item_url_name=add_item_url_name existing_ids_in_db=existing_ids_in_db item_type_name=item_type_name %}
                 {% endfor %}
             </div>
